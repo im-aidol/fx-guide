@@ -5,8 +5,8 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const ITEMS = [
-  { href: "/", label: "홈 (대시보드)", icon: "🏠" },
-  { href: "/simulator", label: "송금 흐름 도우미", icon: "🧭" },
+  { href: "/", label: "홈", icon: "🏠" },
+  { href: "/simulator", label: "당발 송금 도우미", icon: "📤" },
   { href: "/incoming", label: "타발 송금 안내", icon: "📥" },
   { href: "/guide", label: "업무별 가이드", icon: "📚" },
   { href: "/faq", label: "FAQ", icon: "❓" },
@@ -20,7 +20,7 @@ export function Sidebar() {
   return (
     <>
       {/* 모바일 헤더 */}
-      <header className="md:hidden border-b border-border bg-white sticky top-0 z-30 flex items-center justify-between px-4 h-14">
+      <header className="md:hidden print:hidden border-b border-border bg-white sticky top-0 z-30 flex items-center justify-between px-4 h-14">
         <Link
           href="/"
           className="font-bold text-primary text-base"
@@ -40,7 +40,7 @@ export function Sidebar() {
       {/* 모바일 backdrop */}
       {open && (
         <div
-          className="md:hidden fixed inset-0 top-14 bg-charcoal/30 z-20"
+          className="md:hidden print:hidden fixed inset-0 top-14 bg-charcoal/30 z-20"
           onClick={() => setOpen(false)}
         />
       )}
@@ -48,7 +48,7 @@ export function Sidebar() {
       {/* 사이드바 본체 */}
       <aside
         className={[
-          "bg-white border-r border-border z-30 flex flex-col",
+          "bg-white border-r border-border z-30 flex flex-col print:hidden",
           // 모바일: fixed slide-in (헤더 14h 아래)
           "fixed top-14 left-0 w-64 h-[calc(100vh-3.5rem)]",
           // 데스크톱: sticky 사이드바 (모바일 스타일을 덮어씀)

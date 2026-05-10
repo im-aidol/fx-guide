@@ -165,12 +165,12 @@ function QuickStartCard() {
       className="bg-primary text-white rounded-xl p-5 hover:bg-primary-dark transition group flex flex-col"
     >
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-lg">🧭</span>
+        <span className="text-lg">📤</span>
         <span className="text-xs uppercase tracking-wide opacity-90">
-          가장 자주 쓰는 도구
+          당발 송금 (한국 → 해외)
         </span>
       </div>
-      <h3 className="text-xl font-bold mb-2">송금 흐름 도우미</h3>
+      <h3 className="text-xl font-bold mb-2">당발 송금 도우미</h3>
       <p className="text-sm opacity-90 flex-1 leading-relaxed">
         고객이 어떤 사유로 보내는지 모르더라도, 클릭으로 좁혀가며 거래코드·한도·서류·안내멘트까지 한 번에.
       </p>
@@ -190,33 +190,42 @@ function IncomingCard() {
       <div className="flex items-center gap-2 mb-2">
         <span className="text-lg">📥</span>
         <span className="text-xs uppercase tracking-wide text-charcoal-soft">
-          타발 송금 (받기)
+          타발 송금 (해외 → 한국)
         </span>
       </div>
-      <h3 className="font-bold mb-3">iM뱅크 수취 정보</h3>
-      <dl className="space-y-2 text-sm flex-1">
-        <div className="flex justify-between gap-2">
-          <dt className="text-charcoal-soft">SWIFT/BIC</dt>
-          <dd className="font-mono font-bold">DAEBKR22</dd>
+      <h3 className="font-bold mb-4">iM뱅크 수취 정보</h3>
+
+      {/* SWIFT/BIC: 가장 자주 묻는 정보, 크게 강조 */}
+      <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mb-3">
+        <p className="text-[10px] text-charcoal-soft uppercase tracking-wide">
+          SWIFT / BIC
+        </p>
+        <p className="text-2xl font-bold font-mono tracking-wider text-charcoal mt-0.5">
+          DAEBKR22
+        </p>
+      </div>
+
+      {/* 부가 정보: 작게 stack */}
+      <dl className="space-y-2 text-xs flex-1">
+        <div>
+          <dt className="text-charcoal-soft uppercase tracking-wide text-[10px]">
+            Bank Name
+          </dt>
+          <dd className="font-mono mt-0.5">iM Bank (FORMERLY DAEGU BANK)</dd>
         </div>
         <div>
-          <dt className="text-charcoal-soft text-xs">Bank Name</dt>
-          <dd className="text-xs font-mono mt-0.5">
-            iM Bank (FORMERLY DAEGU BANK)
-          </dd>
-        </div>
-        <div>
-          <dt className="text-charcoal-soft text-xs">Address</dt>
-          <dd className="text-xs font-mono mt-0.5 leading-relaxed">
-            2310, DALGUBEOL-DAERO,
-            <br />
-            SUSEONG-GU, DAEGU, SOUTH KOREA
+          <dt className="text-charcoal-soft uppercase tracking-wide text-[10px]">
+            Address
+          </dt>
+          <dd className="font-mono mt-0.5 leading-relaxed">
+            2310, DALGUBEOL-DAERO, SUSEONG-GU, DAEGU, SOUTH KOREA
           </dd>
         </div>
       </dl>
+
       <Link
         href="/incoming"
-        className="text-xs text-primary hover:text-primary-dark mt-3 inline-block font-medium"
+        className="text-xs text-primary hover:text-primary-dark mt-4 inline-block font-medium"
       >
         고객 정보 입력 + 인쇄 →
       </Link>
