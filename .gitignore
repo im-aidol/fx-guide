@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 외환규정 변환 임시 파일 (변환 부산물)
+**/_archive_*/

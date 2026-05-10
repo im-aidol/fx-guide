@@ -5,7 +5,7 @@ import { Navigation } from "@/components/Navigation";
 export const metadata: Metadata = {
   title: "외환 길잡이 | iM뱅크 영업점 가이드",
   description:
-    "iM뱅크 영업점 직원용 외환 송금 가이드. 외국환거래규정(2025.2.10. 시행) 기준.",
+    "iM뱅크 영업점 직원용 외환 송금 가이드. 외국환거래규정(2026.3.30. 시행) 기준.",
 };
 
 export default function RootLayout({

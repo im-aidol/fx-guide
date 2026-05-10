@@ -33,7 +33,7 @@ export default function HomePage() {
         </p>
         <h1 className="text-4xl font-bold mb-4">외환 길잡이</h1>
         <p className="text-charcoal-soft text-lg max-w-2xl">
-          외국환거래규정(기획재정부고시 제2025-4호, 시행 2025.2.10.) 기준.
+          외국환거래규정(재정경제부고시 제2026-69호, 시행 2026.3.30.) 기준.
           창구에서 외환 송금 거래를 빠르게 분류하고 응대 기준을 잡을 수 있도록 돕습니다.
         </p>
       </section>
