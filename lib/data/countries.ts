@@ -20,11 +20,13 @@ export const COUNTRIES: Country[] = [
     ibanRequired: false,
     routingType: "ABA",
     routingDigits: 9,
-    purposeCodeRequired: false,
+    purposeCodeRequired: true, // iM뱅크 자료: 송금사유 필수 기재국
     remarks: [
       "ABA 라우팅 번호 9자리 필수",
       "수취인 영문 이름·영문 주소·ZIP code 필수",
+      "송금사유 필수 기재 (iM뱅크 안내)",
       "OFAC 제재대상자 점검 (모든 미국 송금)",
+      "iM뱅크 해외송금 Lite (모바일 한정): ACH Routing 9자리 사용, ABA 입력 시 처리 불가",
     ],
   },
   {
@@ -58,7 +60,8 @@ export const COUNTRIES: Country[] = [
     routingType: "JapaneseBank",
     purposeCodeRequired: false,
     remarks: [
-      "은행 코드 4자리 + 지점 코드 3자리 + 계좌 7자리",
+      "지점명 또는 지점코드 3자리 (iM뱅크 안내)",
+      "은행 코드 4자리 + 계좌번호 7자리도 필요",
       "수취인 카타카나 또는 영문명",
       "SWIFT BIC 필요",
     ],
@@ -317,7 +320,8 @@ export const COUNTRIES: Country[] = [
     ibanRequired: true,
     ibanLength: 24,
     routingType: "SWIFT_only",
-    remarks: ["IBAN 24자리 (SA 시작)"],
+    purposeCodeRequired: true, // iM뱅크 자료
+    remarks: ["IBAN 24자리 (SA 시작)", "송금사유 필수 기재 (iM뱅크 안내)"],
   },
   {
     id: "ae",
@@ -330,7 +334,12 @@ export const COUNTRIES: Country[] = [
     ibanRequired: true,
     ibanLength: 23,
     routingType: "SWIFT_only",
-    remarks: ["IBAN 23자리 (AE 시작)"],
+    purposeCodeRequired: true, // iM뱅크 자료
+    remarks: [
+      "IBAN 23자리 (AE 시작)",
+      "POP CODE 3자리 필요 (iM뱅크 안내)",
+      "송금사유 필수 기재 (iM뱅크 안내)",
+    ],
   },
   {
     id: "tr",

@@ -4,8 +4,13 @@ const FEATURES = [
   {
     href: "/simulator",
     title: "송금 흐름 도우미",
-    desc: "국가·금액·사유·신분·수취인 입력으로 거래코드/한도/서류/안내멘트 자동 생성",
+    desc: "국가·금액·사유 따라 거래코드/한도/서류/안내멘트 자동 생성. 환율 자동 환산",
     badge: "메인",
+  },
+  {
+    href: "/incoming",
+    title: "타발 송금 안내",
+    desc: "iM뱅크 SWIFT/BIC + 영문 은행명·주소. 수취인 정보 입력 후 인쇄해 고객에게",
   },
   {
     href: "/guide",

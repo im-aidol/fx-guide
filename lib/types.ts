@@ -196,12 +196,17 @@ export type GlossaryTerm = {
 // ============================================================
 
 export const AMOUNT_THRESHOLDS = {
-  bankDesignation: 5_000, // 거래외국환은행 지정
-  internetLimit: 10_000, // 인터넷뱅킹 한도
-  thirdPartyReport: 5_000, // 제3자 지급 신고
-  customsReport: 10_000, // 관세청 통보
-  taxReport: 10_000, // 국세청 통보
-  fssReport: 50_000, // 금감원 통보 — ⚠️ 4-8조③1호 본문은 미화 1만불. 50_000 근거 재확인 필요
-  noProofLimit: 100_000, // 거주자 미증빙 연간 한도
-  foreignerNoProof: 50_000, // 외국인 미증빙 연간 한도
+  // ─── 외환규정 본문 직접 인용 ───
+  customsReport: 10_000, // 관세청 통보 — 4-8조 ②5·6호
+  taxReport: 10_000, // 국세청 통보 — 4-8조 ①1호
+  fssReport: 10_000, // 금감원 통보 — 4-8조 ③1호 (이전 50_000은 근거 불명, 본문 기준 정정)
+
+  // ─── iM뱅크 모바일앱 안내 자료 (1차) ─── (영업점 기준 검증 필요)
+  noProofLimit: 100_000, // 거주자 무증빙 해외송금 연간 한도 (1.1~12.31) — 외환규정 4-3조 ①1호
+  foreignerNoProof: 50_000, // 외국인·비거주자 국내소득송금 연간 한도
+
+  // ─── 출처 미명확 (검증 필요) ───
+  bankDesignation: 5_000, // 거래외국환은행 지정 — ⚠️ 정확한 외환규정 출처 검증 필요
+  internetLimit: 10_000, // 인터넷뱅킹 한도 — ⚠️ iM뱅크 자체 한도 검증 필요
+  thirdPartyReport: 5_000, // 제3자 지급 신고 — ⚠️ 외환규정 출처 검증 필요
 } as const;
