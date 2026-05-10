@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 외환 길잡이 (FX Desk Guide)
 
-## Getting Started
+iM뱅크 영업점 직원용 외환 송금 가이드.
+**1차 기준**: 외국환거래규정 (기획재정부고시 제2025-4호, 시행 2025.2.10.)
 
-First, run the development server:
+> ⚠️ iM뱅크 내부용 도구입니다. **저장소는 private 유지**.
+
+## 시작하기
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+→ http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 기술 스택
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js 16** (App Router)
+- **TypeScript**
+- **Tailwind CSS v4**
+- **Vercel** 배포
 
-## Learn More
+## 프로젝트 구조
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/                  # 라우트 (파일명 = URL)
+├── page.tsx          # /
+├── simulator/        # /simulator (메인 도구)
+├── guide/            # /guide
+├── faq/              # /faq
+└── glossary/         # /glossary
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+components/           # 공유 UI
+lib/
+├── types.ts          # 도메인 타입
+└── data/             # 정적 데이터
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 기여 가이드
 
-## Deploy on Vercel
+- 작업 전 [CLAUDE.md](./CLAUDE.md) 필독 (외환규정 준수사항·작업 분담)
+- 원본 코드는 `../fx/` 폴더에 보존 (v6.0, 마이그레이션 참고용)
+- 외환규정/거래코드/한도는 임의 변경 금지
+- 핀테크 송금 업체(한패스, 센트비 등) 언급 금지
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 명령어
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run dev     # 개발 서버
+npm run build   # 프로덕션 빌드
+npm run lint    # ESLint
+npx tsc --noEmit  # 타입 검사
+```
+
+## 면책
+
+본 자료는 영업점 직원 참고용. 실제 거래 처리 시 본부 외환부서 또는 외환규정 원문 확인 필수.
