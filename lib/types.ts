@@ -182,12 +182,30 @@ export type Faq = {
   category: string;
   question: string;
   answer: string;
+  source?: string; // 1차 출처 (예: "외환규정 4-3조 ①1호" / "iM뱅크 모바일앱 안내")
+  keywords?: string[];
 };
+
+export type GlossaryCategory =
+  | "거주성"     // 거주자, 비거주자, 재외동포 등
+  | "거래"       // 경상거래, 자본거래, 본지사간거래 등
+  | "지급수단"   // 지급수단, 신용카드, 여행자카드 등
+  | "환율"       // 매매기준율, 위안화 등
+  | "신고제출"   // 신고, 신고수리, 인정된 거래 등
+  | "외국환은행" // 외국환은행, 거래외국환은행, 지정거래외국환은행
+  | "기관"       // 기관투자가, 외환동시결제시스템, 공공기관 등
+  | "파생상품"   // 신용파생, 외환파생, 장내·장외파생, 외환증거금
+  | "송금경비"   // 해외여행경비, 해외이주비, 해외여행자(체재자/유학생/일반)
+  | "현지금융"   // 현지금융, 현지법인, 현지법인금융기관, LCT 직거래은행
+  | "수입금융"   // 내국수입유산스, 수입인수금융
+  | "기타";
 
 export type GlossaryTerm = {
   id: string;
   term: string;
   definition: string;
+  category: GlossaryCategory;
+  source?: string; // 1차 출처 (예: "외환규정 1-2조 29호")
   related?: string[];
 };
 
