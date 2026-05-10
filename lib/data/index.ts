@@ -1,7 +1,11 @@
 // fx/data.js → TypeScript 마이그레이션 진입점
 // 4명이 영역 나눠 옮길 수 있도록 파일 분리
 
-export { COUNTRIES } from "./countries";
+export {
+  COUNTRIES,
+  IM_BANK_SENDABLE_CURRENCIES,
+  getSendableCurrencies,
+} from "./countries";
 export { PURPOSES } from "./purposes";
 export { GLOSSARY } from "./glossary";
 export { FAQS } from "./faqs";

@@ -1,5 +1,41 @@
 import type { Country } from "../types";
 
+// iM뱅크 해외계좌송금에서 송금 가능한 17종 통화 (출처: iM뱅크 모바일앱 안내).
+// 이 목록에 없는 통화는 USD로만 송금 가능 (예: 중국 CNY/베트남 VND/인도 INR/멕시코 MXN 등).
+export const IM_BANK_SENDABLE_CURRENCIES = [
+  "USD",
+  "JPY",
+  "EUR",
+  "AUD",
+  "CAD",
+  "GBP",
+  "CHF",
+  "HKD",
+  "SEK",
+  "DKK",
+  "NOK",
+  "SAR",
+  "KWD",
+  "SGD",
+  "NZD",
+  "THB",
+  "IDR",
+] as const;
+
+/** 어떤 나라에 어떤 통화로 송금할 수 있는지 반환. 자국 통화가 가능하면 [자국, USD], 아니면 [USD] 만. */
+export function getSendableCurrencies(country: Country): string[] {
+  const result: string[] = [];
+  if (
+    country.currency &&
+    country.currency !== "USD" &&
+    (IM_BANK_SENDABLE_CURRENCIES as readonly string[]).includes(country.currency)
+  ) {
+    result.push(country.currency);
+  }
+  result.push("USD");
+  return result;
+}
+
 // ⚠️ 잠정 데이터 (2026-05-10 Claude 작성, 외환 일반 상식 기반)
 // IBAN 자릿수·라우팅 코드·사유코드 필수국 등은 영업점 실제 처리 기준으로 검증 필요.
 // 4명이 분담해서 채워나갈 영역.
