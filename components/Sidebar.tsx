@@ -49,11 +49,10 @@ export function Sidebar() {
       <aside
         className={[
           "bg-white border-r border-border z-30 flex flex-col",
-          // 데스크톱: sticky 사이드바
+          // 모바일: fixed slide-in (헤더 14h 아래)
+          "fixed top-14 left-0 w-64 h-[calc(100vh-3.5rem)]",
+          // 데스크톱: sticky 사이드바 (모바일 스타일을 덮어씀)
           "md:sticky md:top-0 md:h-screen md:w-60 md:shrink-0",
-          // 모바일: 햄버거 토글로 slide-in
-          "fixed md:fixed-none top-14 md:top-0 left-0",
-          "w-64 h-[calc(100vh-3.5rem)] md:h-screen",
           "transition-transform",
           open ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         ].join(" ")}
