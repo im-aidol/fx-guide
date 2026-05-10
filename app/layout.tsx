@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Navigation } from "@/components/Navigation";
+import { Sidebar } from "@/components/Sidebar";
 
 export const metadata: Metadata = {
   title: "외환 길잡이 | iM뱅크 영업점 가이드",
@@ -21,9 +21,11 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-offwhite text-charcoal">
-        <Navigation />
-        <main className="flex-1">{children}</main>
+      <body className="min-h-full bg-offwhite text-charcoal">
+        <div className="md:flex md:min-h-screen">
+          <Sidebar />
+          <main className="flex-1 min-w-0">{children}</main>
+        </div>
       </body>
     </html>
   );
