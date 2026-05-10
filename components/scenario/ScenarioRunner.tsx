@@ -1,13 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type {
+  Country,
   FlowResult,
   Scenario,
   ScenarioNode,
   ScenarioOption,
 } from "@/lib/types";
 import { COUNTRIES } from "@/lib/data";
+import {
+  fetchUsdRates,
+  localToUsd,
+  type UsdRates,
+} from "@/lib/exchange-rates";
 import { CountryPicker } from "./CountryPicker";
 
 type Props = { scenario: Scenario };
@@ -24,6 +30,15 @@ export function ScenarioRunner({ scenario }: Props) {
     history: [],
     inputs: {},
   });
+
+  const [rates, setRates] = useState<UsdRates | null>(null);
+  const [ratesError, setRatesError] = useState<boolean>(false);
+
+  useEffect(() => {
+    fetchUsdRates()
+      .then(setRates)
+      .catch(() => setRatesError(true));
+  }, []);
 
   const node = scenario.nodes[state.currentNodeId];
 
@@ -56,8 +71,37 @@ export function ScenarioRunner({ scenario }: Props) {
   };
 
   const setInput = (key: string, value: string | number) => {
-    setState((s) => ({ ...s, inputs: { ...s.inputs, [key]: value } }));
+    setState((s) => {
+      const newInputs: Record<string, string | number> = {
+        ...s.inputs,
+        [key]: value,
+      };
+
+      // 나라 변경 시 금액 초기화 (현지 통화가 바뀌므로)
+      if (key === "countryId") {
+        delete newInputs.amountLocal;
+        delete newInputs.amountUsd;
+      }
+
+      // amountLocal 입력 시 USD 자동 환산
+      if (key === "amountLocal" && typeof value === "number" && !isNaN(value)) {
+        const countryId = (newInputs.countryId as string) || (s.inputs.countryId as string);
+        const country = COUNTRIES.find((c) => c.id === countryId);
+        if (country?.currency === "USD") {
+          newInputs.amountUsd = value;
+        } else if (country?.currency && rates) {
+          const usd = localToUsd(value, country.currency, rates);
+          if (usd !== null) newInputs.amountUsd = usd;
+        }
+      }
+
+      return { ...s, inputs: newInputs };
+    });
   };
+
+  const selectedCountry = COUNTRIES.find(
+    (c) => c.id === (state.inputs.countryId as string),
+  );
 
   return (
     <div className="grid md:grid-cols-[1fr_280px] gap-6 items-start">
@@ -81,6 +125,9 @@ export function ScenarioRunner({ scenario }: Props) {
             node={node}
             inputs={state.inputs}
             setInput={setInput}
+            country={selectedCountry}
+            rates={rates}
+            ratesError={ratesError}
             onNext={() => {
               const firstNext = node.options?.[0]?.next;
               if (firstNext) goTo(firstNext);
@@ -116,6 +163,8 @@ export function ScenarioRunner({ scenario }: Props) {
 
       <SummarySidebar
         inputs={state.inputs}
+        country={selectedCountry}
+        rates={rates}
         steps={state.history.length + 1}
         onReset={reset}
       />
@@ -127,11 +176,17 @@ function InputNodeView({
   node,
   inputs,
   setInput,
+  country,
+  rates,
+  ratesError,
   onNext,
 }: {
   node: ScenarioNode;
   inputs: Record<string, string | number>;
   setInput: (key: string, value: string | number) => void;
+  country: Country | undefined;
+  rates: UsdRates | null;
+  ratesError: boolean;
   onNext: () => void;
 }) {
   const canProceed = node.inputs?.every((f) => {
@@ -148,6 +203,15 @@ function InputNodeView({
             <CountryPicker
               value={(inputs[f.key] as string) ?? ""}
               onChange={(id) => setInput(f.key, id)}
+            />
+          ) : f.type === "amount" ? (
+            <AmountInput
+              fieldKey={f.key}
+              inputs={inputs}
+              setInput={setInput}
+              country={country}
+              rates={rates}
+              ratesError={ratesError}
             />
           ) : f.type === "amountUsd" ? (
             <div className="flex items-center gap-2">
@@ -186,6 +250,129 @@ function InputNodeView({
       >
         다음 →
       </button>
+    </div>
+  );
+}
+
+function AmountInput({
+  fieldKey,
+  inputs,
+  setInput,
+  country,
+  rates,
+  ratesError,
+}: {
+  fieldKey: string;
+  inputs: Record<string, string | number>;
+  setInput: (key: string, value: string | number) => void;
+  country: Country | undefined;
+  rates: UsdRates | null;
+  ratesError: boolean;
+}) {
+  const currency = country?.currency;
+  const amountLocal = inputs[fieldKey];
+  const amountUsd = inputs.amountUsd as number | undefined;
+
+  const placeholder =
+    currency === "VND"
+      ? "예: 5000000"
+      : currency === "JPY"
+        ? "예: 100000"
+        : currency === "IDR"
+          ? "예: 5000000"
+          : "예: 3000";
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <input
+          type="number"
+          min={0}
+          value={amountLocal === undefined ? "" : (amountLocal as number)}
+          onChange={(e) =>
+            setInput(
+              fieldKey,
+              e.target.value === "" ? "" : Number(e.target.value),
+            )
+          }
+          placeholder={placeholder}
+          disabled={!country}
+          className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary disabled:bg-offwhite disabled:cursor-not-allowed"
+        />
+        <span className="text-charcoal-soft text-sm font-medium whitespace-nowrap min-w-[3rem] text-center border border-border rounded-md px-2 py-1.5 bg-offwhite">
+          {currency || "—"}
+        </span>
+      </div>
+
+      {!country ? (
+        <p className="text-xs text-warn">⚠️ 받는 나라를 먼저 선택하세요.</p>
+      ) : !currency ? (
+        <p className="text-xs text-warn">
+          ⚠️ {country.name} 통화 정보 없음 — USD 환산 직접 확인 필요
+        </p>
+      ) : (
+        <AmountFooter
+          currency={currency}
+          amountLocal={amountLocal}
+          amountUsd={amountUsd}
+          rates={rates}
+          ratesError={ratesError}
+        />
+      )}
+    </div>
+  );
+}
+
+function AmountFooter({
+  currency,
+  amountLocal,
+  amountUsd,
+  rates,
+  ratesError,
+}: {
+  currency: string;
+  amountLocal: string | number | undefined;
+  amountUsd: number | undefined;
+  rates: UsdRates | null;
+  ratesError: boolean;
+}) {
+  const isUsd = currency === "USD";
+  const rate = rates?.rates[currency.toLowerCase()];
+
+  return (
+    <div className="text-xs bg-offwhite border border-border rounded-md px-3 py-2 space-y-0.5">
+      {isUsd ? (
+        <p className="text-charcoal-soft">USD 직접 입력</p>
+      ) : ratesError ? (
+        <p className="text-warn">
+          ⚠️ 환율 가져오기 실패 — USD 환산은 직접 계산 필요
+        </p>
+      ) : !rates ? (
+        <p className="text-charcoal-soft">환율 가져오는 중…</p>
+      ) : amountLocal === "" || amountLocal === undefined ? (
+        <p className="text-charcoal-soft">
+          금액 입력 시 USD 환산 자동 표시 · 환율 1 USD ={" "}
+          {rate?.toLocaleString()} {currency} ({rates.date} 갱신)
+        </p>
+      ) : amountUsd === undefined ? (
+        <p className="text-warn">⚠️ 환산 불가</p>
+      ) : (
+        <>
+          <p className="text-charcoal font-semibold">
+            ≈ USD{" "}
+            {amountUsd.toLocaleString(undefined, {
+              maximumFractionDigits: 2,
+            })}
+          </p>
+          <p className="text-charcoal-soft">
+            환율 1 USD = {rate?.toLocaleString()} {currency} ({rates.date}{" "}
+            갱신)
+          </p>
+          <p className="text-[10px] text-charcoal-soft mt-1">
+            ⚠️ 참고용 환율. 실제 거래는 iM뱅크 매매기준율 적용
+          </p>
+        </>
+      )}
     </div>
   );
 }
@@ -329,16 +516,21 @@ function Section({
 
 function SummarySidebar({
   inputs,
+  country,
+  rates,
   steps,
   onReset,
 }: {
   inputs: Record<string, string | number>;
+  country: Country | undefined;
+  rates: UsdRates | null;
   steps: number;
   onReset: () => void;
 }) {
-  const countryId = inputs.countryId as string | undefined;
-  const amount = inputs.amountUsd as number | undefined;
-  const country = COUNTRIES.find((c) => c.id === countryId);
+  const amountLocal = inputs.amountLocal as number | undefined;
+  const amountUsd = inputs.amountUsd as number | undefined;
+  const currency = country?.currency;
+
   return (
     <aside className="bg-white border border-border rounded-xl p-4 md:sticky md:top-20">
       <h3 className="text-xs font-medium text-charcoal-soft mb-3 tracking-wide">
@@ -351,17 +543,30 @@ function SummarySidebar({
           value={country ? `${country.flag} ${country.name}` : "—"}
         />
         <Row
-          label="금액"
+          label="현지 금액"
           value={
-            amount !== undefined
-              ? `USD ${Number(amount).toLocaleString()}`
+            amountLocal !== undefined && currency
+              ? `${Number(amountLocal).toLocaleString()} ${currency}`
+              : "—"
+          }
+        />
+        <Row
+          label="USD 환산"
+          value={
+            amountUsd !== undefined
+              ? `USD ${amountUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}`
               : "—"
           }
         />
       </dl>
+      {rates && (
+        <p className="text-[10px] text-charcoal-soft mt-3 pt-3 border-t border-border">
+          환율 {rates.date} 기준 · 참고용
+        </p>
+      )}
       <button
         onClick={onReset}
-        className="mt-4 w-full text-xs text-charcoal-soft hover:text-primary py-2 border-t border-border pt-3"
+        className="mt-3 w-full text-xs text-charcoal-soft hover:text-primary py-2 border-t border-border pt-3"
       >
         상담 처음부터
       </button>

@@ -29,7 +29,7 @@ export const REMITTANCE_SCENARIO: Scenario = {
       hint: "고객의 첫 마디에서 자연스럽게 받아 적기. 거주성·국적은 KYC에서 자동 확인됨.",
       inputs: [
         { key: "countryId", label: "받는 나라", type: "country" },
-        { key: "amountUsd", label: "금액 (USD 환산)", type: "amountUsd" },
+        { key: "amountLocal", label: "금액", type: "amount" },
       ],
       options: [{ id: "next", label: "다음", next: "purpose-entry" }],
     },

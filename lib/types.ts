@@ -75,6 +75,8 @@ export type Country = {
   routingDigits?: number;
   purposeCodeRequired?: boolean;   // 현지 송금사유 코드 필수 여부
 
+  currency?: string; // ISO 4217 통화 코드 (USD, KRW, VND, EUR 등) — 환율 환산용
+
   remarks?: string[]; // 직원 안내용 자유 메모
   notes?: string[];   // (legacy — 기존 호환)
 };
@@ -138,7 +140,9 @@ export type ScenarioNodeType = "input" | "select" | "result";
 export type ScenarioInputField = {
   key: string; // FlowInput의 키 또는 자유 입력
   label: string;
-  type: "country" | "amountUsd" | "residence" | "text";
+  type: "country" | "amountUsd" | "amount" | "residence" | "text";
+  // "amount" — 현지 통화 입력 + USD 자동 환산 (countryId 필요)
+  // "amountUsd" — USD 직접 입력 (legacy)
   hint?: string;
 };
 
