@@ -19,7 +19,7 @@ export default function ReceiveGuidePage() {
         </p>
       </header>
 
-      {/* 가장 자주 묻는 정보 */}
+      {/* iM 수취 정보 */}
       <section className="bg-primary/5 border border-primary/20 rounded-xl p-5 mb-4">
         <div className="flex items-baseline justify-between mb-3">
           <h2 className="font-bold">iM뱅크 수취 정보</h2>
@@ -86,23 +86,46 @@ export default function ReceiveGuidePage() {
         </p>
       </section>
 
-      {/* WU 수령 */}
+      {/* WU 수령 — 약관 본문 반영 */}
       <section className="bg-white border border-border rounded-xl p-5 mb-4">
         <h2 className="font-bold mb-3">웨스턴유니온 (WU) 수령</h2>
-        <ul className="space-y-2 text-sm text-charcoal">
-          <li>
-            <strong>MTCN</strong> (Money Transfer Control Number) — 송금자가
-            알려주는 추적번호 필수
-          </li>
-          <li>수취 시 신분증 + 여권/주민번호 등 본인 확인 필수</li>
-          <li>수취통화: KRW 또는 USD 선택</li>
-          <li>송금인 이름·성·송금국가 사전 확인</li>
-          <li>18세 이하는 수취 불가 (WU 정책)</li>
-        </ul>
+        <dl className="space-y-2 text-sm mb-3">
+          <Row
+            label="수취 한도"
+            value="건당 USD 7,000 (송금 한도도 동일 — 국가별 변경 가능)"
+          />
+          <Row
+            label="필수 제시"
+            value="신분증 + MTCN (Money Transfer Control Number)"
+          />
+          <Row
+            label="수취 통화"
+            value="KRW 또는 USD (송금인이 선택한 통화와 다를 시 추가 비용·환율 차 발생 가능)"
+          />
+          <Row
+            label="송금 전달 시간"
+            value="통상 수분 이내 (AML/OFAC/EU 제재 점검 시 지연 가능)"
+          />
+          <Row
+            label="환급"
+            value="송금일로부터 45일 이내 미지급 시 서면 요청으로 환급 — 환급 시점 환율 적용"
+          />
+          <Row label="연령 제한" value="18세 이하 수취 불가" />
+        </dl>
+        <div className="bg-offwhite border border-border rounded-md p-3 text-xs text-charcoal-soft">
+          <p className="font-medium text-charcoal mb-1">⚠️ AML 점검 (WU 약관 3조)</p>
+          <p>
+            모든 WU 거래는 EU·OFAC 제재 리스트 자동 점검 대상. 자금세탁 개연성
+            확인 시 추가 정보·신분증 요구로 거래 지연 가능.
+          </p>
+        </div>
         <div className="flex flex-wrap gap-1 mt-3">
           <Tag>WU 특급송금 신청서</Tag>
           <Tag>WU 특급송금 약관</Tag>
         </div>
+        <p className="text-[10px] text-charcoal-soft mt-3">
+          출처: 웨스턴유니온 특급송금 거래약관 (1·2·3·5·6조)
+        </p>
       </section>
 
       {/* 관련 자료 */}
@@ -114,6 +137,17 @@ export default function ReceiveGuidePage() {
           <li>웨스턴유니온 특급송금 약관 (신청서 뒷면)</li>
         </ul>
       </section>
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-3 py-1 border-b border-border last:border-0">
+      <dt className="text-xs text-charcoal-soft sm:w-28 sm:shrink-0 uppercase tracking-wide">
+        {label}
+      </dt>
+      <dd className="text-charcoal leading-relaxed">{value}</dd>
     </div>
   );
 }

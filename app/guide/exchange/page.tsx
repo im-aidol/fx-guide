@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function ExchangeGuidePage() {
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="max-w-5xl mx-auto px-6 py-12">
       <Link
         href="/guide"
         className="text-xs text-charcoal-soft hover:text-primary inline-flex items-center gap-1 mb-3"
@@ -15,7 +15,8 @@ export default function ExchangeGuidePage() {
         </p>
         <h1 className="text-3xl font-bold mb-2">환전 안내</h1>
         <p className="text-sm text-charcoal-soft">
-          외화 매수(사기) / 매도(팔기). iM뱅크 BuyAndSell 서비스 + 영업점 환전 절차.
+          외화 매수(사기) / 매도(팔기). iM뱅크 BuyAndSell 서비스 본문 기반 +
+          영업점 환전 절차.
         </p>
       </header>
 
@@ -28,7 +29,8 @@ export default function ExchangeGuidePage() {
               매매기준율 (USD·CNY)
             </dt>
             <dd className="mt-0.5">
-              외국환중개회사를 통해 거래된 현물환매매 중 익익영업일 결제거래의 시장평균환율 (9:00~15:30 KST 거래량 가중평균).
+              외국환중개회사를 통해 거래된 현물환매매 중 익익영업일 결제거래의
+              시장평균환율 (9:00~15:30 KST 거래량 가중평균).
             </dd>
           </div>
           <div className="pt-2 border-t border-border">
@@ -55,17 +57,80 @@ export default function ExchangeGuidePage() {
         </p>
       </section>
 
-      {/* BuyAndSell */}
+      {/* BuyAndSell — 두 방식 비교 */}
       <section className="bg-white border border-border rounded-xl p-5 mb-4">
-        <h2 className="font-bold mb-2">🛒 외화 BuyAndSell 서비스</h2>
-        <p className="text-sm text-charcoal-soft mb-3">
-          비대면 외화 매매. 모바일·인터넷으로 신청 후 영업점 또는 자택에서 수령 가능.
+        <h2 className="font-bold mb-3">🛒 외화 BuyAndSell 서비스 (비대면 전용)</h2>
+        <p className="text-sm text-charcoal-soft mb-4">
+          본인 원화 계좌와 외화 계좌 간 이체로 외화 매입/매도. 인터넷·모바일앱뱅킹.
+          가입 대상: <strong>국민인 거주자 개인</strong> (기업뱅킹 제외).
         </p>
-        <ul className="text-sm space-y-1 text-charcoal-soft list-disc list-inside">
-          <li>약관: 외화 BuyAndSell 이용약관 (현행 + 개정 대비표)</li>
-          <li>수령 방법: 영업점 / 외화배송 (iM외화배송서비스 약관 적용)</li>
-          <li>매매 환율: iM뱅크 고시 환율 (위 매매기준율 기반)</li>
-        </ul>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-offwhite">
+                <th className="text-left p-2.5 text-xs text-charcoal-soft uppercase tracking-wide w-32">
+                  항목
+                </th>
+                <th className="text-left p-2.5">실시간 Buy &amp; Sell</th>
+                <th className="text-left p-2.5">희망환율 Buy &amp; Sell</th>
+              </tr>
+            </thead>
+            <tbody>
+              <CompareRow
+                label="이용시간"
+                a="영업일 09:00 ~ 23:50"
+                b="24시간 365일 신청 (체결은 익영업일부터 영업일 09:00~17:30)"
+              />
+              <CompareRow
+                label="거래 통화"
+                a="USD / JPY / EUR / CNY ↔ KRW"
+                b="USD / JPY / EUR / CNY ↔ KRW"
+              />
+              <CompareRow
+                label="1회 금액"
+                a="USD 50 상당액 이상 ~ 전자금융 1회·1일 한도"
+                b="USD 100 ~ USD 100,000 상당액"
+              />
+              <CompareRow
+                label="1일 신청"
+                a="이체한도 내"
+                b="최대 5회"
+              />
+              <CompareRow
+                label="유효기일"
+                a="—"
+                b="익영업일 ~ 10영업일 이내 지정"
+              />
+              <CompareRow
+                label="환율우대"
+                a="전신환매매율 70% 우대"
+                b="전신환매매율 50% 우대"
+              />
+              <CompareRow
+                label="체결 방식"
+                a="즉시 거래 (환율 변동 시 처음부터 다시)"
+                b="희망환율 도달 자동 거래 (매입: ≤ 희망 / 매도: ≥ 희망)"
+              />
+              <CompareRow
+                label="결과통지"
+                a="—"
+                b="SMS (거래완료·유효기일 경과 안내)"
+              />
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-4 bg-offwhite border border-border rounded-md p-3 text-xs text-charcoal-soft">
+          <p className="font-medium text-charcoal mb-1">⚠️ 변경·취소</p>
+          <p>
+            거래 완료 후 변경·취소 불가. 단, 희망환율 신청건의 <strong>유효기일 이내 미체결</strong> 건은 인터넷·모바일뱅킹에서 취소만 가능 (변경 불가).
+          </p>
+        </div>
+
+        <p className="text-[10px] text-charcoal-soft mt-3">
+          출처: 외화 BuyAndSell 서비스 이용약관 (개정 전후 대비표 별도)
+        </p>
       </section>
 
       {/* 영업점 환전 임계 */}
@@ -100,10 +165,31 @@ export default function ExchangeGuidePage() {
           <li>iM외화배송서비스 이용약관 (배송 수령 시)</li>
         </ul>
         <p className="text-[10px] text-charcoal-soft mt-3">
-          ⚠️ 본 안내는 외환규정 + 약관 인덱스 기반. 상세 절차는 본부 외환부서 매뉴얼 확인.
+          ⚠️ 본 안내는 외환규정 + 약관 본문 기반. 영업점 환전 수수료·게시 환율은
+          영업점·홈페이지 기준 확인.
         </p>
       </section>
     </div>
+  );
+}
+
+function CompareRow({
+  label,
+  a,
+  b,
+}: {
+  label: string;
+  a: string;
+  b: string;
+}) {
+  return (
+    <tr className="border-b border-border last:border-0 align-top">
+      <td className="p-2.5 text-xs text-charcoal-soft uppercase tracking-wide whitespace-nowrap">
+        {label}
+      </td>
+      <td className="p-2.5 text-charcoal-soft leading-relaxed">{a}</td>
+      <td className="p-2.5 text-charcoal-soft leading-relaxed">{b}</td>
+    </tr>
   );
 }
 
