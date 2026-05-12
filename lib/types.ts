@@ -178,6 +178,35 @@ export type Scenario = {
 // ============================================================
 
 // ============================================================
+// 본부 공지·가이드 게시판 + 익명 Q&A (시연용 데모 데이터)
+// ============================================================
+
+export type NoticeCategory = "공지" | "가이드" | "정책변경";
+
+export type Notice = {
+  id: string;
+  category: NoticeCategory;
+  title: string;
+  content: string;
+  author: string;
+  createdAt: string; // ISO
+};
+
+export type QnaStatus = "대기" | "완료";
+
+export type QnaItem = {
+  id: string;
+  title: string;
+  question: string;
+  questionerName?: string; // 익명이면 undefined
+  isAnonymous: boolean;
+  createdAt: string;
+  answer?: string;
+  answeredBy?: string;
+  answeredAt?: string;
+};
+
+// ============================================================
 // 업무별 가이드 (사유별 1장 카드)
 // ============================================================
 
