@@ -177,6 +177,36 @@ export type Scenario = {
 // FAQ / Glossary
 // ============================================================
 
+// ============================================================
+// 업무별 가이드 (사유별 1장 카드)
+// ============================================================
+
+export type BusinessGuideCategory =
+  | "경상거래"      // 해외여행경비, 의료비, 일반 증여, 수입대금 등
+  | "자산이전"      // 해외이주비, 재외동포 재산반출
+  | "외국인송금"    // 외국인·비거주자 국내소득 송금
+  | "자본거래"      // 제7장 자본거래 (별도)
+  | "기타";
+
+export type BusinessGuideItem = {
+  id: string;
+  title: string;            // "해외체재비 (02)"
+  subtitle?: string;        // 한 줄 설명
+  category: BusinessGuideCategory;
+  transactionCode?: string; // 한은 외환전산망 코드 + 명칭 (확정된 것만)
+  legalRef: string;         // 외환규정 조항 1차 인용
+  designationMethod:        // 거래외국환은행 지정 방법
+    | "외화송금신청서로_직접"
+    | "별도_신청서_필요"
+    | "지정_불요";
+  annualLimit?: string;     // 한도 (자유 문자열)
+  requiredDocs: string[];   // 필요 서류
+  cautions: string[];       // 주의사항/통보의무
+  customerScripts?: string[]; // 안내 멘트 (선택)
+  relatedTerms?: string[];  // 관련 약관 이름 (string)
+  source: string;           // 1차 출처 명시
+};
+
 export type Faq = {
   id: string;
   category: string;

@@ -9,6 +9,7 @@ export {
 export { PURPOSES } from "./purposes";
 export { GLOSSARY } from "./glossary";
 export { FAQS } from "./faqs";
+export { BUSINESS_GUIDE } from "./business-guide";
 
 // 시나리오 트리 (창구 가이드)
 export { REMITTANCE_SCENARIO } from "./scenarios/remittance";
