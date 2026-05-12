@@ -345,15 +345,18 @@ export const REMITTANCE_SCENARIO: Scenario = {
       type: "result",
       question: "해외유학생·체재자 송금",
       result: {
-        transactionCode: "해외유학생경비 송금",
+        transactionCode: "(02) 해외체재비 (외화송금신청서 명시)",
         legalBasis: "외환규정 4-5조 ② (해외유학생·해외체재자 — 거래외국환은행 지정 필수)",
         channel: "branch_only",
         needsBankDesignation: true,
         reportRequirement: "none",
-        documents: ["재학증명서 또는 해외체재 입증 서류 (매년 갱신)"],
+        documents: [
+          "재학증명서 또는 해외체재 입증 서류 (매년 갱신)",
+          "외화송금신청서 (지정항목: ☑ 02 해외체재비)",
+        ],
         cautions: [
           "연간 10만불 초과 시 국세청 통보 (4-8조 ①3호)",
-          "거래외국환은행 지정 필수",
+          "거래외국환은행 지정은 외화송금신청서로 직접 가능 (02 코드)",
         ],
         suspiciousSignals: [],
         needsHQReview: false,
@@ -391,7 +394,7 @@ export const REMITTANCE_SCENARIO: Scenario = {
       type: "result",
       question: "수입대금 사전지급",
       result: {
-        transactionCode: "수입대금 사전지급",
+        transactionCode: "수입대금 사전지급 (코드 번호 한은 자료 확인 필요)",
         legalBasis: "외환규정 4-3조 ①5호 (거래·행위 발생 전 지급, 정산의무)",
         channel: "branch_only",
         needsBankDesignation: false,
@@ -400,11 +403,14 @@ export const REMITTANCE_SCENARIO: Scenario = {
           "Proforma Invoice",
           "계약서 (있는 경우)",
           "정산 후 Commercial Invoice·선적서류",
+          "외화송금신청서 + 별지 (사전송금방식 지급 확인 서류)",
         ],
         cautions: [
           "선적/제공 후 일정 기간 안에 정산 자료 제출 의무",
           "지급금액의 10% 이내는 정산 면제",
           "1만불 초과 시 관세청 통보 (4-8조 ②1호)",
+          "⚠️ 계약 건당 10만불 초과 + 1년 초과 수령 예정 시 한국은행 신고 (별지 작성 필수)",
+          "무역거래 형태 확인: 일반수입 / 중계무역 / 외국인수수입",
         ],
         suspiciousSignals: ["선적 일정·계약 상세에 답변 회피"],
         needsHQReview: false,
@@ -441,16 +447,22 @@ export const REMITTANCE_SCENARIO: Scenario = {
       type: "result",
       question: "해외이주비 송금",
       result: {
-        transactionCode: "해외이주비 송금",
+        transactionCode: "해외이주비 송금 (코드 번호 한은 자료 확인 필요)",
         legalBasis:
           "외환규정 4-3조 ①9호 — 자금출처확인서 범위 내, 거래외국환은행 지정 필수 (제4-6조는 2025-4호로 ①~⑤항 전부 삭제 → 4-3조 ①9호로 흡수)",
         channel: "branch_only",
         needsBankDesignation: true,
         reportRequirement: "none",
-        documents: ["해외이주신고 필증", "자금출처확인서"],
+        documents: [
+          "해외이주신고 필증",
+          "자금출처확인서",
+          "외화송금신청서",
+          "⚠️ 거래외국환은행 지정 신청서 (별도) — 외화송금신청서로는 02·08만 지정 가능",
+        ],
         cautions: [
           "자금출처확인서 범위 내에서만 지급 가능",
           "건당 1만불 초과 해외이주비는 관세청 통보 (4-8조 ②5호)",
+          "거래외국환은행 지정은 외화송금신청서로 불가 — 별도 신청서 필요",
         ],
         suspiciousSignals: [],
         needsHQReview: false,
@@ -463,13 +475,18 @@ export const REMITTANCE_SCENARIO: Scenario = {
       type: "result",
       question: "비거주자 재외동포 재산반출",
       result: {
-        transactionCode: "비거주자 재외동포 국내재산 반출",
+        transactionCode:
+          "비거주자 재외동포 국내재산 반출 (코드 번호 한은 자료 확인 필요)",
         legalBasis:
           "외환규정 4-4조 ①8호 (2025-4호 신설). 제4-7조는 ①~④항 전부 삭제됨",
         channel: "branch_only",
         needsBankDesignation: true,
         reportRequirement: "none",
-        documents: ["부동산매각자금확인서 또는 자금출처확인서"],
+        documents: [
+          "부동산매각자금확인서 또는 자금출처확인서",
+          "외화송금신청서",
+          "⚠️ 거래외국환은행 지정 신청서 (별도) — 외화송금신청서로는 02·08만 지정 가능",
+        ],
         cautions: [
           "지정거래외국환은행을 통해서만 지급 가능",
           "거주자 재외동포(한국 국적 보유)는 일반 거주자로 4-3조 적용",
