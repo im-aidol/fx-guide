@@ -1,0 +1,75 @@
+                                                                                                                       실명확인   담당자   책임자
+
+
+                         인터넷을 이용한 해외송금 신청서
+     (APPLICATION for Overseas Remittance by Internet Banking Service)
+
+
+                    앞
+
+
+      신청구분                                                      □ 신규           □ 변경              □ 해지
+
+               성명                영문(English) :
+보            (Name)              한글(Korean) :
+내
+는         주소(Address)
+
+분     생년월일/사업자번호                                                                           연락처
+          (Date of Birth)                                                          (TEL No. / Moblie Phone)
+
+               성명
+                                                                                                              (신청인과의 관계 :            )
+       (Beneficiary Name)
+
+
+                                                                건물번호, 도로명, 우편번호 등 상세주소 기재
+
+받              주소
+으                                도시명 (CITY)                                               국가명(COUNTRY)
+            (Address)
+실
+                                 연락처 (TEL No.)
+분
+
+                                □ 계좌번호
+            계좌번호
+      (Beneficiary’s A/C No.)
+                                □ IBAN CODE                                       (유럽·중동 국가로 송금 시)
+
+             은행명
+          (Bank Name)
+수
+취                                                               건물번호, 도로명, 우편번호 등 상세주소 기재
+은           은행주소
+행        (Bank Address)
+                                 도시명 (CITY)                                               국가명(COUNTRY)
+및
+            은행코드                                     국가별 은행코드                                          중계은행
+송          (SWIFT/BIC)                                 (BANK CODE)                               (Intermediary Bank)
+금           송금 목적
+정                                                           송금목적 확인 국가로 송금하는 경우 구체적 기재필요
+      (Purpose of Payment)
+보
+           적요(Memo)                               송금 전문에 추가적인 정보(계약서 번호, 수취인 정보 등) 기재가 필요한 경우
+
+
+
+        □ 본인은 「외환거래기본약관」을 열람하고 그 내용에 따를 것을 확약하며, 위와 같이 인터넷을 이용한 해외송금 서비스를 신청합니다.
+            I certify that I will observe the general terms and conditions of foreign exchange transactions kept in your bank’s
+            branch and I hereby apply for the overseas remittance service by Internet
+
+
+                                                            년        월     일
+
+
+                 신 청 인(Debtor)                                                                      (인) 또는 서명
+                 생년월일 / 사업자번호 :
+
+        ※ 거주자의 무증빙해외송금은 전업권(금융기관, 비금융기관) 합산하여 연간(매년 1.1 ~ 12.31) 미화 10만불까지 송금가능합니다.
+        ※ 타 매체를 이용한 송금실적을 포함하여 해외유학생 및 해외체재자 경비지급 송금은 연간 10만불, 외국인 또는 비거주자의 국내보수 또는
+         소득금액 지급 송금은 연간 5만불 범위 내에서 자동화기기를 통해서 송금이 가능합니다.
+        ※ 이 신청서는 외국환 통계자료로 활용하며 국세청(세무서)통보대상 송금인 경우 과세자료로 활용이 됩니다.
+
+4 0 1 2 4 4 1
+
