@@ -1,0 +1,193 @@
+// iM뱅크 외화 예금·적금 상품 6종 (글로벌외화종합통장 + 적금 4종 + 자동이체)
+// 출처: 각 상품 특약 (docs/regulations/) 본문 정리. 영업점 영업 자료 아닌 약관 기준.
+
+export type DepositProduct = {
+  id: string;
+  title: string;
+  shortTitle: string; // 표 헤더용
+  category: "예금" | "적금" | "이체";
+  description: string;
+
+  // 가입 조건 (있는 항목만 채움)
+  eligibility?: string;
+  period?: string;
+  currencies?: string;
+  channels?: string;
+  initialDeposit?: string;
+  additionalDeposit?: string;
+  accountLimit?: string;
+
+  // 이자
+  interestPayment?: string;
+  baseRate?: string;
+  bonusRate?: string[];
+
+  // 해지·만기
+  partialWithdraw?: string;
+  earlyTermination?: string;
+  postMaturity?: string;
+  autoRenew?: string;
+
+  benefits?: string[];
+
+  termsFile: string;
+  source: string;
+};
+
+export const DEPOSIT_PRODUCTS: DepositProduct[] = [
+  {
+    id: "global-comprehensive",
+    title: "글로벌외화종합통장",
+    shortTitle: "글로벌",
+    category: "예금",
+    description:
+      "외화 종합통장. 모계좌(외화보통예금) + 연결계좌(외화정기예금·통지예금·회전복리예금) 구조.",
+    eligibility: "외화예금거래 기본약관 따름",
+    period: "예금 종류별 (보통·통지·정기·회전복리)",
+    interestPayment: "예금 종류별 약관 적용",
+    benefits: [
+      "한 통장으로 외화 보통·정기·통지·회전복리 모두 관리",
+      "모계좌·연결계좌 명의·인감 동일",
+    ],
+    termsFile: "글로벌외화종합통장_약관",
+    source: "글로벌외화종합통장 약관 (개정 2025.04.28.)",
+  },
+  {
+    id: "foryou",
+    title: "For You 자유적립 외화예금",
+    shortTitle: "For You",
+    category: "적금",
+    description: "기본형 외화 자유적립 예금. 1~12개월 단기.",
+    period: "1개월 이상 12개월 이내",
+    initialDeposit: "USD 100 상당액 이상",
+    additionalDeposit:
+      "건당 USD 100 상당액 또는 원화 100,000원 이상 / 건당 최고 USD 100만 이하 / 만기일 전날까지 자유 입금",
+    interestPayment: "만기 일시지급식",
+    baseRate: "입금일 영업점 게시 예금 이율 (입금건별 계산)",
+    partialWithdraw: "만기일 전 3회까지 / 일부해지 최소 USD 100 상당액 이상",
+    earlyTermination:
+      "신규 시 고시된 기간별 약정금리 적용 (3회차 초과 시 중도해지이율 적용). 상속(사망)은 약정이율 (단 7일 미만은 무이자)",
+    postMaturity: "만기 후 영업점 고시 만기 후 이자 지급",
+    autoRenew: "특약에 명시 X — 본부 매뉴얼 확인",
+    benefits: ["부가서비스는 은행 기준에 따름"],
+    termsFile: "ForYou_자유적립_외화예금_특약",
+    source: "For You 자유적립 외화예금 특약 (시행 2021.07.15.)",
+  },
+  {
+    id: "plusyou",
+    title: "Plus-You 자유적립 외화예금",
+    shortTitle: "Plus-You",
+    category: "적금",
+    description:
+      "장기·고우대 외화 적립 예금. 36개월까지 + 추가금리 + 환율우대·수수료 면제.",
+    eligibility: "제한 없음",
+    period: "1개월 ~ 36개월 (월·일 단위)",
+    currencies: "USD / JPY / EUR / CAD / GBP / AUD / CHF / NZD (8종)",
+    initialDeposit: "USD 100 ~ USD 100만 상당액",
+    additionalDeposit:
+      "건당 USD 10 ~ USD 100만 상당액 / 신규 후 추가 입금 가능",
+    interestPayment: "만기 일시지급식",
+    baseRate: "For You 자유적립 외화예금 금리 적용 (입금건별, 12개월 초과 시 12개월 금리)",
+    bonusRate: [
+      "12개월 초과 24개월 이하: +0.1%p",
+      "24개월 초과 36개월 미만: +0.2%p",
+      "36개월 예치: +0.3%p",
+      "(중도해지 시 추가금리 미적용)",
+    ],
+    partialWithdraw:
+      "만기일 전 3회까지 입금건별 / 최소 USD 100 상당액 / 선입선출 (지정 가능)",
+    earlyTermination:
+      "입금일 영업점·홈페이지 게시 중도해지이율. 상속(사망)은 약정이율 (단 7일 미만 무이자)",
+    postMaturity: "원금 최종잔액에 입금일 게시 만기 후 이율 적용",
+    autoRenew:
+      "신청 시 만기일에 동일 기간(또는 지정 기간) 자동 재예치 / 원금 = 입금금액 + 지급이자",
+    benefits: [
+      "신규·자동이체적립·만기해지: 환율우대 50%",
+      "자동이체 외 추가적립: 환율우대 30%",
+      "6개월 경과 후 해외송금수수료 3회 전액 면제",
+      "6개월 경과 후 외화현찰수수료 전액 면제 (일부·계좌 해지 시)",
+      "6개월 경과 후 여행자수표 매도수수료 50% 우대",
+    ],
+    termsFile: "PlusYou_자유적립_외화예금_특약",
+    source: "Plus-You 자유적립 외화예금 특약 (시행 2021.07.15.)",
+  },
+  {
+    id: "im-free",
+    title: "iM 외화자유적금",
+    shortTitle: "iM",
+    category: "적금",
+    description: "비대면(모바일) 전용 외화 자유 적립 적금. 12개월 고정.",
+    eligibility: "실명의 개인(국민인 거주자), 1인당 최대 3개 계좌",
+    period: "12개월 고정",
+    currencies: "USD / JPY / EUR (가입 시 1개 통화 선택)",
+    channels: "비대면 채널 전용 (모바일앱뱅킹)",
+    initialDeposit: "USD 100 ~ USD 1,000 상당액",
+    additionalDeposit: "USD 10 ~ USD 1,000 상당액 (적립 횟수 제한 없음)",
+    accountLimit:
+      "1일 최대 USD 1,000 / 계좌당 최대 USD 20,000 상당액",
+    interestPayment: "만기 일시지급식",
+    baseRate: "For You 자유적립 외화예금 금리 적용 (입금건별)",
+    bonusRate: [
+      "최근 1년 내 외화저축성 예금 미가입자: +0.10%p (최초 1회)",
+      "마케팅 활용 [개인(신용)정보 수집·이용동의] 전체 동의: +0.10%p",
+      "매회 신규가입액 이상 금액을 8회 이상 자동이체 입금: +0.30%p",
+      "(최대 0.50%p 우대 / 0% 금리·중도/일부해지 시 미적용)",
+    ],
+    partialWithdraw:
+      "만기일 전 10회까지 / 일부해지 최소 USD 100 / 계좌 최소 유지잔액 USD 100",
+    earlyTermination:
+      "7일 미만 무이자 / 7~15일 약정금리 1/10 / 15일~1개월 2/10 / 1~3개월 3/10 / 3~6개월 4/10 / 6~12개월 5/10. 상속(사망)은 약정이율 (단 7일 미만 무이자)",
+    postMaturity: "만기 후 1년까지 약정금리 3/10 / 1년 초과 1/10 (기본금리만)",
+    autoRenew:
+      "신청 시 만기 자동재예치 (동일 기간) / 원금 = 입금금액 + 지급이자",
+    termsFile: "iM_외화자유적금_특약",
+    source: "iM 외화자유적금 특약",
+  },
+  {
+    id: "idream-free",
+    title: "IDREAM 외화자유적금",
+    shortTitle: "IDREAM",
+    category: "적금",
+    description:
+      "외화 자유 적립 적금. 12개월 고정 + 미성년자 우대 + 외화 첫 신규 우대.",
+    eligibility: "실명의 개인(국민인 거주자), 1인당 최대 3개 계좌",
+    period: "12개월 고정",
+    currencies: "USD / JPY / EUR (가입 시 1개 통화 선택)",
+    channels: "비대면 가능 (스마트뱅킹 가입 시 계좌당 USD 30만 미만)",
+    initialDeposit: "USD 10 상당액 이상",
+    additionalDeposit: "USD 10 상당액 이상 (적립 횟수 제한 없음)",
+    accountLimit: "비대면 가입 계좌당 USD 30만 상당액 미만",
+    interestPayment: "만기 일시지급식",
+    baseRate: "For-You 자유적립 외화예금 금리 적용 (입금건별)",
+    bonusRate: [
+      "미성년자(만19세 미만) 가입자: +0.20%p",
+      "외화예금 최초신규 (당행 외화 예·적금 미가입): +0.10%p",
+      "(최대 0.30%p / 모든 우대는 6회 이상 자동이체 조건 + 출금계좌 원화 한정)",
+    ],
+    partialWithdraw:
+      "만기일 전 3회까지 / 최소 USD 10 / 최소 유지잔액 USD 10 / 신규당일 불가",
+    earlyTermination:
+      "7일 미만 무이자 / 7~15일 기본금리 1/10 / 15일~1개월 2/10 / 1~3개월 3/10 / 3~6개월 4/10 / 6~12개월 5/10. 상속(사망)은 약정이율 (단 7일 미만 무이자)",
+    postMaturity: "만기 후 1년까지 기본금리 3/10 / 1년 초과 1/10",
+    autoRenew: "신청 시 자동재예치 (동일 기간) + 우대이자율 유지",
+    termsFile: "IDREAM_외화자유적금_특약",
+    source: "IDREAM 외화자유적금 특약",
+  },
+  {
+    id: "auto-transfer",
+    title: "외화 자동이체",
+    shortTitle: "자동이체",
+    category: "이체",
+    description:
+      "외화 예금/적금 적립용 자동이체. 원화→외화 또는 외화→외화 정기 이체.",
+    period: "1개월 단위 자동이체 지정 가능 (For You·Plus-You·iM 등 연계)",
+    benefits: [
+      "Plus-You 가입 시 자동이체 입금 50% 환율우대",
+      "iM 자동이체 8회 이상: +0.30%p 우대",
+      "IDREAM 자동이체 6회 이상: 우대조건",
+      "상한환율 지정 가능 (For You) — 지정 초과 시 이체 중지",
+    ],
+    termsFile: "외화자동이체_이용약관",
+    source: "외화자동이체 서비스 이용약관 + 각 상품 특약",
+  },
+];
