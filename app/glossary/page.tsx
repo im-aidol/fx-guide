@@ -24,6 +24,7 @@ export default function GlossaryPage() {
   const [activeCategory, setActiveCategory] = useState<GlossaryCategory | null>(
     null,
   );
+  const [openIds, setOpenIds] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -45,6 +46,36 @@ export default function GlossaryPage() {
     });
     return map;
   }, []);
+
+  const isSearching = search.trim().length > 0;
+  const filteredIds = useMemo(() => filtered.map((g) => g.id), [filtered]);
+  const allVisibleOpen =
+    filteredIds.length > 0 && filteredIds.every((id) => openIds.has(id));
+
+  const toggle = (id: string) => {
+    setOpenIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAllVisible = () => {
+    if (allVisibleOpen) {
+      setOpenIds((prev) => {
+        const next = new Set(prev);
+        filteredIds.forEach((id) => next.delete(id));
+        return next;
+      });
+    } else {
+      setOpenIds((prev) => {
+        const next = new Set(prev);
+        filteredIds.forEach((id) => next.add(id));
+        return next;
+      });
+    }
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
@@ -89,11 +120,29 @@ export default function GlossaryPage() {
           검색 결과가 없습니다.
         </p>
       ) : (
-        <ul className="space-y-3">
-          {filtered.map((g) => (
-            <TermCard key={g.id} term={g} />
-          ))}
-        </ul>
+        <>
+          <div className="flex items-center justify-between mb-2 px-1">
+            <p className="text-xs text-charcoal-soft">
+              {filtered.length}개 용어
+            </p>
+            <button
+              onClick={toggleAllVisible}
+              className="text-xs text-primary hover:text-primary-dark font-medium"
+            >
+              {allVisibleOpen ? "전체 접기" : "전체 펼치기"}
+            </button>
+          </div>
+          <ul className="space-y-2">
+            {filtered.map((g) => (
+              <TermCard
+                key={g.id}
+                term={g}
+                open={openIds.has(g.id) || isSearching}
+                onToggle={() => toggle(g.id)}
+              />
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );
@@ -123,22 +172,48 @@ function CategoryChip({
   );
 }
 
-function TermCard({ term }: { term: GlossaryTerm }) {
+function TermCard({
+  term,
+  open,
+  onToggle,
+}: {
+  term: GlossaryTerm;
+  open: boolean;
+  onToggle: () => void;
+}) {
   return (
-    <li className="bg-white border border-border rounded-xl p-5 hover:border-primary/40 transition">
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <h3 className="text-lg font-bold">{term.term}</h3>
-        <span className="text-[10px] text-charcoal-soft bg-offwhite border border-border px-2 py-0.5 rounded-full whitespace-nowrap">
-          {term.category}
-        </span>
-      </div>
-      <p className="text-sm text-charcoal leading-relaxed whitespace-pre-line">
-        {term.definition}
-      </p>
-      {term.source && (
-        <p className="text-[11px] text-charcoal-soft mt-3 pt-3 border-t border-border">
-          출처: {term.source}
-        </p>
+    <li className="bg-white border border-border rounded-xl overflow-hidden hover:border-primary/40 transition">
+      <button
+        onClick={onToggle}
+        className="w-full text-left px-5 py-4 hover:bg-offwhite transition flex items-start justify-between gap-3"
+        aria-expanded={open}
+      >
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base font-bold">{term.term}</h3>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[11px] text-charcoal-soft bg-offwhite border border-border px-2 py-0.5 rounded-full whitespace-nowrap">
+            {term.category}
+          </span>
+          <span
+            className="text-charcoal-soft text-lg leading-none w-4 text-center"
+            aria-hidden
+          >
+            {open ? "−" : "+"}
+          </span>
+        </div>
+      </button>
+      {open && (
+        <div className="px-5 pb-5 border-t border-border">
+          <p className="text-sm text-charcoal leading-relaxed whitespace-pre-line pt-4">
+            {term.definition}
+          </p>
+          {term.source && (
+            <p className="text-xs text-charcoal-soft mt-3 pt-3 border-t border-border">
+              출처: {term.source}
+            </p>
+          )}
+        </div>
       )}
     </li>
   );
