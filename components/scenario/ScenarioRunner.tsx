@@ -475,10 +475,9 @@ function ResultNodeView({ result }: { result: FlowResult }) {
         </span>
       </div>
 
-      <Section
-        title="필요 서류"
+      <DocumentsChecklist
+        key={result.transactionCode}
         items={result.documents}
-        emptyText="별도 증빙 서류 불필요"
       />
       <Section title="주의·통보의무" items={result.cautions} />
       <Section
@@ -502,6 +501,109 @@ function ResultNodeView({ result }: { result: FlowResult }) {
           </p>
         </details>
       )}
+    </div>
+  );
+}
+
+function DocumentsChecklist({ items }: { items: string[] }) {
+  const [checked, setChecked] = useState<Set<number>>(new Set());
+
+  if (items.length === 0) {
+    return (
+      <div>
+        <h3 className="text-sm font-medium mb-1.5">필요 서류</h3>
+        <p className="text-sm text-charcoal-soft italic">
+          별도 증빙 서류 불필요
+        </p>
+      </div>
+    );
+  }
+
+  const toggle = (i: number) => {
+    setChecked((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
+  };
+
+  const allChecked = checked.size === items.length;
+  const toggleAll = () => {
+    setChecked(allChecked ? new Set() : new Set(items.map((_, i) => i)));
+  };
+
+  return (
+    <div>
+      <div className="flex items-baseline justify-between mb-2">
+        <h3 className="text-sm font-medium">
+          필요 서류{" "}
+          <span className="text-xs text-charcoal-soft font-normal">
+            ({checked.size}/{items.length} 확인)
+          </span>
+        </h3>
+        <button
+          type="button"
+          onClick={toggleAll}
+          className="text-xs text-primary hover:text-primary-dark font-medium"
+        >
+          {allChecked ? "전체 해제" : "전체 체크"}
+        </button>
+      </div>
+      <ul className="space-y-1">
+        {items.map((item, i) => {
+          const isChecked = checked.has(i);
+          return (
+            <li key={i}>
+              <label className="flex items-start gap-2 py-1.5 px-2 -mx-2 rounded-md hover:bg-offwhite cursor-pointer transition">
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={() => toggle(i)}
+                  className="peer sr-only"
+                  aria-label={item}
+                />
+                <span
+                  aria-hidden="true"
+                  className={[
+                    "mt-0.5 w-4 h-4 shrink-0 rounded border flex items-center justify-center transition",
+                    "peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-1",
+                    isChecked
+                      ? "bg-primary border-primary"
+                      : "bg-white border-charcoal-soft/40",
+                  ].join(" ")}
+                >
+                  {isChecked && (
+                    <svg
+                      className="w-3 h-3 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </span>
+                <span
+                  className={[
+                    "text-sm leading-relaxed select-none",
+                    isChecked
+                      ? "text-charcoal-soft line-through"
+                      : "text-charcoal",
+                  ].join(" ")}
+                >
+                  {item}
+                </span>
+              </label>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
