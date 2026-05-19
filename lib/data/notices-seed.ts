@@ -1,6 +1,6 @@
 import type { Notice } from "../types";
 
-// 본부 게시판 시드 데이터 (시연용).
+// 공지사항 시드 데이터 (시연용).
 // 실제 운영 시에는 본부 외환사업부 담당자가 웹 에디터로 직접 작성·갱신.
 export const NOTICES_SEED: Notice[] = [
   {

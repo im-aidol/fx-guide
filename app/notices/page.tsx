@@ -76,7 +76,7 @@ export default function NoticesPage() {
     <div className="max-w-4xl mx-auto px-6 py-12">
       <header className="mb-6">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
-          본부 게시판
+          공지사항
         </p>
         <h1 className="text-3xl font-bold mb-2">외환사업부 공지·가이드</h1>
         <p className="text-sm text-charcoal-soft">
