@@ -129,28 +129,38 @@ function ModeToggle() {
     { value: "hq", label: "본점", icon: "🏛️" },
   ];
 
+  const description =
+    mode === "hq"
+      ? "외환사업부 관리자. 가이드·공지 작성과 Q&A 답변이 가능합니다."
+      : "영업점 직원 조회 화면. 가이드 열람과 익명 Q&A 등록이 가능합니다.";
+
   return (
-    <div className="flex gap-1 bg-offwhite border border-border rounded-md p-0.5">
-      {options.map((opt) => {
-        const active = mode === opt.value;
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            onClick={() => setMode(opt.value)}
-            className={[
-              "flex-1 text-xs px-2 py-1.5 rounded transition flex items-center justify-center gap-1",
-              active
-                ? "bg-primary text-white font-medium"
-                : "text-charcoal-soft hover:text-charcoal",
-            ].join(" ")}
-            aria-pressed={active}
-          >
-            <span className="text-sm leading-none">{opt.icon}</span>
-            <span>{opt.label}</span>
-          </button>
-        );
-      })}
-    </div>
+    <>
+      <div className="flex gap-1 bg-offwhite border border-border rounded-md p-0.5">
+        {options.map((opt) => {
+          const active = mode === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setMode(opt.value)}
+              className={[
+                "flex-1 text-xs px-2 py-1.5 rounded transition flex items-center justify-center gap-1",
+                active
+                  ? "bg-primary text-white font-medium"
+                  : "text-charcoal-soft hover:text-charcoal",
+              ].join(" ")}
+              aria-pressed={active}
+            >
+              <span className="text-sm leading-none">{opt.icon}</span>
+              <span>{opt.label}</span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-[10px] text-charcoal-soft leading-snug mt-1.5 px-1">
+        {description}
+      </p>
+    </>
   );
 }
