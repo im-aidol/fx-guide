@@ -3,29 +3,43 @@
 import { useMemo, useState } from "react";
 import { FAQS } from "@/lib/data";
 import type { Faq } from "@/lib/types";
+import { useMode } from "@/components/Mode";
+import { useEditableList } from "@/lib/hooks/useEditableList";
+import { AdminBadge } from "@/components/admin/AdminBadge";
+
+const STORAGE_KEY = "fx-guide:faqs";
 
 export default function FaqPage() {
+  const { mode } = useMode();
+  const canEdit = mode === "hq";
+  const { items, add, update, remove, reset } = useEditableList<Faq>(
+    STORAGE_KEY,
+    FAQS,
+  );
+
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [openIds, setOpenIds] = useState<Set<string>>(new Set());
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
-    FAQS.forEach((f) => set.add(f.category));
+    items.forEach((f) => set.add(f.category));
     return Array.from(set);
-  }, []);
+  }, [items]);
 
   const counts = useMemo(() => {
     const map: Record<string, number> = {};
-    FAQS.forEach((f) => {
+    items.forEach((f) => {
       map[f.category] = (map[f.category] ?? 0) + 1;
     });
     return map;
-  }, []);
+  }, [items]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return FAQS.filter((f) => {
+    return items.filter((f) => {
       if (activeCategory && f.category !== activeCategory) return false;
       if (!q) return true;
       return (
@@ -34,7 +48,7 @@ export default function FaqPage() {
         (f.keywords ?? []).some((k) => k.toLowerCase().includes(q))
       );
     });
-  }, [search, activeCategory]);
+  }, [items, search, activeCategory]);
 
   const toggle = (id: string) => {
     setOpenIds((prev) => {
@@ -54,8 +68,9 @@ export default function FaqPage() {
         <h1 className="text-3xl font-bold mb-2">자주 묻는 질문</h1>
         <p className="text-sm text-charcoal-soft">
           외환규정 본문과 iM뱅크 공식 안내에서 도출. 모든 답변에 1차 출처 표기.
-          총 {FAQS.length}개.
+          총 {items.length}개.
         </p>
+        <AdminBadge hqHint="본점 관리자 — FAQ 추가·수정·삭제가 가능합니다" />
       </header>
 
       <div className="bg-white border border-border rounded-xl p-4 mb-4 sticky top-16 z-10">
@@ -68,20 +83,53 @@ export default function FaqPage() {
         />
         <div className="flex flex-wrap gap-1.5 mt-3">
           <CategoryChip
-            label={`전체 (${FAQS.length})`}
+            label={`전체 (${items.length})`}
             active={activeCategory === null}
             onClick={() => setActiveCategory(null)}
           />
           {categories.map((c) => (
             <CategoryChip
               key={c}
-              label={`${c} (${counts[c]})`}
+              label={`${c} (${counts[c] ?? 0})`}
               active={activeCategory === c}
               onClick={() => setActiveCategory(c)}
             />
           ))}
         </div>
+        {canEdit && (
+          <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-border">
+            <button
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="bg-primary hover:bg-primary-dark text-white px-3 py-1.5 rounded-lg text-xs font-medium transition"
+            >
+              {showAddForm ? "취소" : "+ 새 FAQ 추가"}
+            </button>
+            <button
+              onClick={() => {
+                if (confirm("FAQ를 초기 시드 데이터로 되돌립니다. 계속할까요?")) {
+                  reset();
+                  setEditingId(null);
+                  setShowAddForm(false);
+                }
+              }}
+              className="text-[11px] text-charcoal-soft hover:text-charcoal"
+            >
+              ↺ 초기화
+            </button>
+          </div>
+        )}
       </div>
+
+      {canEdit && showAddForm && (
+        <FaqForm
+          onSubmit={(faq) => {
+            add(faq);
+            setShowAddForm(false);
+          }}
+          onCancel={() => setShowAddForm(false)}
+          existingCategories={categories}
+        />
+      )}
 
       {filtered.length === 0 ? (
         <p className="text-center text-charcoal-soft py-12">
@@ -89,14 +137,34 @@ export default function FaqPage() {
         </p>
       ) : (
         <ul className="space-y-2">
-          {filtered.map((f) => (
-            <FaqCard
-              key={f.id}
-              faq={f}
-              open={openIds.has(f.id)}
-              onToggle={() => toggle(f.id)}
-            />
-          ))}
+          {filtered.map((f) =>
+            editingId === f.id ? (
+              <FaqForm
+                key={f.id}
+                initial={f}
+                onSubmit={(updated) => {
+                  update(f.id, updated);
+                  setEditingId(null);
+                }}
+                onCancel={() => setEditingId(null)}
+                existingCategories={categories}
+              />
+            ) : (
+              <FaqCard
+                key={f.id}
+                faq={f}
+                open={openIds.has(f.id)}
+                onToggle={() => toggle(f.id)}
+                canEdit={canEdit}
+                onEdit={() => setEditingId(f.id)}
+                onDelete={() => {
+                  if (confirm(`"${f.question}"\n\n이 FAQ를 삭제할까요?`)) {
+                    remove(f.id);
+                  }
+                }}
+              />
+            ),
+          )}
         </ul>
       )}
     </div>
@@ -131,10 +199,16 @@ function FaqCard({
   faq,
   open,
   onToggle,
+  canEdit,
+  onEdit,
+  onDelete,
 }: {
   faq: Faq;
   open: boolean;
   onToggle: () => void;
+  canEdit: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
 }) {
   return (
     <li className="bg-white border border-border rounded-xl overflow-hidden">
@@ -174,8 +248,149 @@ function FaqCard({
               ))}
             </div>
           )}
+          {canEdit && (
+            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
+              <button
+                onClick={onEdit}
+                className="text-xs text-primary hover:text-primary-dark font-medium"
+              >
+                ✏️ 수정
+              </button>
+              <button
+                onClick={onDelete}
+                className="text-xs text-danger hover:underline"
+              >
+                🗑️ 삭제
+              </button>
+            </div>
+          )}
         </div>
       )}
+    </li>
+  );
+}
+
+function FaqForm({
+  initial,
+  onSubmit,
+  onCancel,
+  existingCategories,
+}: {
+  initial?: Faq;
+  onSubmit: (faq: Faq) => void;
+  onCancel: () => void;
+  existingCategories: string[];
+}) {
+  const [category, setCategory] = useState(initial?.category ?? "기타");
+  const [question, setQuestion] = useState(initial?.question ?? "");
+  const [answer, setAnswer] = useState(initial?.answer ?? "");
+  const [source, setSource] = useState(initial?.source ?? "");
+  const [keywordsRaw, setKeywordsRaw] = useState(
+    (initial?.keywords ?? []).join(", "),
+  );
+
+  const submit = () => {
+    if (!question.trim() || !answer.trim()) return;
+    const keywords = keywordsRaw
+      .split(",")
+      .map((k) => k.trim())
+      .filter(Boolean);
+    onSubmit({
+      id: initial?.id ?? `faq-${Date.now()}`,
+      category: category.trim() || "기타",
+      question: question.trim(),
+      answer: answer.trim(),
+      source: source.trim() || undefined,
+      keywords: keywords.length > 0 ? keywords : undefined,
+    });
+  };
+
+  return (
+    <li className="bg-white border-2 border-primary/50 rounded-xl p-5 space-y-3 mb-2 list-none">
+      <h3 className="font-bold text-sm">
+        {initial ? "FAQ 수정" : "새 FAQ 추가"}
+      </h3>
+      <div>
+        <label className="text-[11px] text-charcoal-soft block mb-1">
+          카테고리
+        </label>
+        <input
+          type="text"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          list="faq-categories"
+          placeholder="카테고리 (예: 한도, 타발 송금, 신고)"
+          className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary text-sm"
+        />
+        <datalist id="faq-categories">
+          {existingCategories.map((c) => (
+            <option key={c} value={c} />
+          ))}
+        </datalist>
+      </div>
+      <div>
+        <label className="text-[11px] text-charcoal-soft block mb-1">
+          질문
+        </label>
+        <input
+          type="text"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          placeholder="질문"
+          className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary text-sm"
+        />
+      </div>
+      <div>
+        <label className="text-[11px] text-charcoal-soft block mb-1">
+          답변 (**bold** 강조 가능)
+        </label>
+        <textarea
+          value={answer}
+          onChange={(e) => setAnswer(e.target.value)}
+          placeholder="답변"
+          rows={8}
+          className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary text-sm resize-y"
+        />
+      </div>
+      <div>
+        <label className="text-[11px] text-charcoal-soft block mb-1">
+          출처 (1차 자료)
+        </label>
+        <input
+          type="text"
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+          placeholder="예: 외환규정 4-3조 ①1호"
+          className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary text-sm"
+        />
+      </div>
+      <div>
+        <label className="text-[11px] text-charcoal-soft block mb-1">
+          키워드 (쉼표로 구분)
+        </label>
+        <input
+          type="text"
+          value={keywordsRaw}
+          onChange={(e) => setKeywordsRaw(e.target.value)}
+          placeholder="10만불, 무증빙, 한도"
+          className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary text-sm"
+        />
+      </div>
+      <div className="flex items-center justify-end gap-2 pt-2">
+        <button
+          onClick={onCancel}
+          className="text-xs text-charcoal-soft hover:text-charcoal px-3 py-1.5"
+        >
+          취소
+        </button>
+        <button
+          onClick={submit}
+          disabled={!question.trim() || !answer.trim()}
+          className="bg-primary hover:bg-primary-dark text-white px-4 py-1.5 rounded-lg text-xs font-medium transition disabled:opacity-50"
+        >
+          {initial ? "수정 저장" : "추가"}
+        </button>
+      </div>
     </li>
   );
 }

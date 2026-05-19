@@ -3,6 +3,9 @@
 import { useMemo, useState } from "react";
 import { GLOSSARY } from "@/lib/data";
 import type { GlossaryCategory, GlossaryTerm } from "@/lib/types";
+import { useMode } from "@/components/Mode";
+import { useEditableList } from "@/lib/hooks/useEditableList";
+import { AdminBadge } from "@/components/admin/AdminBadge";
 
 const CATEGORIES: GlossaryCategory[] = [
   "거주성",
@@ -19,16 +22,27 @@ const CATEGORIES: GlossaryCategory[] = [
   "기타",
 ];
 
+const STORAGE_KEY = "fx-guide:glossary";
+
 export default function GlossaryPage() {
+  const { mode } = useMode();
+  const canEdit = mode === "hq";
+  const { items, add, update, remove, reset } = useEditableList<GlossaryTerm>(
+    STORAGE_KEY,
+    GLOSSARY,
+  );
+
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<GlossaryCategory | null>(
     null,
   );
   const [openIds, setOpenIds] = useState<Set<string>>(new Set());
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return GLOSSARY.filter((g) => {
+    return items.filter((g) => {
       if (activeCategory && g.category !== activeCategory) return false;
       if (!q) return true;
       return (
@@ -37,15 +51,15 @@ export default function GlossaryPage() {
         (g.source ?? "").toLowerCase().includes(q)
       );
     });
-  }, [search, activeCategory]);
+  }, [items, search, activeCategory]);
 
   const counts = useMemo(() => {
     const map: Record<string, number> = {};
-    GLOSSARY.forEach((g) => {
+    items.forEach((g) => {
       map[g.category] = (map[g.category] ?? 0) + 1;
     });
     return map;
-  }, []);
+  }, [items]);
 
   const isSearching = search.trim().length > 0;
   const filteredIds = useMemo(() => filtered.map((g) => g.id), [filtered]);
@@ -86,8 +100,9 @@ export default function GlossaryPage() {
         <h1 className="text-3xl font-bold mb-2">외환 용어 사전</h1>
         <p className="text-sm text-charcoal-soft">
           외국환거래규정 (재정경제부고시 제2026-69호) 제1-2조 본문 1차 인용. 총{" "}
-          {GLOSSARY.length}개 용어.
+          {items.length}개 용어.
         </p>
+        <AdminBadge hqHint="본점 관리자 — 용어 추가·수정·삭제가 가능합니다" />
       </header>
 
       <div className="bg-white border border-border rounded-xl p-4 mb-4 sticky top-16 z-10">
@@ -100,7 +115,7 @@ export default function GlossaryPage() {
         />
         <div className="flex flex-wrap gap-1.5 mt-3">
           <CategoryChip
-            label={`전체 (${GLOSSARY.length})`}
+            label={`전체 (${items.length})`}
             active={activeCategory === null}
             onClick={() => setActiveCategory(null)}
           />
@@ -113,7 +128,39 @@ export default function GlossaryPage() {
             />
           ))}
         </div>
+        {canEdit && (
+          <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-border">
+            <button
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="bg-primary hover:bg-primary-dark text-white px-3 py-1.5 rounded-lg text-xs font-medium transition"
+            >
+              {showAddForm ? "취소" : "+ 새 용어 추가"}
+            </button>
+            <button
+              onClick={() => {
+                if (confirm("용어 사전을 초기 시드 데이터로 되돌립니다. 계속할까요?")) {
+                  reset();
+                  setEditingId(null);
+                  setShowAddForm(false);
+                }
+              }}
+              className="text-[11px] text-charcoal-soft hover:text-charcoal"
+            >
+              ↺ 초기화
+            </button>
+          </div>
+        )}
       </div>
+
+      {canEdit && showAddForm && (
+        <TermForm
+          onSubmit={(t) => {
+            add(t);
+            setShowAddForm(false);
+          }}
+          onCancel={() => setShowAddForm(false)}
+        />
+      )}
 
       {filtered.length === 0 ? (
         <p className="text-center text-charcoal-soft py-12">
@@ -133,14 +180,33 @@ export default function GlossaryPage() {
             </button>
           </div>
           <ul className="space-y-2">
-            {filtered.map((g) => (
-              <TermCard
-                key={g.id}
-                term={g}
-                open={openIds.has(g.id) || isSearching}
-                onToggle={() => toggle(g.id)}
-              />
-            ))}
+            {filtered.map((g) =>
+              editingId === g.id ? (
+                <TermForm
+                  key={g.id}
+                  initial={g}
+                  onSubmit={(updated) => {
+                    update(g.id, updated);
+                    setEditingId(null);
+                  }}
+                  onCancel={() => setEditingId(null)}
+                />
+              ) : (
+                <TermCard
+                  key={g.id}
+                  term={g}
+                  open={openIds.has(g.id) || isSearching}
+                  onToggle={() => toggle(g.id)}
+                  canEdit={canEdit}
+                  onEdit={() => setEditingId(g.id)}
+                  onDelete={() => {
+                    if (confirm(`"${g.term}"\n\n이 용어를 삭제할까요?`)) {
+                      remove(g.id);
+                    }
+                  }}
+                />
+              ),
+            )}
           </ul>
         </>
       )}
@@ -176,10 +242,16 @@ function TermCard({
   term,
   open,
   onToggle,
+  canEdit,
+  onEdit,
+  onDelete,
 }: {
   term: GlossaryTerm;
   open: boolean;
   onToggle: () => void;
+  canEdit: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
 }) {
   return (
     <li className="bg-white border border-border rounded-xl overflow-hidden hover:border-primary/40 transition">
@@ -213,8 +285,128 @@ function TermCard({
               출처: {term.source}
             </p>
           )}
+          {canEdit && (
+            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
+              <button
+                onClick={onEdit}
+                className="text-xs text-primary hover:text-primary-dark font-medium"
+              >
+                ✏️ 수정
+              </button>
+              <button
+                onClick={onDelete}
+                className="text-xs text-danger hover:underline"
+              >
+                🗑️ 삭제
+              </button>
+            </div>
+          )}
         </div>
       )}
+    </li>
+  );
+}
+
+function TermForm({
+  initial,
+  onSubmit,
+  onCancel,
+}: {
+  initial?: GlossaryTerm;
+  onSubmit: (t: GlossaryTerm) => void;
+  onCancel: () => void;
+}) {
+  const [term, setTerm] = useState(initial?.term ?? "");
+  const [definition, setDefinition] = useState(initial?.definition ?? "");
+  const [category, setCategory] = useState<GlossaryCategory>(
+    initial?.category ?? "기타",
+  );
+  const [source, setSource] = useState(initial?.source ?? "");
+
+  const submit = () => {
+    if (!term.trim() || !definition.trim()) return;
+    onSubmit({
+      id: initial?.id ?? `term-${Date.now()}`,
+      term: term.trim(),
+      definition: definition.trim(),
+      category,
+      source: source.trim() || undefined,
+      related: initial?.related,
+    });
+  };
+
+  return (
+    <li className="bg-white border-2 border-primary/50 rounded-xl p-5 space-y-3 mb-2 list-none">
+      <h3 className="font-bold text-sm">
+        {initial ? "용어 수정" : "새 용어 추가"}
+      </h3>
+      <div>
+        <label className="text-[11px] text-charcoal-soft block mb-1">
+          용어
+        </label>
+        <input
+          type="text"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+          placeholder="예: 거주자"
+          className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary text-sm"
+        />
+      </div>
+      <div>
+        <label className="text-[11px] text-charcoal-soft block mb-1">
+          카테고리
+        </label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value as GlossaryCategory)}
+          className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary text-sm bg-white"
+        >
+          {CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label className="text-[11px] text-charcoal-soft block mb-1">
+          정의
+        </label>
+        <textarea
+          value={definition}
+          onChange={(e) => setDefinition(e.target.value)}
+          placeholder="정의"
+          rows={6}
+          className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary text-sm resize-y"
+        />
+      </div>
+      <div>
+        <label className="text-[11px] text-charcoal-soft block mb-1">
+          출처 (1차 자료)
+        </label>
+        <input
+          type="text"
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+          placeholder="예: 외환규정 1-2조 29호"
+          className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary text-sm"
+        />
+      </div>
+      <div className="flex items-center justify-end gap-2 pt-2">
+        <button
+          onClick={onCancel}
+          className="text-xs text-charcoal-soft hover:text-charcoal px-3 py-1.5"
+        >
+          취소
+        </button>
+        <button
+          onClick={submit}
+          disabled={!term.trim() || !definition.trim()}
+          className="bg-primary hover:bg-primary-dark text-white px-4 py-1.5 rounded-lg text-xs font-medium transition disabled:opacity-50"
+        >
+          {initial ? "수정 저장" : "추가"}
+        </button>
+      </div>
     </li>
   );
 }
