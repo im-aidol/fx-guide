@@ -515,9 +515,16 @@ function ResultNodeView({
         key={result.transactionCode}
         items={result.documents}
       />
-      <Section title="주의·통보의무" items={result.cautions} />
       <Section
-        title="고객 응대 멘트 (직원이 그대로 읽어도 OK)"
+        title="주의·통보의무"
+        icon="⚠️"
+        items={result.cautions}
+        variant="caution"
+      />
+      <Section
+        title="고객 응대 멘트"
+        subtitle="직원이 그대로 읽어도 OK"
+        icon="💬"
         items={result.customerScripts}
         variant="quote"
       />
@@ -546,12 +553,15 @@ function DocumentsChecklist({ items }: { items: string[] }) {
 
   if (items.length === 0) {
     return (
-      <div>
-        <h3 className="text-sm font-medium mb-1.5">필요 서류</h3>
+      <section className="bg-offwhite border border-border rounded-lg p-4">
+        <h3 className="text-sm font-medium mb-1.5 flex items-center gap-2">
+          <span>📋</span>
+          <span>필요 서류</span>
+        </h3>
         <p className="text-sm text-charcoal-soft italic">
           별도 증빙 서류 불필요
         </p>
-      </div>
+      </section>
     );
   }
 
@@ -570,10 +580,11 @@ function DocumentsChecklist({ items }: { items: string[] }) {
   };
 
   return (
-    <div>
-      <div className="flex items-baseline justify-between mb-2">
-        <h3 className="text-sm font-medium">
-          필요 서류{" "}
+    <section className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+      <div className="flex items-baseline justify-between mb-2 gap-2">
+        <h3 className="text-sm font-semibold flex items-center gap-2">
+          <span>📋</span>
+          <span>필요 서류</span>
           <span className="text-xs text-charcoal-soft font-normal">
             ({checked.size}/{items.length} 확인)
           </span>
@@ -581,7 +592,7 @@ function DocumentsChecklist({ items }: { items: string[] }) {
         <button
           type="button"
           onClick={toggleAll}
-          className="text-xs text-primary hover:text-primary-dark font-medium"
+          className="text-xs text-primary hover:text-primary-dark font-medium shrink-0"
         >
           {allChecked ? "전체 해제" : "전체 체크"}
         </button>
@@ -640,33 +651,56 @@ function DocumentsChecklist({ items }: { items: string[] }) {
           );
         })}
       </ul>
-    </div>
+    </section>
   );
 }
 
 function Section({
   title,
+  subtitle,
+  icon,
   items,
   emptyText,
   variant,
 }: {
   title: string;
+  subtitle?: string;
+  icon?: string;
   items: string[];
   emptyText?: string;
-  variant?: "quote";
+  variant?: "quote" | "caution";
 }) {
+  // 색상 분기
+  const bgClass =
+    variant === "caution"
+      ? "bg-warn/10 border-warn/30"
+      : variant === "quote"
+        ? "bg-offwhite border-border"
+        : "bg-white border-border";
+
   if (items.length === 0) {
     if (!emptyText) return null;
     return (
-      <div>
-        <h3 className="text-sm font-medium mb-1.5">{title}</h3>
+      <section className={`border rounded-lg p-4 ${bgClass}`}>
+        <h3 className="text-sm font-semibold mb-1.5 flex items-center gap-2">
+          {icon && <span>{icon}</span>}
+          <span>{title}</span>
+        </h3>
         <p className="text-sm text-charcoal-soft italic">{emptyText}</p>
-      </div>
+      </section>
     );
   }
   return (
-    <div>
-      <h3 className="text-sm font-medium mb-2">{title}</h3>
+    <section className={`border rounded-lg p-4 ${bgClass}`}>
+      <div className="mb-2 flex items-baseline justify-between gap-2 flex-wrap">
+        <h3 className="text-sm font-semibold flex items-center gap-2">
+          {icon && <span>{icon}</span>}
+          <span>{title}</span>
+        </h3>
+        {subtitle && (
+          <span className="text-[11px] text-charcoal-soft">{subtitle}</span>
+        )}
+      </div>
       <ul className="space-y-1.5 text-sm">
         {items.map((item, i) => (
           <li
@@ -674,14 +708,16 @@ function Section({
             className={
               variant === "quote"
                 ? "text-charcoal italic pl-3 border-l-2 border-primary/30"
-                : "text-charcoal-soft pl-1 list-disc list-inside"
+                : variant === "caution"
+                  ? "text-charcoal pl-1 list-disc list-inside"
+                  : "text-charcoal-soft pl-1 list-disc list-inside"
             }
           >
             {item}
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 }
 
