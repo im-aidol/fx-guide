@@ -185,7 +185,8 @@ export type Denomination = {
   value: string;       // 표기: "$100", "10,000엔" 등
   series?: string;     // 발행 시리즈/연도 (예: "2024년 신권")
   imageUrl?: string;   // public/currency-samples/... 경로 (없으면 placeholder)
-  acceptable: boolean; // 매입 가능 여부
+  buyable: boolean;    // 매입 가능 여부 (고객→은행, 외화 매입)
+  sellable: boolean;   // 매도 가능 여부 (은행→고객, 외화 매도)
   notes?: string;      // 특이 사항
 };
 

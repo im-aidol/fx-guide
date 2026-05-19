@@ -131,6 +131,20 @@ function Flag({ code, className }: { code: string; className?: string }) {
 }
 
 function CurrencyDetail({ sample }: { sample: CurrencySample }) {
+  // 정렬: 매입·매도 둘 다 가능 → 매입만 가능 → 둘 다 불가
+  const score = (d: Denomination): number => {
+    if (d.buyable && d.sellable) return 2;
+    if (d.buyable && !d.sellable) return 1;
+    return 0;
+  };
+  const sorted = [...sample.denominations]
+    .map((d, originalIndex) => ({ d, originalIndex }))
+    .sort((a, b) => score(b.d) - score(a.d));
+
+  const fullyOk = sorted.filter(({ d }) => d.buyable && d.sellable);
+  const buyOnly = sorted.filter(({ d }) => d.buyable && !d.sellable);
+  const neither = sorted.filter(({ d }) => !d.buyable && !d.sellable);
+
   return (
     <section className="bg-white border border-border rounded-xl p-5">
       <div className="flex items-center gap-3 mb-4 pb-4 border-b border-border">
@@ -144,23 +158,42 @@ function CurrencyDetail({ sample }: { sample: CurrencySample }) {
             <span className="text-charcoal-soft font-medium">({sample.code})</span>
           </h2>
           <p className="text-xs text-charcoal-soft">
-            권종별 매입 가능 여부 확인 — 총 {sample.denominations.length}개
+            권종별 매입·매도 가능 여부 확인 — 총 {sample.denominations.length}개
           </p>
         </div>
       </div>
 
-      {/* 권종 카드 그리드 */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-5">
-        {sample.denominations.map((d, i) => (
-          <DenominationCard key={`${sample.id}-${i}`} denomination={d} />
-        ))}
-      </div>
+      {/* 그룹별 섹션 */}
+      {fullyOk.length > 0 && (
+        <DenominationGroup
+          title="매입·매도 모두 가능"
+          color="green"
+          items={fullyOk.map(({ d, originalIndex }) => ({ d, originalIndex }))}
+          sampleId={sample.id}
+        />
+      )}
+      {buyOnly.length > 0 && (
+        <DenominationGroup
+          title="매입만 가능 (매도 불가)"
+          color="warn"
+          items={buyOnly.map(({ d, originalIndex }) => ({ d, originalIndex }))}
+          sampleId={sample.id}
+        />
+      )}
+      {neither.length > 0 && (
+        <DenominationGroup
+          title="매입·매도 모두 불가"
+          color="danger"
+          items={neither.map(({ d, originalIndex }) => ({ d, originalIndex }))}
+          sampleId={sample.id}
+        />
+      )}
 
       {/* 일반 유의사항 */}
       {sample.generalNotes && sample.generalNotes.length > 0 && (
-        <div className="bg-offwhite border border-border rounded-md p-3 text-sm">
+        <div className="bg-offwhite border border-border rounded-md p-3 text-sm mt-5">
           <p className="text-xs font-medium text-charcoal-soft uppercase tracking-wide mb-2">
-            매입 일반 유의사항
+            일반 유의사항
           </p>
           <ul className="space-y-1 text-charcoal-soft list-disc list-inside">
             {sample.generalNotes.map((n, i) => (
@@ -173,14 +206,59 @@ function CurrencyDetail({ sample }: { sample: CurrencySample }) {
   );
 }
 
+function DenominationGroup({
+  title,
+  color,
+  items,
+  sampleId,
+}: {
+  title: string;
+  color: "green" | "warn" | "danger";
+  items: { d: Denomination; originalIndex: number }[];
+  sampleId: string;
+}) {
+  const dot = {
+    green: "bg-primary",
+    warn: "bg-warn",
+    danger: "bg-danger",
+  }[color];
+
+  return (
+    <div className="mb-5 last:mb-0">
+      <div className="flex items-center gap-2 mb-2">
+        <span className={`w-2 h-2 rounded-full ${dot}`} />
+        <h3 className="text-sm font-medium text-charcoal-soft uppercase tracking-wide">
+          {title}{" "}
+          <span className="text-[10px] normal-case ml-0.5">({items.length})</span>
+        </h3>
+      </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {items.map(({ d, originalIndex }) => (
+          <DenominationCard
+            key={`${sampleId}-${originalIndex}`}
+            denomination={d}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function DenominationCard({ denomination }: { denomination: Denomination }) {
+  const bothOk = denomination.buyable && denomination.sellable;
+  const buyOnly = denomination.buyable && !denomination.sellable;
+
+  const bgClass = bothOk
+    ? "bg-white border-border"
+    : buyOnly
+      ? "bg-warn/5 border-warn/30"
+      : "bg-danger/5 border-danger/30";
+
   return (
     <article
       className={[
         "border rounded-lg overflow-hidden flex flex-col",
-        denomination.acceptable
-          ? "bg-white border-border"
-          : "bg-danger/5 border-danger/30",
+        bgClass,
       ].join(" ")}
     >
       {/* 사진 영역 (placeholder) */}
@@ -205,18 +283,19 @@ function DenominationCard({ denomination }: { denomination: Denomination }) {
 
       {/* 정보 */}
       <div className="p-3 flex-1 flex flex-col">
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <p className="font-bold">{denomination.value}</p>
-          {denomination.acceptable ? (
-            <span className="text-[10px] text-primary border border-primary/30 bg-primary/10 px-2 py-0.5 rounded-full whitespace-nowrap">
-              ✓ 매입
-            </span>
-          ) : (
-            <span className="text-[10px] text-danger border border-danger/30 bg-danger/10 px-2 py-0.5 rounded-full whitespace-nowrap">
-              ✗ 매입 불가
-            </span>
-          )}
+        <p className="font-bold mb-1.5">{denomination.value}</p>
+
+        <div className="flex flex-wrap gap-1 mb-2">
+          <StatusChip
+            label="매입"
+            ok={denomination.buyable}
+          />
+          <StatusChip
+            label="매도"
+            ok={denomination.sellable}
+          />
         </div>
+
         {denomination.series && (
           <p className="text-xs text-charcoal-soft mb-1">{denomination.series}</p>
         )}
@@ -227,5 +306,20 @@ function DenominationCard({ denomination }: { denomination: Denomination }) {
         )}
       </div>
     </article>
+  );
+}
+
+function StatusChip({ label, ok }: { label: string; ok: boolean }) {
+  return (
+    <span
+      className={[
+        "text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap font-medium",
+        ok
+          ? "text-primary border-primary/30 bg-primary/10"
+          : "text-danger border-danger/30 bg-danger/10",
+      ].join(" ")}
+    >
+      {ok ? "✓" : "✗"} {label}
+    </span>
   );
 }
