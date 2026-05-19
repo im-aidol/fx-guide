@@ -11,6 +11,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "usd",
     code: "USD",
+    countryCode: "us",
     countryName: "미국",
     flag: "🇺🇸",
     primary: true,
@@ -32,6 +33,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "jpy",
     code: "JPY",
+    countryCode: "jp",
     countryName: "일본",
     flag: "🇯🇵",
     primary: true,
@@ -52,6 +54,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "eur",
     code: "EUR",
+    countryCode: "eu",
     countryName: "유럽 (유로)",
     flag: "🇪🇺",
     primary: true,
@@ -73,6 +76,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "cny",
     code: "CNY",
+    countryCode: "cn",
     countryName: "중국 (위안)",
     flag: "🇨🇳",
     primary: true,
@@ -95,6 +99,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "gbp",
     code: "GBP",
+    countryCode: "gb",
     countryName: "영국",
     flag: "🇬🇧",
     primary: false,
@@ -112,6 +117,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "aud",
     code: "AUD",
+    countryCode: "au",
     countryName: "호주",
     flag: "🇦🇺",
     primary: false,
@@ -127,6 +133,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "cad",
     code: "CAD",
+    countryCode: "ca",
     countryName: "캐나다",
     flag: "🇨🇦",
     primary: false,
@@ -141,6 +148,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "hkd",
     code: "HKD",
+    countryCode: "hk",
     countryName: "홍콩",
     flag: "🇭🇰",
     primary: false,
@@ -156,6 +164,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "chf",
     code: "CHF",
+    countryCode: "ch",
     countryName: "스위스",
     flag: "🇨🇭",
     primary: false,
@@ -172,6 +181,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "sgd",
     code: "SGD",
+    countryCode: "sg",
     countryName: "싱가포르",
     flag: "🇸🇬",
     primary: false,
@@ -186,6 +196,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "thb",
     code: "THB",
+    countryCode: "th",
     countryName: "태국",
     flag: "🇹🇭",
     primary: false,
@@ -201,6 +212,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "nzd",
     code: "NZD",
+    countryCode: "nz",
     countryName: "뉴질랜드",
     flag: "🇳🇿",
     primary: false,
@@ -215,6 +227,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "sar",
     code: "SAR",
+    countryCode: "sa",
     countryName: "사우디",
     flag: "🇸🇦",
     primary: false,
@@ -230,6 +243,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "kwd",
     code: "KWD",
+    countryCode: "kw",
     countryName: "쿠웨이트",
     flag: "🇰🇼",
     primary: false,
@@ -246,6 +260,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "sek",
     code: "SEK",
+    countryCode: "se",
     countryName: "스웨덴",
     flag: "🇸🇪",
     primary: false,
@@ -262,6 +277,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "nok",
     code: "NOK",
+    countryCode: "no",
     countryName: "노르웨이",
     flag: "🇳🇴",
     primary: false,
@@ -276,6 +292,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
   {
     id: "dkk",
     code: "DKK",
+    countryCode: "dk",
     countryName: "덴마크",
     flag: "🇩🇰",
     primary: false,

@@ -192,8 +192,9 @@ export type Denomination = {
 export type CurrencySample = {
   id: string;
   code: string;          // ISO 4217 (예: USD, JPY, EUR)
+  countryCode: string;   // ISO 3166-1 alpha-2 (예: us, jp, eu, gb) — flag-icons 클래스용 소문자
   countryName: string;
-  flag: string;
+  flag: string;          // legacy emoji (호환용)
   primary: boolean;      // 주요 통화 (상단 노출)
   denominations: Denomination[];
   generalNotes?: string[]; // 매입 일반 유의사항
