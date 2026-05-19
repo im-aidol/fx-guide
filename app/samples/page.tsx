@@ -90,7 +90,7 @@ function CurrencyCard({
       <div className={large ? "flex items-center gap-2.5 mb-1" : "flex items-center gap-1.5"}>
         <Flag
           code={sample.countryCode}
-          className={large ? "w-9 h-7 shrink-0 shadow-sm" : "w-6 h-[18px] shrink-0"}
+          className={large ? "w-10 shrink-0 shadow-sm" : "w-6 shrink-0"}
         />
         <div className="min-w-0">
           <p className={large ? "font-bold text-base" : "font-medium text-sm truncate"}>
@@ -114,13 +114,15 @@ function CurrencyCard({
 }
 
 function Flag({ code, className }: { code: string; className?: string }) {
-  // flag-icons 는 background-image 로 국기 표시. 인라인 width/height 또는 Tailwind class로 크기 지정.
+  // flag-icons는 background-image. aspect-[4/3]로 비율 고정, 사용처는 width만 지정.
+  // background-size: cover 로 컨테이너 가득 채워 위아래 여백 없앰.
   return (
     <span
       className={[
         "fi",
         `fi-${code.toLowerCase()}`,
-        "inline-block rounded-sm border border-border bg-offwhite",
+        "block aspect-[4/3] rounded-sm border border-border",
+        "!bg-cover", // flag-icons 기본 contain 오버라이드 (Tailwind important 접두사)
         className ?? "",
       ].join(" ")}
       aria-label={`${code} flag`}
@@ -134,7 +136,7 @@ function CurrencyDetail({ sample }: { sample: CurrencySample }) {
       <div className="flex items-center gap-3 mb-4 pb-4 border-b border-border">
         <Flag
           code={sample.countryCode}
-          className="w-14 h-10 shrink-0 shadow-sm"
+          className="w-16 shrink-0 shadow-sm"
         />
         <div>
           <h2 className="text-xl font-bold">
