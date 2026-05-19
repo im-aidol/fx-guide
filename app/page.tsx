@@ -66,7 +66,7 @@ export default function HomePage() {
         />
         <SmallLink
           href="/glossary"
-          title="용어 사전"
+          title="외환 용어집"
           desc="50여개 — 외환규정 1-2조 본문 인용"
         />
       </section>
@@ -268,7 +268,7 @@ function SearchCard() {
           href="/glossary"
           className="flex justify-between items-center text-sm hover:text-primary transition"
         >
-          <span>용어 사전</span>
+          <span>외환 용어집</span>
           <span className="text-xs text-charcoal-soft">50+개</span>
         </Link>
       </div>

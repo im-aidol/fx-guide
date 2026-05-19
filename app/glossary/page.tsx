@@ -95,9 +95,9 @@ export default function GlossaryPage() {
     <div className="max-w-5xl mx-auto px-6 py-12">
       <header className="mb-6">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
-          용어 사전
+          외환 용어집
         </p>
-        <h1 className="text-3xl font-bold mb-2">외환 용어 사전</h1>
+        <h1 className="text-3xl font-bold mb-2">외환 용어집</h1>
         <p className="text-sm text-charcoal-soft">
           외국환거래규정 (재정경제부고시 제2026-69호) 제1-2조 본문 1차 인용. 총{" "}
           {items.length}개 용어.
@@ -138,7 +138,7 @@ export default function GlossaryPage() {
             </button>
             <button
               onClick={() => {
-                if (confirm("용어 사전을 초기 시드 데이터로 되돌립니다. 계속할까요?")) {
+                if (confirm("외환 용어집을 초기 시드 데이터로 되돌립니다. 계속할까요?")) {
                   reset();
                   setEditingId(null);
                   setShowAddForm(false);

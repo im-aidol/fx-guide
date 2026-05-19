@@ -10,11 +10,11 @@ const ITEMS = [
   { href: "/simulator", label: "당발 송금 도우미", icon: "📤" },
   { href: "/incoming", label: "타발 송금 안내", icon: "📥" },
   { href: "/guide", label: "업무별 가이드", icon: "📚" },
-  { href: "/samples", label: "외국통화 견양", icon: "💴" },
+  { href: "/samples", label: "통화 견본", icon: "💴" },
   { href: "/notices", label: "공지사항", icon: "📣" },
   { href: "/qna", label: "익명 Q&A", icon: "💬" },
   { href: "/faq", label: "FAQ", icon: "❓" },
-  { href: "/glossary", label: "용어 사전", icon: "📖" },
+  { href: "/glossary", label: "외환 용어집", icon: "📖" },
 ];
 
 export function Sidebar() {

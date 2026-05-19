@@ -31,7 +31,7 @@ export default function SamplesPage() {
     <div className="max-w-6xl mx-auto px-6 py-12">
       <header className="mb-6">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
-          외국통화 견양
+          통화 견본
         </p>
         <h1 className="text-3xl font-bold mb-2">환전 매입 가능 통화 확인</h1>
         <p className="text-sm text-charcoal-soft">
