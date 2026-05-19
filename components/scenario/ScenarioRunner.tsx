@@ -154,6 +154,11 @@ export function ScenarioRunner({ scenario }: Props) {
           <ResultNodeView
             result={node.result}
             amountUsd={state.inputs.amountUsd as number | undefined}
+            amountLocal={state.inputs.amountLocal as number | undefined}
+            inputCurrency={
+              (state.inputs.amountCurrency as string) ||
+              selectedCountry?.currency
+            }
           />
         )}
 
@@ -462,9 +467,13 @@ function SelectNodeView({
 function ResultNodeView({
   result,
   amountUsd,
+  amountLocal,
+  inputCurrency,
 }: {
   result: FlowResult;
   amountUsd?: number;
+  amountLocal?: number;
+  inputCurrency?: string;
 }) {
   return (
     <div className="space-y-4">
@@ -478,7 +487,13 @@ function ResultNodeView({
         </p>
       </div>
 
-      {amountUsd !== undefined && <ThresholdCheck amount={amountUsd} />}
+      {amountUsd !== undefined && (
+        <ThresholdCheck
+          amount={amountUsd}
+          amountLocal={amountLocal}
+          inputCurrency={inputCurrency}
+        />
+      )}
 
       <div className="flex flex-wrap gap-2">
         {result.needsBankDesignation && (
@@ -672,7 +687,16 @@ function Section({
 
 // 입력한 USD 환산 금액 기준 임계값 자동 점검.
 // 외환규정 4-3조 ①·②·4-4조·4-8조 + iM뱅크 안내 한도 기준.
-function ThresholdCheck({ amount }: { amount: number }) {
+// 외환규정 임계값은 모두 USD("미화") 기준이라 자국통화 입력 시 USD로 환산해 점검.
+function ThresholdCheck({
+  amount,
+  amountLocal,
+  inputCurrency,
+}: {
+  amount: number;
+  amountLocal?: number;
+  inputCurrency?: string;
+}) {
   type Severity = "ok" | "info" | "warn" | "danger";
   type Check = {
     label: string;
@@ -731,10 +755,34 @@ function ThresholdCheck({ amount }: { amount: number }) {
   const fmt = (n: number) =>
     n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
+  // 입력값이 USD가 아닌 경우 헤더에 원본 통화·금액 + USD 환산 함께 표시
+  const hasLocalInput =
+    inputCurrency &&
+    inputCurrency !== "USD" &&
+    typeof amountLocal === "number" &&
+    !isNaN(amountLocal);
+
   return (
     <div className="bg-offwhite border border-border rounded-lg p-3">
-      <p className="text-xs font-medium text-charcoal-soft uppercase tracking-wide mb-2">
-        💰 USD {fmt(amount)} 임계 점검 (1회 송금 기준)
+      <div className="flex items-baseline justify-between gap-2 mb-1">
+        <p className="text-xs font-medium text-charcoal-soft uppercase tracking-wide">
+          💰 임계 점검 (1회 송금 기준)
+        </p>
+        <p className="text-[10px] text-charcoal-soft">
+          외환규정 임계값은 모두 USD 기준
+        </p>
+      </div>
+      <p className="text-sm font-semibold mb-2 pb-2 border-b border-border">
+        {hasLocalInput ? (
+          <>
+            {fmt(amountLocal)} {inputCurrency}{" "}
+            <span className="text-charcoal-soft font-normal">
+              → ≈ USD {fmt(amount)} 로 환산해 점검
+            </span>
+          </>
+        ) : (
+          <>USD {fmt(amount)}</>
+        )}
       </p>
       <ul className="space-y-1.5 text-sm">
         {checks.map((c, i) => (
