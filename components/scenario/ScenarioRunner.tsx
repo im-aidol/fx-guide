@@ -8,7 +8,7 @@ import type {
   ScenarioNode,
   ScenarioOption,
 } from "@/lib/types";
-import { COUNTRIES, getSendableCurrencies } from "@/lib/data";
+import { COUNTRIES, getSendableCurrencies, isImBankSendable } from "@/lib/data";
 import {
   fetchUsdRates,
   localToUsd,
@@ -375,6 +375,9 @@ function AmountFooter({
 }) {
   const isUsd = currency === "USD";
   const rate = rates?.rates[currency.toLowerCase()];
+  // iM뱅크 SWIFT 송금 가능 17종 통화 외(예: VND/CNY/INR)는 입력만 자국통화로,
+  // 실제 송금은 USD로 처리됨을 안내.
+  const needsUsdConversion = !isUsd && !isImBankSendable(currency);
 
   return (
     <div className="text-xs bg-offwhite border border-border rounded-md px-3 py-2 space-y-0.5">
@@ -405,6 +408,12 @@ function AmountFooter({
             환율 1 USD = {rate?.toLocaleString()} {currency} ({rates.date}{" "}
             갱신)
           </p>
+          {needsUsdConversion && (
+            <p className="text-warn text-[11px] mt-1 pt-1 border-t border-border">
+              ℹ️ {currency}는 iM뱅크 SWIFT 송금 17종 미포함 — 실제 송금은 USD로
+              환산 처리됩니다 (현지에서 {currency}로 환전 수령).
+            </p>
+          )}
           <p className="text-[10px] text-charcoal-soft mt-1">
             ⚠️ 참고용 환율. 실제 거래는 iM뱅크 매매기준율 적용
           </p>

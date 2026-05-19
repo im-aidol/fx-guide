@@ -5,6 +5,7 @@ export {
   COUNTRIES,
   IM_BANK_SENDABLE_CURRENCIES,
   getSendableCurrencies,
+  isImBankSendable,
 } from "./countries";
 export { PURPOSES } from "./purposes";
 export { GLOSSARY } from "./glossary";

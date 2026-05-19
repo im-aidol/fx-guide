@@ -22,18 +22,27 @@ export const IM_BANK_SENDABLE_CURRENCIES = [
   "IDR",
 ] as const;
 
-/** 어떤 나라에 어떤 통화로 송금할 수 있는지 반환. 자국 통화가 가능하면 [자국, USD], 아니면 [USD] 만. */
+/**
+ * 영업점 직원이 시뮬레이터에서 선택할 수 있는 통화 — [자국통화, USD].
+ * 자국통화가 USD면 ["USD"] 만.
+ *
+ * 주의: "선택 가능" ≠ "실제 SWIFT 송금 가능".
+ * iM뱅크 SWIFT 송금은 17종(IM_BANK_SENDABLE_CURRENCIES)만 가능. 그 외 통화는
+ * 고객이 자국통화로 말하더라도 실제 송금은 USD로 환산 처리됨.
+ * UI에서 isImBankSendable(currency) 로 판별.
+ */
 export function getSendableCurrencies(country: Country): string[] {
   const result: string[] = [];
-  if (
-    country.currency &&
-    country.currency !== "USD" &&
-    (IM_BANK_SENDABLE_CURRENCIES as readonly string[]).includes(country.currency)
-  ) {
+  if (country.currency && country.currency !== "USD") {
     result.push(country.currency);
   }
   result.push("USD");
   return result;
+}
+
+/** iM뱅크 SWIFT 송금 가능 17종 통화인지 판별. */
+export function isImBankSendable(currency: string): boolean {
+  return (IM_BANK_SENDABLE_CURRENCIES as readonly string[]).includes(currency);
 }
 
 // ⚠️ 잠정 데이터 (2026-05-10 Claude 작성, 외환 일반 상식 기반)
