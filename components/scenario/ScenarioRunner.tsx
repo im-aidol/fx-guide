@@ -151,7 +151,10 @@ export function ScenarioRunner({ scenario }: Props) {
         )}
 
         {node.type === "result" && node.result && (
-          <ResultNodeView result={node.result} />
+          <ResultNodeView
+            result={node.result}
+            amountUsd={state.inputs.amountUsd as number | undefined}
+          />
         )}
 
         <div className="flex items-center gap-2 mt-6 pt-4 border-t border-border">
@@ -447,7 +450,13 @@ function SelectNodeView({
   );
 }
 
-function ResultNodeView({ result }: { result: FlowResult }) {
+function ResultNodeView({
+  result,
+  amountUsd,
+}: {
+  result: FlowResult;
+  amountUsd?: number;
+}) {
   return (
     <div className="space-y-4">
       <div className="bg-primary/5 border border-primary/30 rounded-lg p-4">
@@ -459,6 +468,8 @@ function ResultNodeView({ result }: { result: FlowResult }) {
           {result.legalBasis}
         </p>
       </div>
+
+      {amountUsd !== undefined && <ThresholdCheck amount={amountUsd} />}
 
       <div className="flex flex-wrap gap-2">
         {result.needsBankDesignation && (
@@ -647,6 +658,109 @@ function Section({
         ))}
       </ul>
     </div>
+  );
+}
+
+// 입력한 USD 환산 금액 기준 임계값 자동 점검.
+// 외환규정 4-3조 ①·②·4-4조·4-8조 + iM뱅크 안내 한도 기준.
+function ThresholdCheck({ amount }: { amount: number }) {
+  type Severity = "ok" | "info" | "warn" | "danger";
+  type Check = {
+    label: string;
+    desc: string;
+    sev: Severity;
+  };
+
+  const checks: Check[] = [];
+
+  if (amount <= 0) return null;
+
+  // 무증빙 단계
+  if (amount <= 5000) {
+    checks.push({
+      label: "USD 5,000 이하",
+      desc: "건당 무증빙 송금 가능 (4-3조 ②가목 / 4-4조 ④1호)",
+      sev: "ok",
+    });
+  } else if (amount <= 10000) {
+    checks.push({
+      label: "USD 5,000 ~ 10,000",
+      desc: "증빙 또는 외국환은행장 확인 (4-3조 ② 적용)",
+      sev: "info",
+    });
+  }
+
+  // 통보 의무
+  if (amount > 10000) {
+    checks.push({
+      label: "USD 10,000 초과",
+      desc: "국세청·관세청·금감원 통보 발동 (외환규정 4-8조 ①·②·③)",
+      sev: "warn",
+    });
+  }
+
+  // 외국인·비거주자 한도
+  if (amount > 50000) {
+    checks.push({
+      label: "USD 50,000 초과",
+      desc: "외국인·비거주자라면 연간 국내소득송금 한도(iM뱅크 안내) 초과 — 거래외국환은행 지정 필수",
+      sev: "warn",
+    });
+  }
+
+  // 거주자 무증빙 한도
+  if (amount > 100000) {
+    checks.push({
+      label: "USD 100,000 초과",
+      desc: "거주자 무증빙 연간 한도(4-3조 ①1호) 초과 — 증빙 제출 또는 외국환은행장 확인 필요",
+      sev: "danger",
+    });
+  }
+
+  if (checks.length === 0) return null;
+
+  const fmt = (n: number) =>
+    n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+
+  return (
+    <div className="bg-offwhite border border-border rounded-lg p-3">
+      <p className="text-xs font-medium text-charcoal-soft uppercase tracking-wide mb-2">
+        💰 USD {fmt(amount)} 임계 점검 (1회 송금 기준)
+      </p>
+      <ul className="space-y-1.5 text-sm">
+        {checks.map((c, i) => (
+          <CheckItem key={i} check={c} />
+        ))}
+      </ul>
+      <p className="text-[10px] text-charcoal-soft mt-2 pt-2 border-t border-border">
+        ⚠️ 연간 누계 한도는 별도 — 본부 시스템·고객 누계 별도 확인 필요
+      </p>
+    </div>
+  );
+}
+
+function CheckItem({
+  check,
+}: {
+  check: { label: string; desc: string; sev: "ok" | "info" | "warn" | "danger" };
+}) {
+  const colors = {
+    ok: { icon: "✓", text: "text-primary", bg: "bg-primary/5" },
+    info: { icon: "ⓘ", text: "text-charcoal-soft", bg: "bg-white" },
+    warn: { icon: "⚠️", text: "text-charcoal", bg: "bg-warn/10" },
+    danger: { icon: "❌", text: "text-danger", bg: "bg-danger/10" },
+  }[check.sev];
+
+  return (
+    <li
+      className={`flex items-start gap-2 px-2 py-1.5 rounded ${colors.bg}`}
+    >
+      <span className={`${colors.text} font-bold shrink-0`}>{colors.icon}</span>
+      <div className="min-w-0">
+        <p className={`text-xs font-medium ${colors.text}`}>{check.label}</p>
+        <p className="text-xs text-charcoal-soft leading-relaxed">{check.desc}</p>
+      </div>
+    </li>
   );
 }
 
