@@ -193,14 +193,19 @@ function QuickStartCard() {
 // ─────────────────────────────────────
 function IncomingCard() {
   return (
-    <div className="bg-white border border-border rounded-xl p-5 flex flex-col">
+    <Link
+      href="/incoming"
+      className="bg-white border border-border rounded-xl p-5 flex flex-col hover:border-primary transition group"
+    >
       <div className="flex items-center gap-2 mb-2">
         <span className="text-lg">📥</span>
         <span className="text-xs uppercase tracking-wide text-charcoal-soft">
           타발 송금 (해외 → 한국)
         </span>
       </div>
-      <h3 className="font-bold mb-4">iM뱅크 수취 정보</h3>
+      <h3 className="font-bold mb-4 group-hover:text-primary transition">
+        iM뱅크 수취 정보
+      </h3>
 
       {/* SWIFT/BIC: 가장 자주 묻는 정보, 크게 강조 */}
       <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mb-3">
@@ -230,13 +235,10 @@ function IncomingCard() {
         </div>
       </dl>
 
-      <Link
-        href="/incoming"
-        className="text-xs text-primary hover:text-primary-dark mt-4 inline-block font-medium"
-      >
+      <span className="text-xs text-primary mt-4 inline-flex items-center gap-1 font-medium group-hover:translate-x-1 transition">
         고객 정보 입력 + 인쇄 →
-      </Link>
-    </div>
+      </span>
+    </Link>
   );
 }
 
@@ -252,24 +254,28 @@ function SearchCard() {
           빠른 검색
         </span>
       </div>
-      <h3 className="font-bold mb-3">자료실</h3>
-      <p className="text-sm text-charcoal-soft mb-3 flex-1">
+      <h3 className="font-bold mb-2">자료실</h3>
+      <p className="text-xs text-charcoal-soft mb-3 flex-1">
         외환규정 본문 + iM뱅크 안내 1차 자료. 모든 항목에 출처 표기.
       </p>
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <Link
           href="/faq"
-          className="flex justify-between items-center text-sm hover:text-primary transition"
+          className="flex justify-between items-center bg-offwhite border border-border rounded-lg px-3 py-2.5 text-sm hover:border-primary hover:bg-primary/5 transition group"
         >
-          <span>FAQ</span>
-          <span className="text-xs text-charcoal-soft">13개</span>
+          <span className="font-medium group-hover:text-primary transition">
+            ❓ FAQ
+          </span>
+          <span className="text-xs text-charcoal-soft">13개 →</span>
         </Link>
         <Link
           href="/glossary"
-          className="flex justify-between items-center text-sm hover:text-primary transition"
+          className="flex justify-between items-center bg-offwhite border border-border rounded-lg px-3 py-2.5 text-sm hover:border-primary hover:bg-primary/5 transition group"
         >
-          <span>외환 용어집</span>
-          <span className="text-xs text-charcoal-soft">50+개</span>
+          <span className="font-medium group-hover:text-primary transition">
+            📖 외환 용어집
+          </span>
+          <span className="text-xs text-charcoal-soft">50+개 →</span>
         </Link>
       </div>
     </div>
