@@ -155,6 +155,22 @@ export default function ExchangeGuidePage() {
         </ul>
       </section>
 
+      {/* 외국통화 견양 진입 */}
+      <section className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-4 flex items-center justify-between gap-3">
+        <div>
+          <p className="font-medium text-sm">💴 외국통화 견양 — 매입 가능 여부 확인</p>
+          <p className="text-xs text-charcoal-soft mt-0.5">
+            권종별 사진·시리즈·매입 가능 여부를 한 화면에서.
+          </p>
+        </div>
+        <Link
+          href="/samples"
+          className="text-sm text-primary hover:text-primary-dark font-medium whitespace-nowrap"
+        >
+          견양 보러가기 →
+        </Link>
+      </section>
+
       {/* 관련 자료 */}
       <section className="bg-offwhite border border-border rounded-xl p-5 text-sm">
         <h3 className="font-medium mb-2">📄 관련 자료</h3>

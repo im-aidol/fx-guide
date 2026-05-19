@@ -178,6 +178,28 @@ export type Scenario = {
 // ============================================================
 
 // ============================================================
+// 외국통화 견양 (환전 매입 가능 여부 확인용)
+// ============================================================
+
+export type Denomination = {
+  value: string;       // 표기: "$100", "10,000엔" 등
+  series?: string;     // 발행 시리즈/연도 (예: "2024년 신권")
+  imageUrl?: string;   // public/currency-samples/... 경로 (없으면 placeholder)
+  acceptable: boolean; // 매입 가능 여부
+  notes?: string;      // 특이 사항
+};
+
+export type CurrencySample = {
+  id: string;
+  code: string;          // ISO 4217 (예: USD, JPY, EUR)
+  countryName: string;
+  flag: string;
+  primary: boolean;      // 주요 통화 (상단 노출)
+  denominations: Denomination[];
+  generalNotes?: string[]; // 매입 일반 유의사항
+};
+
+// ============================================================
 // 본부 공지·가이드 게시판 + 익명 Q&A (시연용 데모 데이터)
 // ============================================================
 

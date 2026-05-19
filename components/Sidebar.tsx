@@ -9,6 +9,7 @@ const ITEMS = [
   { href: "/simulator", label: "당발 송금 도우미", icon: "📤" },
   { href: "/incoming", label: "타발 송금 안내", icon: "📥" },
   { href: "/guide", label: "업무별 가이드", icon: "📚" },
+  { href: "/samples", label: "외국통화 견양", icon: "💴" },
   { href: "/notices", label: "본부 게시판", icon: "📣" },
   { href: "/qna", label: "익명 Q&A", icon: "💬" },
   { href: "/faq", label: "FAQ", icon: "❓" },
