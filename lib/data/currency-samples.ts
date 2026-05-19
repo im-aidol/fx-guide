@@ -26,7 +26,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
       { value: "$10", series: "2006~ (Hamilton)", buyable: true, sellable: true },
       { value: "$20", series: "2003~ (Jackson)", buyable: true, sellable: true },
       { value: "$50", series: "2004~ (Grant)", buyable: true, sellable: true },
-      { value: "$100", series: "2013~ (Franklin, Bell in the Inkwell 보안띠)", buyable: true, sellable: true, notes: "위조 빈도 높음 — 보안띠·홀로그램 점검 강화" },
+      { value: "$100", series: "2013~ (Franklin, Bell in the Inkwell 보안띠)", imageUrl: "/currency-samples/usd/100.jpg", buyable: true, sellable: true, notes: "위조 빈도 높음 — 보안띠·홀로그램 점검 강화" },
     ],
     generalNotes: [
       "1971년부터 Federal Reserve Note만 발행",
@@ -48,8 +48,8 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
       { value: "2,000엔", series: "2000년 오키나와 G8 정상회의 기념", buyable: true, sellable: false, notes: "거의 유통되지 않아 매도 불가 — 매입은 정상 통용" },
       { value: "5,000엔", series: "2024.7.3. 신권 (츠다 우메코, 등나무꽃)", buyable: true, sellable: true, notes: "3D 홀로그램" },
       { value: "5,000엔", series: "2004년 E시리즈 구권 (히구치 이치요)", buyable: true, sellable: true, notes: "통용 중" },
-      { value: "10,000엔", series: "2024.7.3. 신권 (시부사와 에이이치, 도쿄역 도안)", buyable: true, sellable: true, notes: "3D 홀로그램" },
-      { value: "10,000엔", series: "2004년 E시리즈 구권 (후쿠자와 유키치)", buyable: true, sellable: true, notes: "통용 중" },
+      { value: "10,000엔", series: "2024.7.3. 신권 (시부사와 에이이치, 도쿄역 도안)", imageUrl: "/currency-samples/jpy/10000-new.jpg", buyable: true, sellable: true, notes: "3D 홀로그램" },
+      { value: "10,000엔", series: "2004년 E시리즈 구권 (후쿠자와 유키치)", imageUrl: "/currency-samples/jpy/10000-old.jpg", buyable: true, sellable: true, notes: "통용 중" },
     ],
     generalNotes: [
       "2024.7.3. 신권 발행 (20년 만의 재디자인) — 신권·구권 모두 통용",
@@ -70,7 +70,7 @@ export const CURRENCY_SAMPLES: CurrencySample[] = [
       { value: "10€", series: "Europa 시리즈 (2014.9.23.~)", buyable: true, sellable: true },
       { value: "20€", series: "Europa 시리즈 (2015.11.25.~)", buyable: true, sellable: true },
       { value: "50€", series: "Europa 시리즈 (2017.4.4.~)", buyable: true, sellable: true },
-      { value: "100€", series: "Europa 시리즈 (2019.5.28.~)", buyable: true, sellable: true },
+      { value: "100€", series: "Europa 시리즈 (2019.5.28.~)", imageUrl: "/currency-samples/eur/100.jpg", buyable: true, sellable: true },
       { value: "200€", series: "Europa 시리즈 (2019.5.28.~)", buyable: true, sellable: true },
       { value: "500€", series: "1차 시리즈 (2019.4.27. 발행 중단)", buyable: true, sellable: false, notes: "Europa 시리즈 미포함 — 매도 불가. 법정통화 자격은 유지 (각국 중앙은행 항시 교환 가능)" },
     ],
