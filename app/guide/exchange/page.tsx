@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminNote } from "@/components/admin/AdminNote";
 
 export default function ExchangeGuidePage() {
   return (
@@ -19,6 +20,8 @@ export default function ExchangeGuidePage() {
           영업점 환전 절차.
         </p>
       </header>
+
+      <AdminNote storageKey="fx-guide:note:guide-exchange" />
 
       {/* 환율 산출 근거 */}
       <section className="bg-white border border-border rounded-xl p-5 mb-4">

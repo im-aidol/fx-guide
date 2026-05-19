@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BUSINESS_AREAS } from "@/lib/data/business-areas";
+import { AdminNote } from "@/components/admin/AdminNote";
 
 export default function GuideIndexPage() {
   return (
@@ -13,6 +14,8 @@ export default function GuideIndexPage() {
           창구에서 가장 먼저 분기되는 6개 업무. 클릭해서 해당 영역의 사유·상품·절차를 확인하세요.
         </p>
       </header>
+
+      <AdminNote storageKey="fx-guide:note:guide-index" />
 
       <section className="grid md:grid-cols-2 gap-4">
         {BUSINESS_AREAS.map((area) => (

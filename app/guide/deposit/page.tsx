@@ -6,6 +6,7 @@ import {
   DEPOSIT_PRODUCTS,
   type DepositProduct,
 } from "@/lib/data/deposit-products";
+import { AdminNote } from "@/components/admin/AdminNote";
 
 const SAVINGS_IDS = ["foryou", "plusyou", "im-free", "idream-free"];
 const SAVINGS = DEPOSIT_PRODUCTS.filter((p) => SAVINGS_IDS.includes(p.id));
@@ -30,6 +31,8 @@ export default function DepositGuidePage() {
           상품 본문(특약) 기준으로 한눈에 비교.
         </p>
       </header>
+
+      <AdminNote storageKey="fx-guide:note:guide-deposit" />
 
       {/* 공통 안내 */}
       <section className="bg-offwhite border border-border rounded-xl p-5 mb-6 text-sm">

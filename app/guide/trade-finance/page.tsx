@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminNote } from "@/components/admin/AdminNote";
 
 export default function TradeFinanceGuidePage() {
   return (
@@ -18,6 +19,8 @@ export default function TradeFinanceGuidePage() {
           수출입대금·신용장(LC)·내국신용장·수출대금채권 매입 등. 외국환거래약정서로 시작.
         </p>
       </header>
+
+      <AdminNote storageKey="fx-guide:note:guide-trade-finance" />
 
       {/* 시작 — 외국환거래약정서 */}
       <section className="bg-primary/5 border border-primary/20 rounded-xl p-5 mb-4">

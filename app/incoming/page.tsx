@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AdminNote } from "@/components/admin/AdminNote";
 
 // iM뱅크 타발 송금 수취 정보 (출처: imbank.co.kr 공식 안내)
 const BANK_INFO = {
@@ -33,6 +34,10 @@ export default function IncomingPage() {
           해외에서 iM뱅크로 송금 받을 때 송금자에게 전달할 정보. 입력 후 인쇄해 고객에게 드리기.
         </p>
       </header>
+
+      <div className="print:hidden">
+        <AdminNote storageKey="fx-guide:note:incoming" />
+      </div>
 
       <section className="bg-white border border-border rounded-xl p-6 mb-4 print:rounded-md print:border-charcoal print:p-4 print:mb-3">
         <h2 className="text-sm font-medium text-primary mb-3 print:text-charcoal print:font-bold print:text-base">

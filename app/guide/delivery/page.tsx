@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminNote } from "@/components/admin/AdminNote";
 
 export default function DeliveryGuidePage() {
   return (
@@ -19,6 +20,8 @@ export default function DeliveryGuidePage() {
           본문 기반.
         </p>
       </header>
+
+      <AdminNote storageKey="fx-guide:note:guide-delivery" />
 
       {/* iM외화배송 */}
       <section className="bg-white border border-border rounded-xl p-5 mb-4">

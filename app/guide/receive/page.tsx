@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminNote } from "@/components/admin/AdminNote";
 
 export default function ReceiveGuidePage() {
   return (
@@ -18,6 +19,8 @@ export default function ReceiveGuidePage() {
           해외에서 한국 iM뱅크로 송금받을 때 절차. 고객에게 알려줄 정보 + 수령 시 임계.
         </p>
       </header>
+
+      <AdminNote storageKey="fx-guide:note:guide-receive" />
 
       {/* iM 수취 정보 */}
       <section className="bg-primary/5 border border-primary/20 rounded-xl p-5 mb-4">

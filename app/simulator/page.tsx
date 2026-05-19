@@ -1,5 +1,6 @@
 import { ScenarioRunner } from "@/components/scenario/ScenarioRunner";
 import { REMITTANCE_SCENARIO } from "@/lib/data";
+import { AdminNote } from "@/components/admin/AdminNote";
 
 export default function SimulatorPage() {
   return (
@@ -14,6 +15,7 @@ export default function SimulatorPage() {
           외국환거래규정(재정경제부고시 제2026-69호) 본문 근거.
         </p>
       </div>
+      <AdminNote storageKey="fx-guide:note:simulator" />
       <ScenarioRunner scenario={REMITTANCE_SCENARIO} />
     </div>
   );

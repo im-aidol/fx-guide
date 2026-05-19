@@ -7,6 +7,7 @@ import type {
   BusinessGuideCategory,
   BusinessGuideItem,
 } from "@/lib/types";
+import { AdminNote } from "@/components/admin/AdminNote";
 
 const CATEGORIES: BusinessGuideCategory[] = [
   "경상거래",
@@ -70,6 +71,8 @@ export default function SendGuidePage() {
           를 이용하세요. 총 {BUSINESS_GUIDE.length}개 사유.
         </p>
       </header>
+
+      <AdminNote storageKey="fx-guide:note:guide-send" />
 
       <div className="bg-white border border-border rounded-xl p-4 mb-4 sticky top-16 z-10">
         <input

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchUsdRates, type UsdRates } from "@/lib/exchange-rates";
+import { AdminNote } from "@/components/admin/AdminNote";
 
 const PURPOSE_REQUIRED_COUNTRIES: { flag: string; name: string }[] = [
   { flag: "🇦🇪", name: "UAE" },
@@ -32,6 +33,12 @@ export default function HomePage() {
           창구 상담용 빠른 참조
         </p>
       </header>
+
+      <AdminNote
+        storageKey="fx-guide:note:home"
+        title="본부 공지 (홈 상단)"
+        placeholder="홈 화면에 노출할 본부 공지·긴급 알림을 적어두세요. 영업점이 접속하면 가장 먼저 확인합니다."
+      />
 
       <RatePanel />
 
