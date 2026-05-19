@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useMode, type Mode } from "@/components/Mode";
 
 const ITEMS = [
   { href: "/", label: "홈", icon: "🏠" },
@@ -65,8 +66,16 @@ export function Sidebar() {
             외환 길잡이
           </Link>
           <p className="text-[10px] text-charcoal-soft mt-1">
-            iM뱅크 영업점 가이드
+            iM뱅크 외환 업무 가이드
           </p>
+        </div>
+
+        {/* 모드 토글 — 본점/영업점 */}
+        <div className="px-3 pt-3 pb-2 border-b border-border">
+          <p className="text-[10px] text-charcoal-soft uppercase tracking-wide mb-1.5 px-1">
+            현재 모드
+          </p>
+          <ModeToggle />
         </div>
 
         <nav className="p-3 flex-1 overflow-y-auto">
@@ -110,5 +119,38 @@ export function Sidebar() {
         </div>
       </aside>
     </>
+  );
+}
+
+function ModeToggle() {
+  const { mode, setMode } = useMode();
+  const options: { value: Mode; label: string; icon: string }[] = [
+    { value: "branch", label: "영업점", icon: "🏢" },
+    { value: "hq", label: "본점", icon: "🏛️" },
+  ];
+
+  return (
+    <div className="flex gap-1 bg-offwhite border border-border rounded-md p-0.5">
+      {options.map((opt) => {
+        const active = mode === opt.value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => setMode(opt.value)}
+            className={[
+              "flex-1 text-xs px-2 py-1.5 rounded transition flex items-center justify-center gap-1",
+              active
+                ? "bg-primary text-white font-medium"
+                : "text-charcoal-soft hover:text-charcoal",
+            ].join(" ")}
+            aria-pressed={active}
+          >
+            <span className="text-sm leading-none">{opt.icon}</span>
+            <span>{opt.label}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 }

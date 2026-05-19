@@ -3,11 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Notice, NoticeCategory } from "@/lib/types";
 import { NOTICES_SEED } from "@/lib/data/notices-seed";
+import { useMode } from "@/components/Mode";
 
 const STORAGE_KEY = "fx-guide:notices";
 const CATEGORIES: NoticeCategory[] = ["공지", "가이드", "정책변경"];
 
 export default function NoticesPage() {
+  const { mode } = useMode();
+  const canEdit = mode === "hq";
   const [notices, setNotices] = useState<Notice[]>([]);
   const [activeCategory, setActiveCategory] =
     useState<NoticeCategory | null>(null);
@@ -80,6 +83,12 @@ export default function NoticesPage() {
           본부 외환사업부가 직접 작성·게시하는 공지, 가이드, 정책 변경 사항.
           영업점은 검색·필터로 빠르게 조회.
         </p>
+        <p className="text-xs text-charcoal-soft mt-2">
+          현재 모드:{" "}
+          <span className="font-medium text-charcoal">
+            {canEdit ? "🏛️ 본점 (관리자 — 작성·게시 가능)" : "🏢 영업점 (조회 전용)"}
+          </span>
+        </p>
       </header>
 
       <DemoNotice />
@@ -100,15 +109,17 @@ export default function NoticesPage() {
             />
           ))}
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition"
-        >
-          {showForm ? "취소" : "+ 새 글 작성"}
-        </button>
+        {canEdit && (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+          >
+            {showForm ? "취소" : "+ 새 글 작성"}
+          </button>
+        )}
       </div>
 
-      {showForm && <NewNoticeForm onSubmit={addNotice} />}
+      {canEdit && showForm && <NewNoticeForm onSubmit={addNotice} />}
 
       {filtered.length === 0 ? (
         <p className="text-center text-charcoal-soft py-12">게시글이 없습니다.</p>

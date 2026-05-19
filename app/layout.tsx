@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
+import { ModeProvider } from "@/components/Mode";
 
 export const metadata: Metadata = {
   title: "외환 길잡이 | iM뱅크 영업점 가이드",
@@ -22,10 +23,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full bg-offwhite text-charcoal">
-        <div className="md:flex md:min-h-screen">
-          <Sidebar />
-          <main className="flex-1 min-w-0">{children}</main>
-        </div>
+        <ModeProvider>
+          <div className="md:flex md:min-h-screen">
+            <Sidebar />
+            <main className="flex-1 min-w-0">{children}</main>
+          </div>
+        </ModeProvider>
       </body>
     </html>
   );

@@ -3,11 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import type { QnaItem, QnaStatus } from "@/lib/types";
 import { QNA_SEED } from "@/lib/data/qna-seed";
+import { useMode } from "@/components/Mode";
 
 const STORAGE_KEY = "fx-guide:qna";
 const STATUS: (QnaStatus | "전체")[] = ["전체", "대기", "완료"];
 
 export default function QnaPage() {
+  const { mode } = useMode();
+  const isBranch = mode === "branch";
+  const isHq = mode === "hq";
   const [items, setItems] = useState<QnaItem[]>([]);
   const [filter, setFilter] = useState<QnaStatus | "전체">("전체");
   const [showForm, setShowForm] = useState(false);
@@ -97,6 +101,14 @@ export default function QnaPage() {
           영업점 직원이 익명으로 질문하면 본부 외환사업부가 답변합니다. 답변
           누적분은 향후 FAQ로 승격됩니다.
         </p>
+        <p className="text-xs text-charcoal-soft mt-2">
+          현재 모드:{" "}
+          <span className="font-medium text-charcoal">
+            {isHq
+              ? "🏛️ 본점 (관리자 — 답변 작성)"
+              : "🏢 영업점 (질문 등록 가능)"}
+          </span>
+        </p>
       </header>
 
       <DemoNotice />
@@ -120,22 +132,29 @@ export default function QnaPage() {
             );
           })}
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition"
-        >
-          {showForm ? "취소" : "+ 새 질문 등록"}
-        </button>
+        {isBranch && (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+          >
+            {showForm ? "취소" : "+ 새 질문 등록"}
+          </button>
+        )}
       </div>
 
-      {showForm && <NewQuestionForm onSubmit={addQuestion} />}
+      {isBranch && showForm && <NewQuestionForm onSubmit={addQuestion} />}
 
       {filtered.length === 0 ? (
         <p className="text-center text-charcoal-soft py-12">질문이 없습니다.</p>
       ) : (
         <ul className="space-y-3">
           {filtered.map((q) => (
-            <QnaCard key={q.id} item={q} onAnswer={addAnswer} />
+            <QnaCard
+              key={q.id}
+              item={q}
+              onAnswer={addAnswer}
+              canAnswer={isHq}
+            />
           ))}
         </ul>
       )}
@@ -252,9 +271,11 @@ function NewQuestionForm({
 function QnaCard({
   item,
   onAnswer,
+  canAnswer,
 }: {
   item: QnaItem;
   onAnswer: (id: string, answer: string, answeredBy: string) => void;
+  canAnswer: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [showAnswerForm, setShowAnswerForm] = useState(false);
@@ -323,7 +344,7 @@ function QnaCard({
                 {item.answer}
               </p>
             </div>
-          ) : (
+          ) : canAnswer ? (
             <div className="mt-4 pt-4 border-t border-border">
               {showAnswerForm ? (
                 <div className="space-y-2">
@@ -365,6 +386,12 @@ function QnaCard({
                   + 답변 작성 (본부)
                 </button>
               )}
+            </div>
+          ) : (
+            <div className="mt-4 pt-4 border-t border-border">
+              <p className="text-xs text-charcoal-soft italic">
+                답변 대기 중입니다. 본부 외환사업부에서 곧 답변 드립니다.
+              </p>
             </div>
           )}
         </div>
