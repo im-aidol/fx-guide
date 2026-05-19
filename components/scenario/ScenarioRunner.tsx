@@ -15,6 +15,7 @@ import {
   type UsdRates,
 } from "@/lib/exchange-rates";
 import { CountryPicker } from "./CountryPicker";
+import { Flag } from "@/components/Flag";
 
 type Props = { scenario: Scenario };
 
@@ -676,10 +677,19 @@ function SummarySidebar({
         </h3>
         <dl className="space-y-3 text-sm">
           <Row label="단계" value={`${steps}번째 화면`} />
-          <Row
-            label="받는 나라"
-            value={country ? `${country.flag} ${country.name}` : "—"}
-          />
+          <div className="flex justify-between gap-2 items-center">
+            <dt className="text-charcoal-soft shrink-0">받는 나라</dt>
+            <dd className="text-right text-charcoal flex items-center gap-1.5">
+              {country ? (
+                <>
+                  <Flag code={country.code} className="w-5" />
+                  <span className="truncate">{country.name}</span>
+                </>
+              ) : (
+                "—"
+              )}
+            </dd>
+          </div>
           <Row
             label="송금 금액"
             value={
@@ -716,28 +726,17 @@ function SummarySidebar({
 }
 
 function CountryNotesPanel({ country }: { country: Country }) {
-  if (country.riskLevel === "BLOCKED") {
-    return (
-      <div className="bg-danger/5 border border-danger/30 rounded-xl p-4">
-        <p className="text-xs font-bold text-danger mb-2">
-          ❌ {country.flag} {country.name} 송금 불가
-        </p>
-        <ul className="text-xs text-charcoal-soft space-y-1 list-disc list-inside">
-          {country.remarks?.map((r, i) => (
-            <li key={i}>{r}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
-
+  // BLOCKED 국가는 CountryPicker에서 필터링되어 여기 도달 안 함
   return (
     <div className="bg-white border border-border rounded-xl p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-medium text-charcoal-soft tracking-wide">
-          {country.flag} {country.name} 유의사항
-        </h3>
-        <span className="text-[9px] text-charcoal-soft">⚠️ 검증 필요</span>
+      <div className="flex items-center justify-between mb-3 gap-2">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Flag code={country.code} className="w-5 shrink-0" />
+          <h3 className="text-xs font-medium text-charcoal-soft tracking-wide truncate">
+            {country.name} 유의사항
+          </h3>
+        </div>
+        <span className="text-[9px] text-charcoal-soft shrink-0">⚠️ 검증 필요</span>
       </div>
       <div className="flex flex-wrap gap-1 mb-3">
         {country.ibanRequired && (

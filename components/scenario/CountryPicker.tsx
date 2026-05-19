@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { COUNTRIES } from "@/lib/data";
 import type { Country, CountryRoutingType } from "@/lib/types";
+import { Flag } from "@/components/Flag";
 
 type Props = {
   value: string;
@@ -13,8 +14,10 @@ export function CountryPicker({ value, onChange }: Props) {
   const [showOthers, setShowOthers] = useState(false);
   const [search, setSearch] = useState("");
 
-  const popular = COUNTRIES.filter((c) => c.popular && c.riskLevel !== "BLOCKED");
-  const others = COUNTRIES.filter((c) => !c.popular);
+  // 송금 불가(BLOCKED) 국가는 시뮬레이터에서 표시하지 않음
+  const sendable = COUNTRIES.filter((c) => c.riskLevel !== "BLOCKED");
+  const popular = sendable.filter((c) => c.popular);
+  const others = sendable.filter((c) => !c.popular);
 
   const filteredOthers = search.trim()
     ? others.filter(
@@ -24,7 +27,7 @@ export function CountryPicker({ value, onChange }: Props) {
       )
     : others;
 
-  const selected = COUNTRIES.find((c) => c.id === value);
+  const selected = sendable.find((c) => c.id === value);
 
   return (
     <div className="space-y-3">
@@ -93,33 +96,25 @@ function CountryCard({
   selected: boolean;
   onClick: () => void;
 }) {
-  const blocked = country.riskLevel === "BLOCKED";
   const watch = country.riskLevel === "WATCH";
 
   return (
     <button
       type="button"
       onClick={onClick}
-      disabled={blocked}
       className={[
         "text-left p-3 border rounded-lg transition",
         selected
           ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-          : blocked
-            ? "border-danger/30 bg-danger/5 opacity-70 cursor-not-allowed"
-            : "border-border hover:border-primary hover:bg-primary/5",
+          : "border-border hover:border-primary hover:bg-primary/5",
       ].join(" ")}
     >
       <div className="flex items-center gap-2">
-        <span className="text-xl leading-none">{country.flag}</span>
-        <span className="font-medium text-sm">{country.name}</span>
+        <Flag code={country.code} className="w-6 shrink-0" />
+        <span className="font-medium text-sm truncate">{country.name}</span>
       </div>
       <p className="text-[10px] text-charcoal-soft mt-1 truncate">
-        {blocked
-          ? "❌ 송금 불가"
-          : watch
-            ? "⚠️ 주의 국가"
-            : describeShort(country)}
+        {watch ? "⚠️ 주의 국가" : describeShort(country)}
       </p>
     </button>
   );
@@ -140,27 +135,16 @@ function describeShort(c: Country): string {
 }
 
 function CountryRemarks({ country }: { country: Country }) {
-  if (country.riskLevel === "BLOCKED") {
-    return (
-      <div className="bg-danger/5 border border-danger/30 rounded-lg p-4">
-        <p className="text-sm font-bold text-danger mb-2">
-          ❌ {country.flag} {country.name} — 송금 불가
-        </p>
-        <ul className="text-sm text-charcoal-soft space-y-0.5 list-disc list-inside">
-          {country.remarks?.map((r, i) => (
-            <li key={i}>{r}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
-
+  // BLOCKED 국가는 CountryPicker에서 필터링되어 여기 도달 안 함
   return (
     <div className="bg-offwhite border border-border rounded-lg p-4 space-y-3">
       <div className="flex items-start justify-between gap-2">
-        <p className="font-medium">
-          {country.flag} {country.name} 송금 시 유의사항
-        </p>
+        <div className="flex items-center gap-2">
+          <Flag code={country.code} className="w-7 shrink-0" />
+          <p className="font-medium">
+            {country.name} 송금 시 유의사항
+          </p>
+        </div>
         <span className="text-[10px] text-charcoal-soft border border-border bg-white px-2 py-0.5 rounded-full whitespace-nowrap">
           ⚠️ 데이터 검증 필요
         </span>

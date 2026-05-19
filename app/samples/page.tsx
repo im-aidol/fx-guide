@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CURRENCY_SAMPLES } from "@/lib/data/currency-samples";
 import type { CurrencySample, Denomination } from "@/lib/types";
+import { Flag } from "@/components/Flag";
 
 const PRIMARY = CURRENCY_SAMPLES.filter((c) => c.primary);
 const OTHERS = CURRENCY_SAMPLES.filter((c) => !c.primary);
@@ -113,22 +114,7 @@ function CurrencyCard({
   );
 }
 
-function Flag({ code, className }: { code: string; className?: string }) {
-  // flag-icons는 background-image. aspect-[4/3]로 비율 고정, 사용처는 width만 지정.
-  // background-size: cover 로 컨테이너 가득 채워 위아래 여백 없앰.
-  return (
-    <span
-      className={[
-        "fi",
-        `fi-${code.toLowerCase()}`,
-        "block aspect-[4/3] rounded-sm border border-border",
-        "!bg-cover", // flag-icons 기본 contain 오버라이드 (Tailwind important 접두사)
-        className ?? "",
-      ].join(" ")}
-      aria-label={`${code} flag`}
-    />
-  );
-}
+// Flag 컴포넌트는 components/Flag.tsx 로 분리됨 (samples + simulator 공통 사용)
 
 function CurrencyDetail({ sample }: { sample: CurrencySample }) {
   // 정렬: 매입·매도 둘 다 가능 → 매입만 가능 → 둘 다 불가
