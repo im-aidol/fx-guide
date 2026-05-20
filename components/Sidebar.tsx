@@ -105,11 +105,17 @@ export function Sidebar() {
   const router = useRouter();
   const { mode } = useMode();
   const canEdit = mode === "hq";
-  const { groups: customGroups, addGroup, removeGroup, slugExists } =
-    useCustomMenus();
+  const {
+    groups: customGroups,
+    addGroup,
+    addItem,
+    removeGroup,
+    slugExists,
+  } = useCustomMenus();
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [addPageGroupId, setAddPageGroupId] = useState<string | null>(null);
 
   // 사용자 정의 그룹을 NavGroup 형태로 변환
   const customNav: NavGroup[] = useMemo(
@@ -202,6 +208,29 @@ export function Sidebar() {
     router.push(`/guide/custom/${finalSlug}`);
   };
 
+  const handleAddPage = (
+    groupId: string,
+    input: { pageLabel: string },
+  ) => {
+    const baseSlug = slugify(input.pageLabel) || `page-${Date.now()}`;
+    let finalSlug = baseSlug;
+    let i = 1;
+    while (slugExists(finalSlug)) {
+      finalSlug = `${baseSlug}-${i++}`;
+    }
+    addItem(groupId, {
+      slug: finalSlug,
+      label: input.pageLabel,
+      pageTitle: input.pageLabel,
+      body:
+        "이 페이지는 본점 외환사업부에서 직접 작성합니다.\n\n" +
+        "오른쪽 위 “✏️ 페이지 수정” 버튼을 눌러 본문을 채우세요.\n",
+      source: "",
+    });
+    setAddPageGroupId(null);
+    router.push(`/guide/custom/${finalSlug}`);
+  };
+
   return (
     <>
       <header className="md:hidden print:hidden border-b border-border bg-white sticky top-0 z-30 flex items-center justify-between px-4 h-14">
@@ -256,7 +285,7 @@ export function Sidebar() {
         <nav className="p-3 flex-1 overflow-y-auto">
           <ul className="space-y-0.5">
             {NAV_TOP.map((item) =>
-              renderNavNode(
+              renderNavNode({
                 item,
                 pathname,
                 expandedIds,
@@ -264,19 +293,25 @@ export function Sidebar() {
                 closeMobile,
                 canEdit,
                 removeGroup,
-              ),
+                addPageGroupId,
+                setAddPageGroupId,
+                onAddPage: handleAddPage,
+              }),
             )}
 
             {customNav.map((g) =>
-              renderNavNode(
-                g,
+              renderNavNode({
+                item: g,
                 pathname,
                 expandedIds,
                 toggleGroup,
                 closeMobile,
                 canEdit,
                 removeGroup,
-              ),
+                addPageGroupId,
+                setAddPageGroupId,
+                onAddPage: handleAddPage,
+              }),
             )}
 
             {canEdit && (
@@ -302,7 +337,7 @@ export function Sidebar() {
             <li className="pt-2 mt-1 border-t border-border" aria-hidden />
 
             {NAV_BOTTOM.map((item) =>
-              renderNavNode(
+              renderNavNode({
                 item,
                 pathname,
                 expandedIds,
@@ -310,7 +345,10 @@ export function Sidebar() {
                 closeMobile,
                 canEdit,
                 removeGroup,
-              ),
+                addPageGroupId,
+                setAddPageGroupId,
+                onAddPage: handleAddPage,
+              }),
             )}
           </ul>
         </nav>
@@ -331,15 +369,31 @@ export function Sidebar() {
   );
 }
 
-function renderNavNode(
-  item: NavItem,
-  pathname: string,
-  expandedIds: Set<string>,
-  toggleGroup: (id: string) => void,
-  closeMobile: () => void,
-  canEdit: boolean,
-  removeGroup: (id: string) => void,
-) {
+type RenderArgs = {
+  item: NavItem;
+  pathname: string;
+  expandedIds: Set<string>;
+  toggleGroup: (id: string) => void;
+  closeMobile: () => void;
+  canEdit: boolean;
+  removeGroup: (id: string) => void;
+  addPageGroupId: string | null;
+  setAddPageGroupId: (id: string | null) => void;
+  onAddPage: (groupId: string, input: { pageLabel: string }) => void;
+};
+
+function renderNavNode({
+  item,
+  pathname,
+  expandedIds,
+  toggleGroup,
+  closeMobile,
+  canEdit,
+  removeGroup,
+  addPageGroupId,
+  setAddPageGroupId,
+  onAddPage,
+}: RenderArgs) {
   if (item.type === "item") {
     const active = isItemActive(item.href, pathname);
     return (
@@ -447,9 +501,77 @@ function renderNavNode(
               </li>
             );
           })}
+
+          {canEdit && item.custom && (
+            <li>
+              {addPageGroupId === item.id ? (
+                <AddPageForm
+                  onSubmit={(pageLabel) =>
+                    onAddPage(item.id, { pageLabel })
+                  }
+                  onCancel={() => setAddPageGroupId(null)}
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setAddPageGroupId(item.id)}
+                  className="w-full text-left px-2.5 py-1.5 rounded-md text-[11px] text-charcoal-soft hover:text-primary hover:bg-offwhite border border-dashed border-border transition"
+                >
+                  + 페이지 추가
+                </button>
+              )}
+            </li>
+          )}
         </ul>
       )}
     </li>
+  );
+}
+
+function AddPageForm({
+  onSubmit,
+  onCancel,
+}: {
+  onSubmit: (pageLabel: string) => void;
+  onCancel: () => void;
+}) {
+  const [pageLabel, setPageLabel] = useState("");
+
+  const submit = () => {
+    if (!pageLabel.trim()) return;
+    onSubmit(pageLabel.trim());
+  };
+
+  return (
+    <div className="bg-offwhite border border-primary/40 rounded-md p-2 space-y-1.5">
+      <input
+        type="text"
+        value={pageLabel}
+        onChange={(e) => setPageLabel(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") submit();
+          if (e.key === "Escape") onCancel();
+        }}
+        placeholder="페이지 제목 (예: 상품 비교)"
+        className="w-full px-2 py-1 border border-border rounded text-[11px] focus:outline-none focus:border-primary bg-white"
+        autoFocus
+      />
+      <div className="flex items-center justify-end gap-1">
+        <button
+          onClick={onCancel}
+          className="text-[10px] text-charcoal-soft hover:text-charcoal px-1.5 py-0.5"
+        >
+          취소
+        </button>
+        <button
+          onClick={submit}
+          disabled={!pageLabel.trim()}
+          className="bg-primary hover:bg-primary-dark text-white px-2 py-0.5 rounded text-[10px] font-medium transition disabled:opacity-50"
+        >
+          추가
+        </button>
+      </div>
+    </div>
   );
 }
 
