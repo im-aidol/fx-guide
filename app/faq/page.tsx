@@ -73,51 +73,53 @@ export default function FaqPage() {
         <AdminBadge hqHint="본점 관리자 — FAQ 추가·수정·삭제가 가능합니다" />
       </header>
 
-      <div className="bg-white border border-border rounded-xl p-4 mb-4 sticky top-16 z-10">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="질문·답변·키워드 검색 (예: SWIFT, 10만불, 해외이주비)"
-          className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:border-primary"
-        />
-        <div className="flex flex-wrap gap-1.5 mt-3">
-          <CategoryChip
-            label={`전체 (${items.length})`}
-            active={activeCategory === null}
-            onClick={() => setActiveCategory(null)}
+      <div className="sticky top-14 md:top-0 z-10 -mx-6 px-6 pt-4 pb-4 bg-offwhite">
+        <div className="bg-white border border-border rounded-xl p-4">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="질문·답변·키워드 검색 (예: SWIFT, 10만불, 해외이주비)"
+            className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:border-primary"
           />
-          {categories.map((c) => (
+          <div className="flex flex-wrap gap-1.5 mt-3">
             <CategoryChip
-              key={c}
-              label={`${c} (${counts[c] ?? 0})`}
-              active={activeCategory === c}
-              onClick={() => setActiveCategory(c)}
+              label={`전체 (${items.length})`}
+              active={activeCategory === null}
+              onClick={() => setActiveCategory(null)}
             />
-          ))}
-        </div>
-        {canEdit && (
-          <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-border">
-            <button
-              onClick={() => setShowAddForm(!showAddForm)}
-              className="bg-primary hover:bg-primary-dark text-white px-3 py-1.5 rounded-lg text-xs font-medium transition"
-            >
-              {showAddForm ? "취소" : "+ 새 FAQ 추가"}
-            </button>
-            <button
-              onClick={() => {
-                if (confirm("FAQ를 초기 시드 데이터로 되돌립니다. 계속할까요?")) {
-                  reset();
-                  setEditingId(null);
-                  setShowAddForm(false);
-                }
-              }}
-              className="text-[11px] text-charcoal-soft hover:text-charcoal"
-            >
-              ↺ 초기화
-            </button>
+            {categories.map((c) => (
+              <CategoryChip
+                key={c}
+                label={`${c} (${counts[c] ?? 0})`}
+                active={activeCategory === c}
+                onClick={() => setActiveCategory(c)}
+              />
+            ))}
           </div>
-        )}
+          {canEdit && (
+            <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-border">
+              <button
+                onClick={() => setShowAddForm(!showAddForm)}
+                className="bg-primary hover:bg-primary-dark text-white px-3 py-1.5 rounded-lg text-xs font-medium transition"
+              >
+                {showAddForm ? "취소" : "+ 새 FAQ 추가"}
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm("FAQ를 초기 시드 데이터로 되돌립니다. 계속할까요?")) {
+                    reset();
+                    setEditingId(null);
+                    setShowAddForm(false);
+                  }
+                }}
+                className="text-[11px] text-charcoal-soft hover:text-charcoal"
+              >
+                ↺ 초기화
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {canEdit && showAddForm && (

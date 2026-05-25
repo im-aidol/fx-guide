@@ -74,30 +74,32 @@ export default function SendGuidePage() {
 
       <AdminNote storageKey="fx-guide:note:guide-send" />
 
-      <div className="bg-white border border-border rounded-xl p-4 mb-4 sticky top-16 z-10">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="사유·조항·서류 검색 (예: 유학, 4-3조, 인보이스)"
-          className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:border-primary"
-        />
-        <div className="flex flex-wrap gap-1.5 mt-3">
-          <Chip
-            label={`전체 (${BUSINESS_GUIDE.length})`}
-            active={activeCategory === null}
-            onClick={() => setActiveCategory(null)}
+      <div className="sticky top-14 md:top-0 z-10 -mx-6 px-6 pt-4 pb-4 bg-offwhite">
+        <div className="bg-white border border-border rounded-xl p-4">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="사유·조항·서류 검색 (예: 유학, 4-3조, 인보이스)"
+            className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:border-primary"
           />
-          {CATEGORIES.map((c) =>
-            counts[c] ? (
-              <Chip
-                key={c}
-                label={`${c} (${counts[c]})`}
-                active={activeCategory === c}
-                onClick={() => setActiveCategory(c)}
-              />
-            ) : null,
-          )}
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            <Chip
+              label={`전체 (${BUSINESS_GUIDE.length})`}
+              active={activeCategory === null}
+              onClick={() => setActiveCategory(null)}
+            />
+            {CATEGORIES.map((c) =>
+              counts[c] ? (
+                <Chip
+                  key={c}
+                  label={`${c} (${counts[c]})`}
+                  active={activeCategory === c}
+                  onClick={() => setActiveCategory(c)}
+                />
+              ) : null,
+            )}
+          </div>
         </div>
       </div>
 
