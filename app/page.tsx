@@ -80,8 +80,16 @@ export default function HomePage() {
 function RatePanel() {
   const [rates, setRates] = useState<UsdRates | null>(null);
   const [error, setError] = useState(false);
+  const [koreaDate, setKoreaDate] = useState('');
 
   useEffect(() => {
+    // 한국 현재 날짜 (YYYY/MM/DD 형식)
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    setKoreaDate(`${year}/${month}/${day}`);
+
     fetchUsdRates()
       .then(setRates)
       .catch(() => setError(true));
@@ -90,7 +98,9 @@ function RatePanel() {
   return (
     <section className="bg-white border border-border rounded-xl p-5 mb-4">
       <div className="flex items-baseline justify-between mb-3">
-        <h2 className="font-semibold">참고 환율 (오늘)</h2>
+        <h2 className="font-semibold">
+          {koreaDate}의 환율
+        </h2>
         <span className="text-[10px] text-charcoal-soft">
           ⚠️ 참고용 · 실제 거래는 iM뱅크 매매기준율 적용
         </span>
