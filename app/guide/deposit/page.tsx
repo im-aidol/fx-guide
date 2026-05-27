@@ -84,11 +84,14 @@ export default function DepositHubPage() {
       </Link>
       <header className="mb-6">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
-          🏦 외화 통장·적금
+          🏦 외화 예금·적금
         </p>
-        <h1 className="text-3xl font-bold mb-2">외화 예금·적금</h1>
+        <h1 className="text-3xl font-bold mb-2">
+          어떤 상품을 보시겠어요?
+        </h1>
         <p className="text-sm text-charcoal-soft">
-          어떤 외화 상품을 보시겠어요? · 총 {DEPOSIT_PRODUCTS.length}개 상품
+          {DEPOSIT_PRODUCTS.length}개 상품 — 카테고리·단일 상품·도구 중 선택해
+          들어갑니다.
         </p>
       </header>
 

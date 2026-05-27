@@ -72,8 +72,9 @@ const NAV_TOP: NavItem[] = [
     label: "외화 예금·적금",
     icon: "🏦",
     href: "/guide/deposit",
+    // 부모 그룹("🏦 외화 예금·적금") 클릭 자체가 진입판으로 가므로
+    // 자식 메뉴에는 진입판 중복 표시 X. 자식은 실제로 가고 싶은 구체적인 페이지만.
     children: [
-      { href: "/guide/deposit", label: "진입 (6가지 선택)" },
       {
         href: "/guide/deposit/global-comprehensive",
         label: "🌐 글로벌외화종합통장",
