@@ -557,6 +557,9 @@ function ResultNodeView({
       {/* 선택 국가 주의사항 — 송금사유·라우팅·WU PAYOUT 필수 등 */}
       {country && <CountryAlerts country={country} />}
 
+      {/* 송금 시 수수료 종합 — 채널별 송금수수료·환전 마진·중계수수료·현찰수수료 */}
+      <FeesSummary />
+
       {/* 송금 채널 선택 — 결과 후 영업점이 어떤 채널로 송금할지 결정 */}
       <NextStepChannels />
 
@@ -640,6 +643,149 @@ function CountryAlerts({ country }: { country: Country }) {
           ❌ 제재국 — 송금 불가
         </p>
       )}
+    </section>
+  );
+}
+
+// ─── 송금 시 수수료 종합 ───
+// 영업점이 "총 얼마 들지" 빠르게 답할 수 있도록 4가지 수수료를 한 표로.
+// 정확한 금액은 채널 페이지·본부 매뉴얼에서 확인.
+function FeesSummary() {
+  return (
+    <section className="bg-white border border-border rounded-lg p-4">
+      <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
+        <span>💸</span>
+        <span>송금 시 수수료 종합</span>
+        <span className="text-[10px] text-charcoal-soft font-normal">
+          총 비용 = 송금수수료 + 환전 마진 + 중계수수료 (현찰 거래 시 현찰수수료 추가)
+        </span>
+      </h3>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead className="bg-offwhite text-charcoal-soft">
+            <tr className="border-b border-border">
+              <th className="text-left py-2 px-2.5 uppercase tracking-wide w-28">
+                항목
+              </th>
+              <th className="text-left py-2 px-2.5">금액·기준</th>
+              <th className="text-left py-2 px-2.5 w-24">출처/참조</th>
+            </tr>
+          </thead>
+          <tbody className="text-charcoal align-top">
+            {/* 송금수수료 */}
+            <tr className="border-b border-border">
+              <td
+                className="py-2 px-2.5 font-medium"
+                rowSpan={5}
+              >
+                ① 송금수수료
+                <span className="block text-[10px] text-charcoal-soft mt-0.5 font-normal">
+                  채널별 차등
+                </span>
+              </td>
+              <td className="py-2 px-2.5">
+                <strong>SWIFT 일반</strong> — 본부 매뉴얼·영업점 게시 기준
+              </td>
+              <td className="py-2 px-2.5 text-charcoal-soft text-[11px]">
+                외환거래기본약관
+              </td>
+            </tr>
+            <tr className="border-b border-border">
+              <td className="py-2 px-2.5">
+                <strong className="text-primary">BARO-BARO 자동</strong>: 전신료
+                8,000원 · <strong>송금수수료 면제</strong>
+              </td>
+              <td className="py-2 px-2.5 text-charcoal-soft text-[11px]">
+                심의필 25-2741
+              </td>
+            </tr>
+            <tr className="border-b border-border">
+              <td className="py-2 px-2.5">
+                <strong>WU iM더빠른송금</strong>: USD 5 (금액 무관)
+              </td>
+              <td className="py-2 px-2.5 text-charcoal-soft text-[11px]">
+                심의필 25-3443
+              </td>
+            </tr>
+            <tr className="border-b border-border">
+              <td className="py-2 px-2.5">
+                <strong>WU 특급송금</strong>: ~500 USD 10 / ~2,000 USD 14 /
+                ~3,000 USD 18 / ~7,000 USD 20
+              </td>
+              <td className="py-2 px-2.5 text-charcoal-soft text-[11px]">
+                심의필 25-3445
+              </td>
+            </tr>
+            <tr className="border-b border-border">
+              <td className="py-2 px-2.5">
+                <strong>WU AUTOSEND</strong>: ~3,000 USD 6 / 3,000~5,000 USD 12
+              </td>
+              <td className="py-2 px-2.5 text-charcoal-soft text-[11px]">
+                심의필 25-3444
+              </td>
+            </tr>
+
+            {/* 환전 마진 */}
+            <tr className="border-b border-border">
+              <td className="py-2 px-2.5 font-medium">
+                ② 환전 마진
+                <span className="block text-[10px] text-charcoal-soft mt-0.5 font-normal">
+                  KRW → 외화
+                </span>
+              </td>
+              <td className="py-2 px-2.5">
+                매매기준율 + 전신환매도 스프레드 (통화별 ~1~2%).
+                <strong> 환율우대 적용</strong>: BARO 30% · 일부 적금 50% 등
+              </td>
+              <td className="py-2 px-2.5 text-charcoal-soft text-[11px]">
+                <Link href="/guide/exchange/calculator" className="text-primary hover:underline">
+                  환전 계산기
+                </Link>
+              </td>
+            </tr>
+
+            {/* 해외은행 중계수수료 */}
+            <tr className="border-b border-border">
+              <td className="py-2 px-2.5 font-medium">
+                ③ 해외은행 중계수수료
+                <span className="block text-[10px] text-charcoal-soft mt-0.5 font-normal">
+                  Beneficiary / Applicant 부담
+                </span>
+              </td>
+              <td className="py-2 px-2.5">
+                외화송금신청서에서 부담자 선택. Applicant 부담해도{" "}
+                <strong>해외은행 청구 초과분 추가 부담 가능</strong>. 해외 측에서
+                수취인 거래은행 수수료가 자동 차감되기도 함.
+              </td>
+              <td className="py-2 px-2.5 text-charcoal-soft text-[11px]">
+                외화송금신청서
+              </td>
+            </tr>
+
+            {/* 외화 현찰수수료 */}
+            <tr>
+              <td className="py-2 px-2.5 font-medium">
+                ④ 외화 현찰수수료
+                <span className="block text-[10px] text-charcoal-soft mt-0.5 font-normal">
+                  현찰 거래 시
+                </span>
+              </td>
+              <td className="py-2 px-2.5">
+                USD/JPY/EUR/GBP/CAD/AUD/CHF/NZD <strong>1.5%</strong> · CNY{" "}
+                <strong>4.0%</strong>. USD 외 현찰 입금 또는 송금 입금분을
+                현찰로 출금 시 부과 (계좌 → 송금 흐름에선 보통 미발생).
+              </td>
+              <td className="py-2 px-2.5 text-charcoal-soft text-[11px]">
+                외화예금 거래기본약관
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-2 text-[10px] text-charcoal-soft leading-relaxed">
+        ⚠️ 실제 적용 금액은 채널·고객 조건·실시간 환율에 따라 달라집니다. 정확한
+        견적은 채널별 페이지·영업점 게시·본부 매뉴얼 확인.
+      </p>
     </section>
   );
 }
