@@ -53,13 +53,14 @@ const NAV_TOP: NavItem[] = [
     label: "환전",
     icon: "💱",
     href: "/guide/exchange",
-    // 외화 배송·E-지갑 모두 비대면 환전 수령 채널로 환전 안에 통합.
+    // 외화 배송·E-지갑은 비대면 채널, 외화 기프티콘은 대면 수령 — 모두 환전 안에 통합.
     children: [
       { href: "/guide/exchange/calculator", label: "🧮 환전 계산기" },
       { href: "/guide/exchange/info", label: "📐 환율 산출 안내" },
       { href: "/samples", label: "💴 통화 견본" },
       { href: "/guide/exchange/e-wallet", label: "💼 외화 E-지갑" },
-      { href: "/guide/delivery", label: "📦 외화 배송·기프티콘" },
+      { href: "/guide/delivery", label: "📦 외화 배송" },
+      { href: "/guide/exchange/gift", label: "🎁 외화 기프티콘" },
     ],
   },
   {

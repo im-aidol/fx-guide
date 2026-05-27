@@ -56,10 +56,19 @@ const CARDS: HubCard[] = [
     id: "delivery",
     href: "/guide/delivery",
     icon: "📦",
-    title: "외화 배송·기프티콘",
-    badge: "비대면",
+    title: "외화 배송",
+    badge: "비대면 수령",
     description:
-      "지정 일자·장소로 대면 수령 또는 CU편의점 수령. 10종 통화 (USD 90% 우대 최고).",
+      "지정 일자·장소로 배달원이 대면 수령 또는 CU편의점 수령. 10종 통화 (USD 90% 우대 최고).",
+  },
+  {
+    id: "gift",
+    href: "/guide/exchange/gift",
+    icon: "🎁",
+    title: "외화 기프티콘",
+    badge: "대면 수령",
+    description:
+      "본인 또는 제3자에게 선물 발행 → 수령자가 영업점 방문해 외화수령증 작성 후 외화 현찰 수령.",
   },
 ];
 

@@ -13,17 +13,16 @@ export default function DeliveryGuidePage() {
           환전
         </Link>
         <span>›</span>
-        <span className="text-charcoal">외화 배송·기프티콘</span>
+        <span className="text-charcoal">외화 배송</span>
       </nav>
       <header className="mb-6">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
-          📦 환전 비대면 채널 — 외화 배송·기프티콘
+          📦 환전 비대면 채널 — 외화 배송
         </p>
-        <h1 className="text-3xl font-bold mb-2">외화 수령 (비대면)</h1>
+        <h1 className="text-3xl font-bold mb-2">iM 외화 배송 서비스</h1>
         <p className="text-sm text-charcoal-soft">
-          영업점 방문 없이 외화 수령하는 두 가지 방식 — 지정 일자·장소로 받는
-          외화 배송과 제3자에게 선물 형태로 전달하는 외화 기프티콘. 상품설명서·약관
-          본문 기준.
+          모바일앱뱅킹으로 환전 신청 후 지정 일자·장소로 대면 수령 또는
+          CU편의점 수령. 상품설명서·약관 본문 기준.
         </p>
       </header>
 
@@ -245,57 +244,41 @@ export default function DeliveryGuidePage() {
         </p>
       </section>
 
-      {/* 외화 기프티콘 */}
-      <section className="bg-white border border-border rounded-xl p-5 mb-4">
-        <h2 className="font-bold mb-3">🎁 외화 기프티콘 (외화수령증)</h2>
-        <p className="text-sm text-charcoal-soft mb-4">
-          외화 수령권을 제3자에게 선물 형태로 전달. 수령자가 수령 시 본인 확인 + 개인정보
-          수집·이용 동의 필요.
-        </p>
-
-        <dl className="space-y-2 text-sm mb-3">
-          <Row
-            label="수령 양식"
-            value="외화수령증 = 개인(신용)정보 수집·이용 동의서 겸용"
-          />
-          <Row
-            label="수집 정보"
-            value="성명, 휴대폰번호, 생년월일 (주민번호 앞 6자리)"
-          />
-          <Row
-            label="수집 목적"
-            value="(금융)거래관계 설정·유지·이행·관리 + 금융사고·분쟁·민원 처리"
-          />
-          <Row
-            label="보유 기간"
-            value="(금융)거래 종료일로부터 5년 (이후 법령상 의무이행 범위만)"
-          />
-          <Row
-            label="동의 거부"
-            value="거부 가능. 단 거부 시 외화기프티콘 계약 체결 불가"
-          />
-        </dl>
-
-        <div className="bg-offwhite border border-border rounded-md p-3 text-xs text-charcoal-soft space-y-1">
-          <p className="font-medium text-charcoal">⚠️ 영업점 직원 확인</p>
-          <p>
-            수령 시 수령인 본인 확인 + 수령증에 성명·휴대폰·생년월일 기재 + 서명/날인.
-            동의 항목 ☐ 동의함 체크 누락 시 거래 진행 불가.
-          </p>
+      {/* 외화 기프티콘 안내 — 별도 페이지 */}
+      <section className="bg-primary/5 border border-primary/30 rounded-xl p-4 mb-4">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl shrink-0">🎁</span>
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-sm text-charcoal mb-1">
+              외화 기프티콘은 별도 서비스입니다
+            </p>
+            <p className="text-xs text-charcoal-soft leading-relaxed">
+              외화 기프티콘은 본인 또는 제3자에게 선물 형태로 외화 수령권을
+              전달하는 서비스로, <strong>수령자가 영업점을 직접 방문</strong>해
+              외화수령증을 작성하고 외화 현찰을 수령하는 <strong>대면 수령</strong>{" "}
+              방식입니다. 외화 배송(비대면)과 동작이 다릅니다.
+            </p>
+            <Link
+              href="/guide/exchange/gift"
+              className="inline-flex items-center gap-1 mt-2 text-xs text-primary hover:text-primary-dark font-medium"
+            >
+              외화 기프티콘 페이지로 →
+            </Link>
+          </div>
         </div>
-
-        <p className="text-[10px] text-charcoal-soft mt-3">
-          출처: 외화수령증 (외화기프티콘) 개인(신용)정보 수집·이용 동의서 겸용
-        </p>
       </section>
 
       {/* 영업점 직원 확인 사항 */}
       <section className="bg-offwhite border border-border rounded-xl p-5 text-sm">
-        <h3 className="font-medium mb-2">⚠️ 두 서비스 공통 확인</h3>
+        <h3 className="font-medium mb-2">⚠️ 외화 배송 공통 확인</h3>
         <ul className="space-y-1 text-charcoal-soft list-disc list-inside">
           <li>외환규정상 환전 규정 + 통보 의무 동일 적용</li>
           <li>
             USD 10,000 초과 환전 후 휴대 출국 시 세관 신고 의무 (외환거래법 위반 시 처벌)
+          </li>
+          <li>
+            보관한도 USD 10,000은 외화 E-지갑·외화기프티콘·환전예약 미수령액
+            합산 산정
           </li>
           <li>상세 절차·한도는 영업점 매뉴얼 기준 (본부 외환부서)</li>
         </ul>
