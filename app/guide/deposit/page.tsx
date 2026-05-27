@@ -1,482 +1,715 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   DEPOSIT_PRODUCTS,
-  depositsByCategory,
+  depositById,
   type DepositProduct,
 } from "@/lib/data/deposit-products";
 import { AdminNote } from "@/components/admin/AdminNote";
 import { InterestSimulator } from "@/components/deposit/InterestSimulator";
 
-const COMPREHENSIVE = depositsByCategory("통합통장");
-const DEMAND = depositsByCategory("수시입출");
-const TERM = depositsByCategory("예치형");
-const SAVINGS = depositsByCategory("적금");
-const TRANSFER = depositsByCategory("이체");
+// 영업점이 창구에서 급할 때 PDF보다 빠르게 찾는 페이지.
+// 1) 통합 검색 (상품명·약관·응대 멘트·체크포인트 모든 텍스트 매칭)
+// 2) 빠른 질문 카드 (가장 자주 묻는 케이스에 즉답)
+// 3) 한 화면 비교표 (12종 상품 전체를 한 표에서 비교)
+// 4) 시뮬레이터
+
+// ─── 빠른 질문 데이터 ───
+type QuickQuestion = {
+  id: string;
+  question: string;
+  icon: string;
+  answer: string;
+  details?: string;
+  productIds: string[];
+};
+
+const QUICK_QUESTIONS: QuickQuestion[] = [
+  {
+    id: "early-termination",
+    question: "정기예금 중도해지 이율은?",
+    icon: "📉",
+    answer:
+      "7일 미만 무이자 / 7~15일 1/10 / 15일~1개월 2/10 / 1~3개월 3/10 / 3~6개월 4/10 / 6~12개월 5/10",
+    details:
+      "상속(사망)으로 인한 중도해지는 약정이율 (단 7일 미만은 무이자). 외화예금거래기본약관 제11조 ③항.",
+    productIds: ["fc-time-deposit", "fc-rolling-compound"],
+  },
+  {
+    id: "post-maturity",
+    question: "만기 지나면 이자 얼마?",
+    icon: "⏰",
+    answer: "만기 후 1년까지 기본금리 × 3/10 / 1년 초과 기본금리 × 1/10",
+    details:
+      "외화예금거래기본약관 제11조 ②항. 자동재예치 신청하면 만기일에 동일 기간으로 새 약정으로 갱신됨.",
+    productIds: ["fc-time-deposit", "fc-rolling-compound", "foryou", "im-free", "idream-free"],
+  },
+  {
+    id: "currencies-9",
+    question: "9개 통화(CNY 포함) 되는 상품?",
+    icon: "💱",
+    answer: "보통·당좌·정기예금 + 글로벌통장(보통·정기 부분)",
+    details: "9개 통화: USD/JPY/EUR/GBP/CAD/AUD/CHF/NZD/CNY",
+    productIds: ["fc-ordinary", "fc-checking", "fc-time-deposit", "global-comprehensive"],
+  },
+  {
+    id: "non-face-to-face",
+    question: "비대면(모바일) 가입 가능?",
+    icon: "📱",
+    answer:
+      "보통·통지·정기·회전복리·iM·IDREAM. 계좌당 USD 30만 미만 한도",
+    details:
+      "당좌예금은 영업점만 가능. iM은 비대면 전용 (영업점 가입 불가, 본부 정책 확인).",
+    productIds: [
+      "fc-ordinary",
+      "fc-notice",
+      "fc-time-deposit",
+      "fc-rolling-compound",
+      "im-free",
+      "idream-free",
+    ],
+  },
+  {
+    id: "corporate",
+    question: "법인 가입 가능한 상품?",
+    icon: "🏢",
+    answer: "보통·당좌·MMDA·통지·정기·회전복리·글로벌통장",
+    details:
+      "MMDA는 잔액·대상별 차등금리 — 법인 50만불↑이 가장 높은 금리. 자유적립 4종(For You/Plus-You/iM/IDREAM)은 개인 한정 또는 본부 확인.",
+    productIds: ["fc-mmda", "fc-time-deposit", "global-comprehensive"],
+  },
+  {
+    id: "compound",
+    question: "복리로 운용 가능?",
+    icon: "🔄",
+    answer: "외화회전복리예금 (1·3·6개월 회전주기)",
+    details:
+      "1~3년 예치. 회전주기마다 원금+이자가 새 원금. 회전주기는 가입 시 결정·변경 불가.",
+    productIds: ["fc-rolling-compound"],
+  },
+  {
+    id: "no-interest",
+    question: "무이자 상품?",
+    icon: "🚫",
+    answer: "외화당좌예금 (당좌 약정 별도 체결 필요)",
+    productIds: ["fc-checking"],
+  },
+  {
+    id: "minor",
+    question: "미성년자 우대?",
+    icon: "👶",
+    answer: "IDREAM 외화자유적금 — 만 19세 미만 +0.20%p",
+    details:
+      "외화 첫 가입 시 추가 +0.10%p. 자동이체 6회 이상 + 원화 출금계좌 조건 충족 시 적용. 최대 +0.30%p.",
+    productIds: ["idream-free"],
+  },
+  {
+    id: "max-bonus",
+    question: "우대금리 가장 높은 상품?",
+    icon: "🎯",
+    answer: "iM 외화자유적금 — 최대 +0.50%p (자동이체 8회 +0.30%p 포함)",
+    details:
+      "Plus-You 36개월 +0.30%p, IDREAM 미성년·최초신규 +0.30%p, For You 우대 없음 (기본형).",
+    productIds: ["im-free"],
+  },
+  {
+    id: "fee-discount",
+    question: "수수료·환율 우대 받으려면?",
+    icon: "💎",
+    answer:
+      "Plus-You (6개월↑) — 송금 3회 면제·현찰 면제·TC 50% / 글로벌통장 + 정기·통지(5만불) — 송금 50%·현찰 50%·TC 30%",
+    details:
+      "Plus-You는 가입 6개월 자동 적용. 글로벌통장 우대는 대상 정기/통지예금 보유 시 자동. 대상예금 해지 시 우대 종료.",
+    productIds: ["plusyou", "global-comprehensive"],
+  },
+  {
+    id: "long-term",
+    question: "최장 36개월 적립?",
+    icon: "📅",
+    answer: "Plus-You 자유적립 외화예금 (1~36개월)",
+    details:
+      "iM·IDREAM은 12개월 고정. For You는 12개월 이내. 회전복리예금은 1~3년 (예치형).",
+    productIds: ["plusyou"],
+  },
+  {
+    id: "first-foreign",
+    question: "외화 첫 가입 고객 추천?",
+    icon: "🌱",
+    answer:
+      "글로벌외화종합통장 (한 통장으로 보통+정기+통지+회전복리) + IDREAM (외화 최초 신규 +0.10%p)",
+    productIds: ["global-comprehensive", "idream-free"],
+  },
+];
+
+// ─── 카테고리 ───
+const CATEGORY_ORDER: Array<{ key: string; label: string; icon: string }> = [
+  { key: "통합통장", label: "통합통장", icon: "🌐" },
+  { key: "수시입출", label: "수시입출", icon: "💵" },
+  { key: "예치형", label: "예치형", icon: "🏛️" },
+  { key: "적금", label: "적금", icon: "💰" },
+  { key: "이체", label: "이체", icon: "🔁" },
+];
 
 export default function DepositGuidePage() {
+  const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [openQuestionId, setOpenQuestionId] = useState<string | null>(null);
+
+  // 검색용 인덱스: 상품의 모든 텍스트 합치기
+  const searchIndex = useMemo(() => {
+    return DEPOSIT_PRODUCTS.map((p) => ({
+      id: p.id,
+      blob: [
+        p.title,
+        p.shortTitle,
+        p.category,
+        p.description,
+        p.eligibility,
+        p.period,
+        p.currencies,
+        p.channels,
+        p.initialDeposit,
+        p.additionalDeposit,
+        p.accountLimit,
+        p.interestPayment,
+        p.baseRate,
+        p.interestFormula,
+        (p.bonusRate ?? []).join(" "),
+        (p.benefits ?? []).join(" "),
+        p.earlyTermination,
+        p.postMaturity,
+        p.autoRenew,
+        p.partialWithdraw,
+        p.cashFee,
+        (p.keyClauses ?? [])
+          .map((c) => `${c.ref} ${c.label} ${c.body}`)
+          .join(" "),
+        (p.examples ?? [])
+          .map((e) => `${e.scenario} ${e.calculation} ${e.result}`)
+          .join(" "),
+        (p.customerScripts ?? [])
+          .map((s) => `${s.situation} ${s.line}`)
+          .join(" "),
+        (p.staffChecklist ?? []).join(" "),
+        p.source,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase(),
+    }));
+  }, []);
+
+  const filteredProducts = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    let result = DEPOSIT_PRODUCTS;
+    if (activeCategory) {
+      result = result.filter((p) => p.category === activeCategory);
+    }
+    if (q) {
+      const matchIds = new Set(
+        searchIndex.filter((s) => s.blob.includes(q)).map((s) => s.id),
+      );
+      result = result.filter((p) => matchIds.has(p.id));
+    }
+    return result;
+  }, [search, activeCategory, searchIndex]);
+
+  const isSearching = search.trim().length > 0;
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className="max-w-6xl mx-auto px-6 py-8">
       <Link
         href="/guide"
         className="text-xs text-charcoal-soft hover:text-primary inline-flex items-center gap-1 mb-3"
       >
         ← 가이드 홈
       </Link>
-      <header className="mb-6">
+      <header className="mb-4">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
           🏦 외화 통장·적금
         </p>
-        <h1 className="text-3xl font-bold mb-2">외화 예금·적금 상품</h1>
+        <h1 className="text-3xl font-bold mb-1">외화 예금·적금</h1>
         <p className="text-sm text-charcoal-soft">
-          iM뱅크 외화 통장(브랜드) 1종 + 예금 6종 + 적금 4종 + 자동이체. 각 상품
-          본문(상품설명서·특약) 기준으로 한눈에 비교.
+          영업점 빠른 참조 — 검색·빠른 질문·전체 비교표·이자 시뮬레이터. 총{" "}
+          {DEPOSIT_PRODUCTS.length}개 상품.
         </p>
       </header>
 
       <AdminNote storageKey="fx-guide:note:guide-deposit" />
 
-      <Toc />
-
-      {/* 공통 안내 */}
-      <section
-        id="common"
-        className="bg-offwhite border border-border rounded-xl p-5 mb-6 text-sm scroll-mt-20"
-      >
-        <p className="font-medium mb-2">📋 모든 외화 예금·적금 공통</p>
-        <ul className="space-y-1 text-charcoal-soft list-disc list-inside">
-          <li>
-            <strong>기본 약관</strong>: 외환거래 기본약관 + 외화예금 거래기본약관
-            (특약·상품설명서에서 정하지 않은 사항은 기본약관 준용)
-          </li>
-          <li>공동명의 가입 불가 (전 상품)</li>
-          <li>
-            예금자보호법 적용 — 원금+이자 <strong>1인당 1억원까지</strong> (본 은행
-            여타 보호상품과 합산)
-          </li>
-          <li>비과세종합저축 가입 불가</li>
-          <li>
-            현찰수수료 (대부분 상품 동일): USD/JPY/EUR/GBP/CAD/AUD/CHF/NZD 1.5%, CNY
-            4.0% (USD 외 현찰 입금 또는 송금 입금분을 현찰로 출금 시)
-          </li>
-          <li>원화 출금 시 환율변동으로 이익/손실 발생 가능</li>
-        </ul>
-      </section>
-
-      {/* 통합통장 — 강조 */}
-      {COMPREHENSIVE.length > 0 && (
-        <section id="comprehensive" className="mb-8 scroll-mt-20">
-          <SectionTitle icon="🌐" title="외화 종합통장 (브랜드)">
-            보통예금이 기본계좌, 통지·정기·회전복리가 연결계좌. 영업점 첫 가입
-            추천.
-          </SectionTitle>
-          <div className="grid md:grid-cols-1 gap-4">
-            {COMPREHENSIVE.map((p) => (
-              <ProductDetailCard key={p.id} product={p} highlight />
-            ))}
+      {/* 검색창 + 카테고리 필터 — sticky */}
+      <div className="sticky top-14 md:top-0 z-10 -mx-6 px-6 pt-3 pb-3 bg-offwhite mb-4">
+        <div className="bg-white border border-border rounded-xl p-3">
+          <div className="relative">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="검색 — 정기예금 중도해지 / 9통화 / 비대면 / 법인 / 미성년 / 복리 / 36개월 ..."
+              className="w-full pl-9 pr-9 py-2.5 border border-border rounded-lg focus:outline-none focus:border-primary text-sm"
+              autoFocus
+            />
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-soft pointer-events-none">
+              🔍
+            </span>
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-charcoal-soft hover:text-charcoal text-sm"
+                aria-label="검색 지우기"
+              >
+                ✕
+              </button>
+            )}
           </div>
-        </section>
-      )}
-
-      {/* 수시입출 예금 3종 비교 */}
-      <section id="demand" className="mb-8 scroll-mt-20">
-        <SectionTitle icon="💵" title="수시입출 외화예금 (3종)">
-          입출금이 자유로운 외화 통장 — 용도·금리 구조로 선택.
-        </SectionTitle>
-        <CompareTable products={DEMAND} compareKeys={DEMAND_COMPARE_KEYS} />
-        <div className="grid md:grid-cols-3 gap-3 mt-4">
-          {DEMAND.map((p) => (
-            <ProductDetailCard key={p.id} product={p} compact />
-          ))}
-        </div>
-      </section>
-
-      {/* 예치형 예금 3종 비교 */}
-      <section id="term" className="mb-8 scroll-mt-20">
-        <SectionTitle icon="🏛️" title="예치형 외화예금 (3종)">
-          기간을 정해 예치하는 외화예금 — 단기·중기·장기 운용에 따라 선택.
-        </SectionTitle>
-        <CompareTable products={TERM} compareKeys={TERM_COMPARE_KEYS} />
-        <div className="grid md:grid-cols-3 gap-3 mt-4">
-          {TERM.map((p) => (
-            <ProductDetailCard key={p.id} product={p} compact />
-          ))}
-        </div>
-      </section>
-
-      {/* 적금 4종 비교 */}
-      <section id="savings" className="mb-8 scroll-mt-20">
-        <SectionTitle icon="💰" title="외화 적금 (4종)">
-          자유적립식 외화 예금 — 기본형·장기우대·비대면·미성년자 우대.
-        </SectionTitle>
-        <CompareTable products={SAVINGS} compareKeys={SAVINGS_COMPARE_KEYS} />
-        <div className="grid md:grid-cols-2 gap-4 mt-4">
-          {SAVINGS.map((p) => (
-            <ProductDetailCard key={p.id} product={p} />
-          ))}
-        </div>
-      </section>
-
-      {/* 자동이체 */}
-      {TRANSFER.length > 0 && (
-        <section id="transfer" className="mb-8 scroll-mt-20">
-          <SectionTitle icon="🔁" title="외화 자동이체">
-            예금·적금 적립용 정기 이체.
-          </SectionTitle>
-          <div className="grid md:grid-cols-1 gap-4">
-            {TRANSFER.map((p) => (
-              <ProductDetailCard key={p.id} product={p} />
-            ))}
+          <div className="flex flex-wrap gap-1 mt-2">
+            <Chip
+              label={`전체 (${DEPOSIT_PRODUCTS.length})`}
+              active={activeCategory === null}
+              onClick={() => setActiveCategory(null)}
+            />
+            {CATEGORY_ORDER.map((c) => {
+              const count = DEPOSIT_PRODUCTS.filter(
+                (p) => p.category === c.key,
+              ).length;
+              return (
+                <Chip
+                  key={c.key}
+                  label={`${c.icon} ${c.label} (${count})`}
+                  active={activeCategory === c.key}
+                  onClick={() =>
+                    setActiveCategory(activeCategory === c.key ? null : c.key)
+                  }
+                />
+              );
+            })}
           </div>
+        </div>
+      </div>
+
+      {/* 검색 중일 때: 결과만 노출 */}
+      {isSearching ? (
+        <section className="mb-8">
+          <h2 className="text-sm font-medium text-charcoal-soft uppercase tracking-wide mb-3">
+            검색 결과 ({filteredProducts.length}개)
+          </h2>
+          {filteredProducts.length === 0 ? (
+            <p className="bg-white border border-border rounded-xl p-6 text-center text-charcoal-soft text-sm">
+              일치하는 상품이 없습니다. 다른 키워드로 검색해 주세요.
+            </p>
+          ) : (
+            <ProductGrid products={filteredProducts} />
+          )}
         </section>
+      ) : (
+        <>
+          {/* 빠른 질문 — 검색 안 할 때 노출 */}
+          <section className="mb-8">
+            <h2 className="text-sm font-medium text-charcoal-soft uppercase tracking-wide mb-3">
+              ⚡ 자주 묻는 질문 — 클릭하면 즉답
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {QUICK_QUESTIONS.map((q) => (
+                <QuickQuestionCard
+                  key={q.id}
+                  q={q}
+                  open={openQuestionId === q.id}
+                  onToggle={() =>
+                    setOpenQuestionId(openQuestionId === q.id ? null : q.id)
+                  }
+                />
+              ))}
+            </div>
+          </section>
+
+          {/* 전체 비교표 */}
+          <section className="mb-8">
+            <h2 className="text-sm font-medium text-charcoal-soft uppercase tracking-wide mb-3">
+              📊 전체 상품 한 화면 비교 ({filteredProducts.length}개)
+            </h2>
+            <FullCompareTable products={filteredProducts} />
+          </section>
+
+          {/* 카테고리별 카드 */}
+          {!activeCategory && (
+            <section className="mb-8">
+              <h2 className="text-sm font-medium text-charcoal-soft uppercase tracking-wide mb-3">
+                카테고리별 상품
+              </h2>
+              <ProductGrid products={filteredProducts} />
+            </section>
+          )}
+
+          {activeCategory && (
+            <section className="mb-8">
+              <h2 className="text-sm font-medium text-charcoal-soft uppercase tracking-wide mb-3">
+                {activeCategory} 상품
+              </h2>
+              <ProductGrid products={filteredProducts} />
+            </section>
+          )}
+
+          {/* 시뮬레이터 */}
+          <section id="simulator" className="mb-8 scroll-mt-20">
+            <h2 className="text-sm font-medium text-charcoal-soft uppercase tracking-wide mb-3">
+              🧮 이자 시뮬레이터
+            </h2>
+            <InterestSimulator />
+          </section>
+
+          {/* 공통 안내 */}
+          <section className="bg-offwhite border border-border rounded-xl p-4 text-xs text-charcoal-soft">
+            <p className="font-medium text-charcoal mb-1.5">📋 모든 외화 예금·적금 공통</p>
+            <ul className="space-y-0.5 list-disc list-inside">
+              <li>
+                예금자보호법 적용 — 원금+이자 <strong className="text-charcoal">1인당 1억원까지</strong> (본 은행 여타 보호상품과 합산)
+              </li>
+              <li>비과세종합저축 가입 불가 · 공동명의 가입 불가</li>
+              <li>
+                현찰수수료: USD/JPY/EUR/GBP/CAD/AUD/CHF/NZD 1.5%, CNY 4.0% (USD 외 현찰 입금 또는 송금 입금분 현찰 출금 시)
+              </li>
+              <li>
+                원화 출금 시 <strong className="text-charcoal">대고객 전신환매입율</strong> 적용 (외화예금거래기본약관 제5조)
+              </li>
+              <li>
+                이자 계산 기준일수: USD 등 360일 · <strong className="text-charcoal">JPY·GBP만 365일</strong> (외화예금거래기본약관 제4조)
+              </li>
+            </ul>
+          </section>
+        </>
       )}
-
-      {/* 시뮬레이터 */}
-      <section id="simulator" className="mb-8 scroll-mt-20">
-        <SectionTitle icon="🧮" title="이자 시뮬레이터">
-          상품·통화·기간·금액·금리를 입력하면 만기 이자를 미리 계산. 외화예금거래기본약관
-          제4조 기준 (연 360일 / JPY·GBP는 365일).
-        </SectionTitle>
-        <InterestSimulator />
-      </section>
-
-      {/* 안내 */}
-      <section className="bg-offwhite border border-border rounded-xl p-5 text-sm">
-        <h3 className="font-medium mb-2">⚠️ 영업점 가입 시 확인</h3>
-        <ul className="space-y-1 text-charcoal-soft list-disc list-inside">
-          <li>
-            위 정보는 상품설명서·특약 본문 기준. 실시간 적용 금리·환율우대 수치는
-            영업점 게시 또는 본부 매뉴얼 기준
-          </li>
-          <li>iM·IDREAM은 비대면(모바일) 가입 채널 중심. 영업점 가입 가능 여부는 본부 확인</li>
-          <li>
-            글로벌통장 수수료 우대 (송금 50% / 현찰 50% / TC 30%)는 외화통지·정기예금
-            보유 + 신규금액 요건 충족 + 대상예금 유지 시에만 적용
-          </li>
-          <li>총 {DEPOSIT_PRODUCTS.length}개 상품. 모든 항목 출처는 각 카드 하단 명시</li>
-        </ul>
-      </section>
     </div>
   );
 }
 
-// ─── 비교표 ───
-type CompareKey = {
-  label: string;
-  get: (p: DepositProduct) => string | undefined | string[];
-};
-
-const DEMAND_COMPARE_KEYS: CompareKey[] = [
-  { label: "가입대상", get: (p) => p.eligibility },
-  { label: "통화", get: (p) => p.currencies },
-  { label: "이자", get: (p) => p.baseRate },
-  { label: "이자지급", get: (p) => p.interestPayment },
-  { label: "가입금액", get: (p) => p.initialDeposit },
-];
-
-const TERM_COMPARE_KEYS: CompareKey[] = [
-  { label: "기간", get: (p) => p.period },
-  { label: "통화", get: (p) => p.currencies },
-  { label: "금리방식", get: (p) => p.baseRate },
-  { label: "중도해지", get: (p) => p.earlyTermination },
-  { label: "재예치", get: (p) => p.autoRenew },
-];
-
-const SAVINGS_COMPARE_KEYS: CompareKey[] = [
-  { label: "가입대상", get: (p) => p.eligibility },
-  { label: "기간", get: (p) => p.period },
-  { label: "통화", get: (p) => p.currencies },
-  { label: "채널", get: (p) => p.channels },
-  { label: "최초가입", get: (p) => p.initialDeposit },
-  { label: "추가입금", get: (p) => p.additionalDeposit },
-  { label: "계좌한도", get: (p) => p.accountLimit },
-  { label: "일부해지", get: (p) => p.partialWithdraw },
-  { label: "자동재예치", get: (p) => p.autoRenew },
-];
-
-function CompareTable({
-  products,
-  compareKeys,
+// ─── 빠른 질문 카드 ───
+function QuickQuestionCard({
+  q,
+  open,
+  onToggle,
 }: {
-  products: DepositProduct[];
-  compareKeys: CompareKey[];
+  q: QuickQuestion;
+  open: boolean;
+  onToggle: () => void;
 }) {
   return (
+    <article
+      className={[
+        "border rounded-xl transition cursor-pointer",
+        open
+          ? "bg-primary/5 border-primary/40"
+          : "bg-white border-border hover:border-primary/40",
+      ].join(" ")}
+    >
+      <button
+        onClick={onToggle}
+        className="w-full text-left p-3 flex items-start gap-2"
+      >
+        <span className="text-lg shrink-0">{q.icon}</span>
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-sm text-charcoal leading-snug">
+            {q.question}
+          </p>
+        </div>
+        <span className="text-charcoal-soft text-base shrink-0">
+          {open ? "−" : "+"}
+        </span>
+      </button>
+      {open && (
+        <div className="px-3 pb-3 border-t border-border/60 pt-2.5">
+          <p className="text-sm text-charcoal leading-relaxed mb-1.5">
+            <strong className="text-primary">→ </strong>
+            {q.answer}
+          </p>
+          {q.details && (
+            <p className="text-xs text-charcoal-soft leading-relaxed mb-2">
+              {q.details}
+            </p>
+          )}
+          {q.productIds.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {q.productIds.map((pid) => {
+                const p = depositById(pid);
+                if (!p) return null;
+                return (
+                  <Link
+                    key={pid}
+                    href={`/guide/deposit/${pid}`}
+                    className="text-[11px] bg-white border border-primary/30 text-primary px-2 py-0.5 rounded-full hover:bg-primary hover:text-white transition"
+                  >
+                    {p.shortTitle} →
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </article>
+  );
+}
+
+// ─── 전체 한 화면 비교표 ───
+function FullCompareTable({ products }: { products: DepositProduct[] }) {
+  return (
     <div className="overflow-x-auto bg-white border border-border rounded-xl">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-border bg-offwhite">
-            <th className="text-left p-3 text-xs text-charcoal-soft uppercase tracking-wide w-28">
-              항목
+      <table className="w-full text-xs">
+        <thead className="bg-offwhite">
+          <tr className="border-b border-border">
+            <th className="text-left p-2.5 text-charcoal-soft uppercase tracking-wide sticky left-0 bg-offwhite z-10 min-w-32">
+              상품
             </th>
-            {products.map((p) => (
-              <th
-                key={p.id}
-                className="text-left p-3 text-charcoal font-semibold"
-              >
-                {p.shortTitle}
-              </th>
-            ))}
+            <th className="text-left p-2.5 text-charcoal-soft uppercase tracking-wide">
+              구분
+            </th>
+            <th className="text-left p-2.5 text-charcoal-soft uppercase tracking-wide">
+              기간
+            </th>
+            <th className="text-left p-2.5 text-charcoal-soft uppercase tracking-wide">
+              통화
+            </th>
+            <th className="text-left p-2.5 text-charcoal-soft uppercase tracking-wide">
+              최소가입
+            </th>
+            <th className="text-left p-2.5 text-charcoal-soft uppercase tracking-wide">
+              추가입금
+            </th>
+            <th className="text-left p-2.5 text-charcoal-soft uppercase tracking-wide">
+              일부해지
+            </th>
+            <th className="text-left p-2.5 text-charcoal-soft uppercase tracking-wide">
+              비대면
+            </th>
+            <th className="text-left p-2.5 text-charcoal-soft uppercase tracking-wide">
+              핵심
+            </th>
+            <th className="text-left p-2.5 text-charcoal-soft uppercase tracking-wide sticky right-0 bg-offwhite z-10">
+              상세
+            </th>
           </tr>
         </thead>
         <tbody>
-          {compareKeys.map((k) => {
-            const allEmpty = products.every((p) => {
-              const v = k.get(p);
-              if (Array.isArray(v)) return v.length === 0;
-              return !v;
-            });
-            if (allEmpty) return null;
-            return (
-              <tr
-                key={k.label}
-                className="border-b border-border last:border-0 align-top"
-              >
-                <td className="p-3 text-xs text-charcoal-soft uppercase tracking-wide whitespace-nowrap">
-                  {k.label}
-                </td>
-                {products.map((p) => {
-                  const v = k.get(p);
-                  const text = Array.isArray(v)
-                    ? v.join(" · ")
-                    : (v ?? "—");
-                  return (
-                    <td
-                      key={p.id}
-                      className="p-3 text-charcoal-soft leading-relaxed text-xs"
-                    >
-                      {text}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
+          {products.map((p, i) => (
+            <tr
+              key={p.id}
+              className={[
+                "border-b border-border last:border-0 align-top",
+                i % 2 === 1 ? "bg-offwhite/40" : "",
+              ].join(" ")}
+            >
+              <td className="p-2.5 sticky left-0 bg-white z-10 group-hover:bg-offwhite">
+                <Link
+                  href={`/guide/deposit/${p.id}`}
+                  className="font-semibold text-charcoal hover:text-primary text-sm block leading-tight"
+                >
+                  {p.title}
+                </Link>
+                <span className="text-[10px] text-charcoal-soft">
+                  {p.shortTitle}
+                </span>
+              </td>
+              <td className="p-2.5 text-charcoal-soft">{p.category}</td>
+              <td className="p-2.5 text-charcoal">{p.period ?? "—"}</td>
+              <td className="p-2.5 text-charcoal">
+                {summarizeCurrencies(p.currencies)}
+              </td>
+              <td className="p-2.5 text-charcoal-soft">
+                {summarize(p.initialDeposit)}
+              </td>
+              <td className="p-2.5 text-charcoal-soft">
+                {summarize(p.additionalDeposit) ||
+                  inferAdditional(p) ||
+                  "—"}
+              </td>
+              <td className="p-2.5 text-charcoal-soft">
+                {summarize(p.partialWithdraw) || inferPartial(p) || "—"}
+              </td>
+              <td className="p-2.5">
+                {channelOnline(p.channels) ? (
+                  <span className="inline-block text-[10px] bg-primary/10 text-primary border border-primary/30 px-1.5 py-0.5 rounded-full">
+                    ✓ 가능
+                  </span>
+                ) : (
+                  <span className="text-charcoal-soft">—</span>
+                )}
+              </td>
+              <td className="p-2.5 text-charcoal-soft">{coreHighlight(p)}</td>
+              <td className="p-2.5 sticky right-0 bg-white z-10">
+                <Link
+                  href={`/guide/deposit/${p.id}`}
+                  className="text-primary hover:text-primary-dark font-medium whitespace-nowrap"
+                >
+                  보기 →
+                </Link>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
   );
 }
 
-// ─── 상품 상세 카드 ───
-function ProductDetailCard({
-  product,
-  highlight,
-  compact,
-}: {
-  product: DepositProduct;
-  highlight?: boolean;
-  compact?: boolean;
-}) {
-  const [open, setOpen] = useState(false);
+function summarize(s?: string): string {
+  if (!s) return "";
+  if (s.length <= 24) return s;
+  return s.slice(0, 22) + "…";
+}
 
+function summarizeCurrencies(s?: string): string {
+  if (!s) return "—";
+  const match = s.match(/(\d+)\s*개?\s*통화/);
+  if (match) return `${match[1]}종`;
+  return summarize(s);
+}
+
+function channelOnline(channels?: string): boolean {
+  if (!channels) return false;
+  return /인터넷|모바일|비대면|앱뱅킹/.test(channels);
+}
+
+function inferAdditional(p: DepositProduct): string {
+  if (p.category === "수시입출" || p.category === "통합통장")
+    return "자유";
+  return "";
+}
+
+function inferPartial(p: DepositProduct): string {
+  if (p.category === "수시입출") return "자유";
+  if (p.category === "예치형") return "불가";
+  return "";
+}
+
+function coreHighlight(p: DepositProduct): string {
+  switch (p.id) {
+    case "global-comprehensive":
+      return "수수료 우대";
+    case "fc-ordinary":
+      return "기본 외화통장";
+    case "fc-checking":
+      return "무이자·당좌";
+    case "fc-mmda":
+      return "잔액 차등금리";
+    case "fc-notice":
+      return "7일 갱신";
+    case "fc-time-deposit":
+      return "표준 정기예금";
+    case "fc-rolling-compound":
+      return "복리";
+    case "foryou":
+      return "기본 자유적립";
+    case "plusyou":
+      return "장기 우대 + 수수료";
+    case "im-free":
+      return "비대면·최대 +0.50%";
+    case "idream-free":
+      return "미성년·외화 첫 +0.30%";
+    case "auto-transfer":
+      return "적립 우대 트리거";
+    default:
+      return "";
+  }
+}
+
+// ─── 압축 카드 그리드 ───
+function ProductGrid({ products }: { products: DepositProduct[] }) {
   return (
-    <article
-      className={[
-        "border rounded-xl p-5 flex flex-col",
-        highlight
-          ? "bg-primary/5 border-primary/30"
-          : "bg-white border-border",
-      ].join(" ")}
-    >
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <h3 className={highlight ? "font-bold text-lg leading-tight" : "font-bold leading-tight"}>
-          {product.title}
-        </h3>
-        <span className="text-[10px] text-charcoal-soft bg-offwhite border border-border px-2 py-0.5 rounded-full whitespace-nowrap">
-          {product.category}
-        </span>
-      </div>
-      <p className="text-sm text-charcoal-soft mb-3 leading-relaxed">
-        {product.description}
-      </p>
+    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {products.map((p) => (
+        <CompactCard key={p.id} product={p} />
+      ))}
+    </ul>
+  );
+}
 
-      {/* 핵심 정보 */}
-      <dl className="space-y-2 text-sm">
-        {!compact && product.eligibility && (
-          <Row label="가입대상" value={product.eligibility} />
-        )}
-        {product.period && <Row label="기간" value={product.period} />}
-        {!compact && product.currencies && (
-          <Row label="통화" value={product.currencies} />
-        )}
-        {!compact && product.channels && (
-          <Row label="채널" value={product.channels} />
-        )}
-        {product.initialDeposit && (
-          <Row label="가입금액" value={product.initialDeposit} />
-        )}
-        {!compact && product.additionalDeposit && (
-          <Row label="추가입금" value={product.additionalDeposit} />
-        )}
-        {product.interestPayment && (
-          <Row label="이자지급" value={product.interestPayment} />
-        )}
-        {product.baseRate && <Row label="기본금리" value={product.baseRate} />}
-      </dl>
-
-      {product.bonusRate && product.bonusRate.length > 0 && (
-        <Section title="우대금리">
-          {product.bonusRate.map((b, i) => (
-            <li key={i} className="text-charcoal pl-1 list-disc list-inside">
-              {b}
-            </li>
-          ))}
-        </Section>
-      )}
-
-      {product.benefits && product.benefits.length > 0 && (
-        <Section title="부가 혜택·특이사항">
-          {product.benefits.map((b, i) => (
-            <li key={i} className="text-charcoal pl-1 list-disc list-inside">
-              {b}
-            </li>
-          ))}
-        </Section>
-      )}
-
-      {/* 펼침 — 중도해지/만기후/현찰수수료/예금자보호 */}
-      {(product.earlyTermination ||
-        product.postMaturity ||
-        product.cashFee ||
-        product.protection ||
-        product.taxBenefit ||
-        product.autoRenew ||
-        product.partialWithdraw) && (
-        <details
-          className="mt-3 pt-3 border-t border-border text-sm"
-          onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}
-        >
-          <summary className="cursor-pointer text-charcoal-soft hover:text-primary text-xs uppercase tracking-wide font-medium">
-            {open ? "▼" : "▶"} 해지·만기·수수료 상세
-          </summary>
-          <dl className="mt-2 space-y-2">
-            {product.earlyTermination && (
-              <Row label="중도해지" value={product.earlyTermination} />
-            )}
-            {product.partialWithdraw && (
-              <Row label="일부해지" value={product.partialWithdraw} />
-            )}
-            {product.postMaturity && (
-              <Row label="만기 후 이자" value={product.postMaturity} />
-            )}
-            {product.autoRenew && (
-              <Row label="자동재예치" value={product.autoRenew} />
-            )}
-            {product.cashFee && <Row label="현찰수수료" value={product.cashFee} />}
-            {product.protection && (
-              <Row label="예금자보호" value={product.protection} />
-            )}
-            {product.taxBenefit && (
-              <Row label="세제혜택" value={product.taxBenefit} />
-            )}
-          </dl>
-        </details>
-      )}
-
-      <div className="flex flex-wrap gap-1 mt-3 pt-3 border-t border-border">
-        <Tag>{product.termsFile}</Tag>
-      </div>
-      <p className="text-[10px] text-charcoal-soft mt-2">
-        출처: {product.source}
-      </p>
-
+function CompactCard({ product }: { product: DepositProduct }) {
+  return (
+    <li>
       <Link
         href={`/guide/deposit/${product.id}`}
-        className="mt-3 inline-flex items-center gap-1 text-xs text-primary hover:text-primary-dark font-medium group/link"
+        className="block bg-white border border-border rounded-xl p-4 hover:border-primary transition group h-full"
       >
-        상세보기 (약관 본문·이자 산식·응대 멘트·체크포인트)
-        <span className="group-hover/link:translate-x-0.5 transition">→</span>
+        <div className="flex items-start justify-between gap-2 mb-1.5">
+          <h3 className="font-bold text-sm leading-tight group-hover:text-primary transition">
+            {product.title}
+          </h3>
+          <span className="text-[9px] text-charcoal-soft bg-offwhite border border-border px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0">
+            {product.category}
+          </span>
+        </div>
+        <p className="text-xs text-charcoal-soft mb-2.5 leading-relaxed line-clamp-2">
+          {product.description}
+        </p>
+        <dl className="text-[11px] space-y-1">
+          {product.period && (
+            <CompactRow label="기간" value={product.period} />
+          )}
+          {product.currencies && (
+            <CompactRow
+              label="통화"
+              value={summarizeCurrencies(product.currencies)}
+            />
+          )}
+          {product.baseRate && (
+            <CompactRow label="금리" value={product.baseRate} truncate />
+          )}
+        </dl>
+        <p className="text-[10px] text-primary font-medium mt-2.5 group-hover:translate-x-0.5 transition inline-block">
+          상세 → 약관·시뮬레이터·응대 멘트
+        </p>
       </Link>
-    </article>
+    </li>
   );
 }
 
-// ─── 보조 ───
-function Toc() {
-  const items = [
-    { href: "#common", label: "공통 약관·예금자보호" },
-    { href: "#comprehensive", label: "🌐 글로벌외화종합통장" },
-    { href: "#demand", label: "💵 수시입출 (3종)" },
-    { href: "#term", label: "🏛️ 예치형 (3종)" },
-    { href: "#savings", label: "💰 적금 (4종)" },
-    { href: "#transfer", label: "🔁 자동이체" },
-    { href: "#simulator", label: "🧮 이자 시뮬레이터" },
-  ];
-  return (
-    <nav className="bg-white border border-border rounded-xl p-3 mb-6 flex flex-wrap gap-1.5 text-xs">
-      <span className="text-charcoal-soft uppercase tracking-wide px-1 py-1">
-        바로가기
-      </span>
-      {items.map((it) => (
-        <a
-          key={it.href}
-          href={it.href}
-          className="px-2.5 py-1 rounded-full border border-border text-charcoal-soft hover:border-primary hover:text-primary transition"
-        >
-          {it.label}
-        </a>
-      ))}
-    </nav>
-  );
-}
-
-function SectionTitle({
-  icon,
-  title,
-  children,
+function CompactRow({
+  label,
+  value,
+  truncate,
 }: {
-  icon: string;
-  title: string;
-  children?: React.ReactNode;
+  label: string;
+  value: string;
+  truncate?: boolean;
 }) {
   return (
-    <div className="mb-3">
-      <h2 className="text-xl font-bold">
-        <span className="mr-2">{icon}</span>
-        {title}
-      </h2>
-      {children && (
-        <p className="text-xs text-charcoal-soft mt-1">{children}</p>
-      )}
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-3">
-      <dt className="text-xs text-charcoal-soft sm:w-24 sm:shrink-0 uppercase tracking-wide">
+    <div className="flex items-baseline gap-1.5">
+      <dt className="text-charcoal-soft uppercase tracking-wide shrink-0 w-9">
         {label}
       </dt>
-      <dd className="text-charcoal leading-relaxed text-sm flex-1">{value}</dd>
+      <dd
+        className={[
+          "text-charcoal flex-1 min-w-0 leading-snug",
+          truncate ? "line-clamp-2" : "",
+        ].join(" ")}
+      >
+        {value}
+      </dd>
     </div>
   );
 }
 
-function Section({
-  title,
-  children,
+function Chip({
+  label,
+  active,
+  onClick,
 }: {
-  title: string;
-  children: React.ReactNode;
+  label: string;
+  active: boolean;
+  onClick: () => void;
 }) {
   return (
-    <div className="mt-3">
-      <h4 className="text-xs font-medium text-charcoal-soft mb-1.5 uppercase tracking-wide">
-        {title}
-      </h4>
-      <ul className="space-y-1 text-sm">{children}</ul>
-    </div>
-  );
-}
-
-function Tag({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="text-[10px] text-charcoal-soft bg-offwhite border border-border px-2 py-0.5 rounded-full">
-      📄 {children}
-    </span>
+    <button
+      onClick={onClick}
+      className={[
+        "text-xs px-2.5 py-1 rounded-full border transition",
+        active
+          ? "bg-primary text-white border-primary"
+          : "bg-white border-border text-charcoal-soft hover:border-primary",
+      ].join(" ")}
+    >
+      {label}
+    </button>
   );
 }
