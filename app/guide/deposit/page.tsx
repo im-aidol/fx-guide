@@ -8,6 +8,7 @@ import {
   type DepositProduct,
 } from "@/lib/data/deposit-products";
 import { AdminNote } from "@/components/admin/AdminNote";
+import { InterestSimulator } from "@/components/deposit/InterestSimulator";
 
 const COMPREHENSIVE = depositsByCategory("통합통장");
 const DEMAND = depositsByCategory("수시입출");
@@ -131,6 +132,15 @@ export default function DepositGuidePage() {
           </div>
         </section>
       )}
+
+      {/* 시뮬레이터 */}
+      <section id="simulator" className="mb-8 scroll-mt-20">
+        <SectionTitle icon="🧮" title="이자 시뮬레이터">
+          상품·통화·기간·금액·금리를 입력하면 만기 이자를 미리 계산. 외화예금거래기본약관
+          제4조 기준 (연 360일 / JPY·GBP는 365일).
+        </SectionTitle>
+        <InterestSimulator />
+      </section>
 
       {/* 안내 */}
       <section className="bg-offwhite border border-border rounded-xl p-5 text-sm">
@@ -372,6 +382,14 @@ function ProductDetailCard({
       <p className="text-[10px] text-charcoal-soft mt-2">
         출처: {product.source}
       </p>
+
+      <Link
+        href={`/guide/deposit/${product.id}`}
+        className="mt-3 inline-flex items-center gap-1 text-xs text-primary hover:text-primary-dark font-medium group/link"
+      >
+        상세보기 (약관 본문·이자 산식·응대 멘트·체크포인트)
+        <span className="group-hover/link:translate-x-0.5 transition">→</span>
+      </Link>
     </article>
   );
 }
@@ -385,6 +403,7 @@ function Toc() {
     { href: "#term", label: "🏛️ 예치형 (3종)" },
     { href: "#savings", label: "💰 적금 (4종)" },
     { href: "#transfer", label: "🔁 자동이체" },
+    { href: "#simulator", label: "🧮 이자 시뮬레이터" },
   ];
   return (
     <nav className="bg-white border border-border rounded-xl p-3 mb-6 flex flex-wrap gap-1.5 text-xs">
