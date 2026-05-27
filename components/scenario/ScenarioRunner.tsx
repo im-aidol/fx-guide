@@ -9,7 +9,12 @@ import type {
   ScenarioNode,
   ScenarioOption,
 } from "@/lib/types";
-import { COUNTRIES, getSendableCurrencies, isImBankSendable } from "@/lib/data";
+import {
+  COUNTRIES,
+  getSendableCurrencies,
+  isImBankSendable,
+} from "@/lib/data";
+import { isBaroSupported } from "@/lib/types";
 import {
   fetchUsdRates,
   localToUsd,
@@ -160,6 +165,7 @@ export function ScenarioRunner({ scenario }: Props) {
               (state.inputs.amountCurrency as string) ||
               selectedCountry?.currency
             }
+            country={selectedCountry}
           />
         )}
 
@@ -470,11 +476,13 @@ function ResultNodeView({
   amountUsd,
   amountLocal,
   inputCurrency,
+  country,
 }: {
   result: FlowResult;
   amountUsd?: number;
   amountLocal?: number;
   inputCurrency?: string;
+  country?: Country;
 }) {
   return (
     <div className="space-y-4">
@@ -546,6 +554,9 @@ function ResultNodeView({
         </details>
       )}
 
+      {/* 선택 국가 주의사항 — 송금사유·라우팅·WU PAYOUT 필수 등 */}
+      {country && <CountryAlerts country={country} />}
+
       {/* 송금 채널 선택 — 결과 후 영업점이 어떤 채널로 송금할지 결정 */}
       <NextStepChannels />
 
@@ -558,7 +569,82 @@ function ResultNodeView({
   );
 }
 
-// ─── 다음 단계: 송금 채널 4종 ───
+// ─── 선택 국가 주의사항 (BARO 가능·WU PAYOUT 필수·IBAN·사유 필수 등) ───
+function CountryAlerts({ country }: { country: Country }) {
+  const baroOk = isBaroSupported(country.currency);
+  const baroOnlyUsd = !baroOk;
+  const ibanCue = country.ibanRequired
+    ? `IBAN ${country.ibanLength ?? ""}자리 필수`
+    : null;
+  const purposeCue = country.purposeCodeRequired
+    ? "송금사유 코드 필수 기재"
+    : null;
+  const wuPayoutCue = country.wuPayoutLocationRequired
+    ? "WU 송금 시 PAYOUT CITY/STATE(지급도시·주) 필수"
+    : null;
+
+  const flags = [
+    baroOk && {
+      tone: "ok" as const,
+      text: `BARO-BARO 자동송금 가능 (${country.currency} 17통화 중)`,
+    },
+    baroOnlyUsd && country.currency &&
+      country.currency !== "USD" && {
+        tone: "warn" as const,
+        text: `BARO-BARO 자동송금 대상 통화 아님 (${country.currency}). USD로 환산 송금 가능 여부는 본부 확인`,
+      },
+    ibanCue && { tone: "ok" as const, text: ibanCue },
+    purposeCue && { tone: "warn" as const, text: purposeCue },
+    wuPayoutCue && { tone: "warn" as const, text: wuPayoutCue },
+  ].filter(Boolean) as Array<{ tone: "ok" | "warn"; text: string }>;
+
+  if (flags.length === 0 && (country.remarks ?? []).length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="bg-white border border-border rounded-lg p-4">
+      <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
+        <span>{country.flag}</span>
+        <span>{country.name} 송금 주의사항</span>
+        <span className="text-[10px] text-charcoal-soft font-normal">
+          선택 국가별 라우팅·사유 코드·채널 안내
+        </span>
+      </h3>
+      {flags.length > 0 && (
+        <ul className="flex flex-wrap gap-1.5 mb-2">
+          {flags.map((f, i) => (
+            <li
+              key={i}
+              className={[
+                "text-[11px] px-2 py-1 rounded-full border",
+                f.tone === "ok"
+                  ? "bg-primary/10 border-primary/30 text-primary"
+                  : "bg-warn/10 border-warn/40 text-charcoal",
+              ].join(" ")}
+            >
+              {f.text}
+            </li>
+          ))}
+        </ul>
+      )}
+      {(country.remarks ?? []).length > 0 && (
+        <ul className="space-y-1 text-xs text-charcoal-soft list-disc list-inside leading-relaxed">
+          {country.remarks!.map((r, i) => (
+            <li key={i}>{r}</li>
+          ))}
+        </ul>
+      )}
+      {country.riskLevel === "BLOCKED" && (
+        <p className="mt-2 text-xs text-danger font-medium">
+          ❌ 제재국 — 송금 불가
+        </p>
+      )}
+    </section>
+  );
+}
+
+// ─── 다음 단계: 송금 채널 3종 (GLN은 결제라 제외) ───
 function NextStepChannels() {
   const channels = [
     {
@@ -579,12 +665,6 @@ function NextStepChannels() {
       href: "/guide/send/channels/wu",
       desc: "200개국·계좌 불필요·USD 단일·7,000 이하",
     },
-    {
-      icon: "💳",
-      title: "GLN 해외 결제",
-      href: "/guide/send/channels/gln",
-      desc: "출국 결제 (송금 아님 — 8개국)",
-    },
   ];
   return (
     <section className="bg-white border border-border rounded-lg p-4">
@@ -595,7 +675,7 @@ function NextStepChannels() {
           위 사유로 어떤 채널로 송금할지 영업점 판단
         </span>
       </h3>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         {channels.map((c) => (
           <Link
             key={c.title}

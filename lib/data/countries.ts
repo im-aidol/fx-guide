@@ -66,11 +66,13 @@ export const COUNTRIES: Country[] = [
     routingType: "ABA",
     routingDigits: 9,
     purposeCodeRequired: true, // iM뱅크 자료: 송금사유 필수 기재국
+    wuPayoutLocationRequired: true, // WU 송금 시 PAYOUT CITY/STATE 필수
     remarks: [
       "ABA 라우팅 번호 9자리 필수",
       "수취인 영문 이름·영문 주소·ZIP code 필수",
       "송금사유 필수 기재 (iM뱅크 안내)",
       "OFAC 제재대상자 점검 (모든 미국 송금)",
+      "WU 송금 시 PAYOUT CITY/STATE(지급도시·주) 필수 기재",
       "iM뱅크 해외송금 Lite (모바일 한정): ACH Routing 9자리 사용, ABA 입력 시 처리 불가",
     ],
   },
@@ -175,10 +177,12 @@ export const COUNTRIES: Country[] = [
     ibanRequired: false,
     routingType: "Transit",
     purposeCodeRequired: false,
+    wuPayoutLocationRequired: true, // WU 송금 시 PAYOUT CITY/STATE 필수
     remarks: [
       "Institution Number 3자리 + Transit Number 5자리 + 계좌",
       "SWIFT BIC 필요",
       "수취인 영문명 + 주소 + 우편번호",
+      "WU 송금 시 PAYOUT CITY/STATE(지급도시·주) 필수 기재",
     ],
   },
   {
@@ -412,7 +416,11 @@ export const COUNTRIES: Country[] = [
     ibanRequired: false,
     routingType: "CLABE",
     routingDigits: 18,
-    remarks: ["CLABE 18자리 + SWIFT BIC"],
+    wuPayoutLocationRequired: true, // WU 송금 시 PAYOUT CITY/STATE 필수
+    remarks: [
+      "CLABE 18자리 + SWIFT BIC",
+      "WU 송금 시 PAYOUT CITY/STATE(지급도시·주) 필수 기재",
+    ],
   },
 
   // ─────────── 제재국 (선택 차단) ───────────

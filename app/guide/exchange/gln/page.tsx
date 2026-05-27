@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { AdminNote } from "@/components/admin/AdminNote";
 
-// GLN 해외 간편 결제 — 송금이 아닌 해외 결제 서비스.
+// GLN 해외 간편 결제 — 해외 결제 서비스 (송금·환전과 별개).
 // 모바일앱 QR/바코드로 8개국 가맹점 결제.
 // 출처: 『GLN 해외 간편 결제 서비스』 상품설명서 (준법감시인 심의필 25-1193호, 2025.06.02~2027.05.31)
 
@@ -15,8 +15,8 @@ export default function GlnPage() {
           가이드 홈
         </Link>
         <span>›</span>
-        <Link href="/guide/send" className="hover:text-primary">
-          당발송금
+        <Link href="/guide/exchange" className="hover:text-primary">
+          환전
         </Link>
         <span>›</span>
         <span className="text-charcoal">GLN 해외 간편 결제</span>
@@ -24,26 +24,26 @@ export default function GlnPage() {
 
       <header className="mb-4">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
-          💳 송금 채널 — 해외 결제
+          💳 해외 결제 도구
         </p>
         <h1 className="text-3xl font-bold mb-2">GLN 해외 간편 결제</h1>
         <p className="text-sm text-charcoal-soft leading-relaxed">
           모바일앱뱅킹의 QR/바코드로 해외 8개국 GLN 가맹점에서 결제하는 서비스.
-          엄밀히 송금이 아닌 결제 — 해외 출국 고객에게 안내.
+          송금·환전이 아닌 결제 — 해외 출국 고객 현지 결제용.
         </p>
       </header>
 
-      <AdminNote storageKey="fx-guide:note:send-gln" />
+      <AdminNote storageKey="fx-guide:note:exchange-gln" />
 
       {/* GLN은 송금 아님 안내 */}
       <section className="bg-warn/10 border border-warn/40 rounded-xl p-4 mb-4">
         <p className="text-xs font-medium text-charcoal mb-1">
-          ⚠️ GLN은 송금이 아닌 해외 결제 서비스
+          ⚠️ GLN은 송금이 아닌 결제 서비스
         </p>
         <p className="text-xs text-charcoal-soft leading-relaxed">
-          GLN은 해외 가맹점에서 QR/바코드로 결제하는 서비스로, 송금(자금
-          이체)이 아닌 결제 거래입니다. 해외 출국 고객이 현지 결제 도구로 사용 —
-          당발송금 카테고리에 함께 두지만 다른 송금 채널과 동작이 다릅니다.
+          GLN은 해외 가맹점에서 QR/바코드로 결제하는 서비스로, 송금(자금 이체)이
+          아닌 결제 거래입니다. 해외 출국 고객이 현지 결제 도구로 사용하므로
+          환전과 같은 카테고리(해외 결제 도구)에서 안내합니다.
         </p>
       </section>
 
@@ -172,43 +172,43 @@ export default function GlnPage() {
         </ul>
       </section>
 
-      {/* 관련 채널 */}
+      {/* 관련 환전·결제 채널 */}
       <section className="mt-6">
         <p className="text-[10px] text-charcoal-soft uppercase tracking-wide mb-2 px-1">
-          다른 송금 채널
+          관련 환전·해외 결제 채널
         </p>
         <div className="grid sm:grid-cols-3 gap-2">
           <Link
-            href="/guide/send/channels/swift"
+            href="/guide/exchange/calculator"
             className="bg-white border border-border rounded-lg p-3 hover:border-primary transition group"
           >
             <p className="font-medium text-sm group-hover:text-primary transition">
-              💸 SWIFT 일반 외화송금
+              🧮 환전 계산기
             </p>
             <p className="text-xs text-charcoal-soft mt-0.5">
-              외화송금신청서 (모든 사유)
+              원·외화 환산 + 환율우대
             </p>
           </Link>
           <Link
-            href="/guide/send/channels/baro"
+            href="/guide/exchange/e-wallet"
             className="bg-white border border-border rounded-lg p-3 hover:border-primary transition group"
           >
             <p className="font-medium text-sm group-hover:text-primary transition">
-              🚀 BARO-BARO 자동송금
+              💼 외화 E-지갑
             </p>
             <p className="text-xs text-charcoal-soft mt-0.5">
-              정기 자동·환율우대 30%
+              외화 보관·영업점 수령
             </p>
           </Link>
           <Link
-            href="/guide/send/channels/wu"
+            href="/guide/delivery"
             className="bg-white border border-border rounded-lg p-3 hover:border-primary transition group"
           >
             <p className="font-medium text-sm group-hover:text-primary transition">
-              ⚡ WU 송금 3종
+              📦 외화 배송
             </p>
             <p className="text-xs text-charcoal-soft mt-0.5">
-              200개국·계좌 불필요
+              비대면 수령 (배달·CU)
             </p>
           </Link>
         </div>

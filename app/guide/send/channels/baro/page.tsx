@@ -245,17 +245,6 @@ export default function BaroBaroPage() {
               200개국·수취인 계좌 불필요
             </p>
           </Link>
-          <Link
-            href="/guide/send/channels/gln"
-            className="bg-white border border-border rounded-lg p-3 hover:border-primary transition group"
-          >
-            <p className="font-medium text-sm group-hover:text-primary transition">
-              💳 GLN 해외 결제
-            </p>
-            <p className="text-xs text-charcoal-soft mt-0.5">
-              QR/바코드 결제 (송금 아님)
-            </p>
-          </Link>
         </div>
       </section>
 

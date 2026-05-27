@@ -75,11 +75,41 @@ export type Country = {
   routingDigits?: number;
   purposeCodeRequired?: boolean;   // 현지 송금사유 코드 필수 여부
 
+  // WU 송금 시 PAYOUT CITY/STATE(지급도시·주) 필수 기재국 (외화송금신청서·WU 약관)
+  wuPayoutLocationRequired?: boolean;
+
   currency?: string; // ISO 4217 통화 코드 (USD, KRW, VND, EUR 등) — 환율 환산용
 
   remarks?: string[]; // 직원 안내용 자유 메모
   notes?: string[];   // (legacy — 기존 호환)
 };
+
+// iM뱅크 BARO-BARO 해외 자동송금 지원 통화 (계좌잔액·예약금액 방식 17종).
+// 출처: 『BARO-BARO 해외 자동송금』 서비스설명서 §2 (준법감시인 심의필 25-2741호)
+export const BARO_SUPPORTED_CURRENCIES = [
+  "USD",
+  "JPY",
+  "EUR",
+  "AUD",
+  "CAD",
+  "GBP",
+  "CHF",
+  "HKD",
+  "SEK",
+  "DKK",
+  "NOK",
+  "SAR",
+  "KWD",
+  "AED",
+  "SGD",
+  "NZD",
+  "THB",
+] as const;
+
+export function isBaroSupported(currency?: string): boolean {
+  if (!currency) return false;
+  return (BARO_SUPPORTED_CURRENCIES as readonly string[]).includes(currency);
+}
 
 export type Purpose = {
   id: string;

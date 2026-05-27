@@ -70,6 +70,15 @@ const CARDS: HubCard[] = [
     description:
       "지정 일자·장소로 배달원 또는 CU편의점에서 비대면 수령. 10종 통화 (USD 90% 우대 — 비대면 중 최고).",
   },
+  {
+    id: "gln",
+    href: "/guide/exchange/gln",
+    icon: "💳",
+    title: "GLN 해외 간편 결제",
+    badge: "해외 결제 (송금 X)",
+    description:
+      "모바일앱 QR/바코드로 8개국(태국·일본·대만·홍콩·싱가포르·괌·라오스·캄보디아) 가맹점 결제. 출국 고객 현지 결제 도구.",
+  },
 ];
 
 export default function ExchangeHubPage() {

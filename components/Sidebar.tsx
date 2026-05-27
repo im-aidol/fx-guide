@@ -38,7 +38,6 @@ const NAV_TOP: NavItem[] = [
       { href: "/guide/send/channels/swift", label: "💸 SWIFT 일반 외화송금" },
       { href: "/guide/send/channels/baro", label: "🚀 BARO-BARO 자동송금" },
       { href: "/guide/send/channels/wu", label: "⚡ WU 송금 3종" },
-      { href: "/guide/send/channels/gln", label: "💳 GLN 해외 결제" },
     ],
   },
   {
@@ -58,7 +57,7 @@ const NAV_TOP: NavItem[] = [
     label: "환전",
     icon: "💱",
     href: "/guide/exchange",
-    // 외화 배송·E-지갑은 비대면 채널, 외화 기프티콘은 대면 수령 — 모두 환전 안에 통합.
+    // 외화 배송·E-지갑은 비대면 채널, 외화 기프티콘은 대면 수령, GLN은 해외 결제 도구.
     children: [
       { href: "/guide/exchange/calculator", label: "🧮 환전 계산기" },
       { href: "/guide/exchange/info", label: "📐 환율 산출 안내" },
@@ -66,6 +65,7 @@ const NAV_TOP: NavItem[] = [
       { href: "/guide/exchange/e-wallet", label: "💼 외화 E-지갑" },
       { href: "/guide/delivery", label: "📦 외화 배송" },
       { href: "/guide/exchange/gift", label: "🎁 외화 기프티콘" },
+      { href: "/guide/exchange/gln", label: "💳 GLN 해외 결제" },
     ],
   },
   {

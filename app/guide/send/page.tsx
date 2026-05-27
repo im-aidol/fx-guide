@@ -74,15 +74,6 @@ export default function SendHubPage() {
       description:
         "수취인 계좌 없이 영문이름·국가만으로 200여 개국 가맹점 수령. 특급송금(영업점)·iM더빠른송금(앱)·AUTOSEND(자동) — USD 단일·USD 7,000 이하.",
     },
-    {
-      id: "gln",
-      href: "/guide/send/channels/gln",
-      icon: "💳",
-      title: "GLN 해외 간편 결제",
-      badge: "해외 결제 (송금 X)",
-      description:
-        "모바일앱 QR/바코드로 해외 8개국(태국·일본·대만·홍콩·싱가포르·괌·라오스·캄보디아) 가맹점 결제. 송금이 아닌 결제 서비스.",
-    },
   ];
 
   return (
