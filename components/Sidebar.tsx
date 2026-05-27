@@ -74,11 +74,14 @@ const NAV_TOP: NavItem[] = [
     href: "/guide/deposit",
     children: [
       { href: "/guide/deposit", label: "전체·검색·빠른 질문" },
-      { href: "/guide/deposit#cat-통합통장", label: "🌐 통합통장 (1)" },
+      {
+        href: "/guide/deposit/global-comprehensive",
+        label: "🌐 글로벌외화종합통장",
+      },
       { href: "/guide/deposit#cat-수시입출", label: "💵 수시입출 (3)" },
       { href: "/guide/deposit#cat-예치형", label: "🏛️ 예치형 (3)" },
       { href: "/guide/deposit#cat-적금", label: "💰 적금 (4)" },
-      { href: "/guide/deposit#cat-이체", label: "🔁 자동이체 (1)" },
+      { href: "/guide/deposit/auto-transfer", label: "🔁 외화 자동이체" },
       { href: "/guide/deposit/simulator", label: "🧮 이자 시뮬레이터" },
     ],
   },

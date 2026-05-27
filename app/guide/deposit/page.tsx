@@ -151,6 +151,9 @@ const CATEGORY_ORDER: Array<{ key: string; label: string; icon: string }> = [
   { key: "이체", label: "이체", icon: "🔁" },
 ];
 
+// 카테고리 헤더 + 그리드로 노출할 카테고리 (1개짜리는 별도 콜아웃으로 처리).
+const MULTI_PRODUCT_CATEGORIES = ["수시입출", "예치형", "적금"] as const;
+
 export default function DepositGuidePage() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -331,29 +334,37 @@ export default function DepositGuidePage() {
             <FullCompareTable products={filteredProducts} />
           </section>
 
-          {/* 카테고리별 카드 — 사이드바 자식 메뉴와 anchor 동기화 */}
+          {/* 카테고리별 카드.
+              1개짜리 카테고리(통합통장·이체)는 일반 카테고리 헤더 대신 특수 처리:
+              · 글로벌외화종합통장 = 영업점 첫 가입 추천 → 상단 큰 콜아웃 카드
+              · 외화 자동이체     = 적금 우대와 연관 도구 → 적금 다음 작은 진입 카드 */}
           {!activeCategory ? (
             <>
-              {CATEGORY_ORDER.map((c) => {
+              <GlobalHero />
+
+              {MULTI_PRODUCT_CATEGORIES.map((key) => {
                 const items = filteredProducts.filter(
-                  (p) => p.category === c.key,
+                  (p) => p.category === key,
                 );
                 if (items.length === 0) return null;
+                const conf = CATEGORY_ORDER.find((c) => c.key === key)!;
                 return (
                   <section
-                    key={c.key}
-                    id={`cat-${c.key}`}
+                    key={key}
+                    id={`cat-${key}`}
                     className="mb-8 scroll-mt-20"
                   >
                     <h2 className="text-sm font-medium text-charcoal-soft uppercase tracking-wide mb-3 flex items-center gap-1.5">
-                      <span className="text-base">{c.icon}</span>
-                      <span>{c.label}</span>
+                      <span className="text-base">{conf.icon}</span>
+                      <span>{conf.label}</span>
                       <span className="text-[10px]">({items.length})</span>
                     </h2>
                     <ProductGrid products={items} />
                   </section>
                 );
               })}
+
+              <AutoTransferCallout />
             </>
           ) : (
             <section
@@ -721,6 +732,83 @@ function CompactRow({
         {value}
       </dd>
     </div>
+  );
+}
+
+// ─── 1개짜리 카테고리 특수 콜아웃 ───
+function GlobalHero() {
+  const p = depositById("global-comprehensive");
+  if (!p) return null;
+  return (
+    <section id="cat-통합통장" className="mb-8 scroll-mt-20">
+      <Link
+        href={`/guide/deposit/${p.id}`}
+        className="block bg-primary/5 border border-primary/30 rounded-xl p-5 hover:border-primary hover:bg-primary/10 transition group"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-[10px] text-primary font-medium uppercase tracking-wide">
+                ⭐ 영업점 첫 가입 추천
+              </span>
+              <span className="text-[9px] text-charcoal-soft bg-white border border-border px-1.5 py-0.5 rounded-full">
+                통합통장
+              </span>
+            </div>
+            <h2 className="text-lg font-bold group-hover:text-primary transition mb-1.5">
+              🌐 {p.title}
+            </h2>
+            <p className="text-sm text-charcoal-soft leading-relaxed">
+              {p.description}
+            </p>
+            <p className="text-xs text-charcoal-soft mt-2">
+              💎 외화통지·정기예금 미화 5만불 이상(법인 10만불) 신규 시{" "}
+              <strong className="text-charcoal">
+                해외송금수수료 50% · 외화현찰수수료 50% · TC 매도수수료 30%
+              </strong>{" "}
+              우대.
+            </p>
+          </div>
+          <span className="text-2xl text-primary group-hover:translate-x-1 transition shrink-0">
+            →
+          </span>
+        </div>
+      </Link>
+    </section>
+  );
+}
+
+function AutoTransferCallout() {
+  const p = depositById("auto-transfer");
+  if (!p) return null;
+  return (
+    <section id="cat-이체" className="mb-8 scroll-mt-20">
+      <Link
+        href={`/guide/deposit/${p.id}`}
+        className="block bg-white border border-border rounded-xl p-4 hover:border-primary transition group"
+      >
+        <div className="flex items-start gap-3">
+          <span className="text-2xl shrink-0">🔁</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-bold text-sm group-hover:text-primary transition">
+                외화 자동이체
+              </h3>
+              <span className="text-[9px] text-charcoal-soft bg-offwhite border border-border px-1.5 py-0.5 rounded-full">
+                도구
+              </span>
+            </div>
+            <p className="text-xs text-charcoal-soft leading-relaxed mb-1">
+              적금 우대 트리거 — Plus-You 환율우대 50%, iM 자동이체 8회 +0.30%p,
+              IDREAM 6회 우대 조건 충족.
+            </p>
+            <p className="text-[10px] text-primary font-medium group-hover:translate-x-0.5 transition inline-block">
+              자동이체 상세 → 약관·체크포인트
+            </p>
+          </div>
+        </div>
+      </Link>
+    </section>
   );
 }
 
