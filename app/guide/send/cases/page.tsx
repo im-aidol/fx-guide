@@ -114,7 +114,7 @@ export default function SendCasesPage() {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="max-w-7xl mx-auto px-6 py-8">
       <nav className="text-xs text-charcoal-soft mb-3 flex items-center gap-1">
         <Link href="/guide" className="hover:text-primary">
           가이드 홈

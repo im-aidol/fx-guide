@@ -4,7 +4,7 @@ import { AdminNote } from "@/components/admin/AdminNote";
 
 export default function GuideIndexPage() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
+    <div className="max-w-6xl mx-auto px-6 py-12">
       <header className="mb-8">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
           영업점 외환 가이드

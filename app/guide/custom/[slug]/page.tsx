@@ -22,7 +22,7 @@ export default function CustomGuidePage({
 
   if (!hydrated) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-5xl mx-auto px-6 py-12">
         <p className="text-sm text-charcoal-soft">불러오는 중…</p>
       </div>
     );
@@ -31,7 +31,7 @@ export default function CustomGuidePage({
   const match = findBySlug(slug);
   if (!match) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-5xl mx-auto px-6 py-12">
         <Link
           href="/guide"
           className="text-xs text-charcoal-soft hover:text-primary inline-flex items-center gap-1 mb-3"
@@ -49,7 +49,7 @@ export default function CustomGuidePage({
   const { group, item } = match;
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="max-w-5xl mx-auto px-6 py-12">
       <Link
         href="/guide"
         className="text-xs text-charcoal-soft hover:text-primary inline-flex items-center gap-1 mb-3"

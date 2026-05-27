@@ -227,7 +227,7 @@ export function TopNav() {
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-border print:hidden">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6">
+      <div className="max-w-[1600px] mx-auto px-4 lg:px-8">
         <div className="flex items-center h-14 gap-3">
           {/* 로고 */}
           <Link

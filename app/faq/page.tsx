@@ -60,7 +60,7 @@ export default function FaqPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12">
+    <div className="max-w-4xl mx-auto px-6 py-12">
       <header className="mb-6">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
           FAQ

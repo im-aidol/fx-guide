@@ -21,7 +21,7 @@ export default function DepositProductDetailPage({
 
   if (!product) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-5xl mx-auto px-6 py-12">
         <Link
           href="/guide/deposit"
           className="text-xs text-charcoal-soft hover:text-primary inline-flex items-center gap-1 mb-3"
@@ -36,7 +36,7 @@ export default function DepositProductDetailPage({
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
+    <div className="max-w-6xl mx-auto px-6 py-12">
       {/* Breadcrumb */}
       <nav className="text-xs text-charcoal-soft mb-3 flex items-center gap-1">
         <Link href="/guide" className="hover:text-primary">
