@@ -344,7 +344,7 @@ export function TopNav() {
                           className="flex items-center px-4 py-2 text-[11px] text-primary hover:bg-primary/5 transition"
                         >
                           <span className="flex-1">
-                            {item.label} 진입판 전체보기
+                            {item.label} 전체보기
                           </span>
                           <span className="opacity-60">→</span>
                         </Link>
@@ -461,7 +461,7 @@ export function TopNav() {
                       href={item.href}
                       className="block px-5 py-2 text-[11px] text-primary hover:bg-primary/10 border-t border-border transition"
                     >
-                      → {item.label} 진입판 전체보기
+                      → {item.label} 전체보기
                     </Link>
                   </div>
                 </details>

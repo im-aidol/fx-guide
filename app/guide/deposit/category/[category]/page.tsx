@@ -213,10 +213,10 @@ export default function DepositCategoryPage({
             className="bg-white border border-border rounded-lg p-2.5 hover:border-primary transition group"
           >
             <p className="text-sm font-medium group-hover:text-primary transition">
-              ← 진입판
+              ← 외화 예금·적금
             </p>
             <p className="text-[10px] text-charcoal-soft mt-0.5">
-              외화 예금·적금 홈
+              전체 선택 화면
             </p>
           </Link>
         </div>

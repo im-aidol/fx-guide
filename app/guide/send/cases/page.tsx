@@ -231,10 +231,10 @@ export default function SendCasesPage() {
           className="bg-white border border-border rounded-xl p-4 hover:border-primary transition group"
         >
           <p className="font-bold text-sm group-hover:text-primary transition mb-0.5">
-            📤 당발송금 진입판
+            📤 당발송금 전체보기
           </p>
           <p className="text-xs text-charcoal-soft leading-relaxed">
-            한도·필수 기재국·송금 채널(SWIFT·BARO·WU·GLN) 등 다른 화면 둘러보기
+            한도·필수 기재국·송금 채널(SWIFT·BARO·WU) 등 다른 화면 둘러보기
           </p>
         </Link>
       </div>
