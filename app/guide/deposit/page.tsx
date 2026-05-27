@@ -8,7 +8,6 @@ import {
   type DepositProduct,
 } from "@/lib/data/deposit-products";
 import { AdminNote } from "@/components/admin/AdminNote";
-import { InterestSimulator } from "@/components/deposit/InterestSimulator";
 
 // 영업점이 창구에서 급할 때 PDF보다 빠르게 찾는 페이지.
 // 1) 통합 검색 (상품명·약관·응대 멘트·체크포인트 모든 텍스트 매칭)
@@ -239,8 +238,8 @@ export default function DepositGuidePage() {
 
       <AdminNote storageKey="fx-guide:note:guide-deposit" />
 
-      {/* 검색창 + 카테고리 필터 — sticky */}
-      <div className="sticky top-14 md:top-0 z-10 -mx-6 px-6 pt-3 pb-3 bg-offwhite mb-4">
+      {/* 검색창 + 카테고리 필터 */}
+      <div className="mb-4">
         <div className="bg-white border border-border rounded-xl p-3">
           <div className="relative">
             <input
@@ -368,12 +367,30 @@ export default function DepositGuidePage() {
             </section>
           )}
 
-          {/* 시뮬레이터 */}
-          <section id="simulator" className="mb-8 scroll-mt-20">
-            <h2 className="text-sm font-medium text-charcoal-soft uppercase tracking-wide mb-3">
-              🧮 이자 시뮬레이터
-            </h2>
-            <InterestSimulator />
+          {/* 시뮬레이터 진입 카드 — 별도 페이지로 분리 */}
+          <section className="mb-8">
+            <Link
+              href="/guide/deposit/simulator"
+              className="block bg-primary/5 border border-primary/30 rounded-xl p-5 hover:bg-primary/10 transition group"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs text-primary font-medium tracking-wide mb-1">
+                    🧮 도구
+                  </p>
+                  <h2 className="font-bold text-lg group-hover:text-primary transition">
+                    이자 시뮬레이터
+                  </h2>
+                  <p className="text-sm text-charcoal-soft mt-1">
+                    통화·기간·금액·금리 입력 → 만기 이자·원리금 미리 계산. 별도
+                    페이지에서 집중해서 사용하세요.
+                  </p>
+                </div>
+                <span className="text-2xl text-primary group-hover:translate-x-1 transition">
+                  →
+                </span>
+              </div>
+            </Link>
           </section>
 
           {/* 공통 안내 */}

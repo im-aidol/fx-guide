@@ -79,7 +79,7 @@ const NAV_TOP: NavItem[] = [
       { href: "/guide/deposit#cat-예치형", label: "🏛️ 예치형 (3)" },
       { href: "/guide/deposit#cat-적금", label: "💰 적금 (4)" },
       { href: "/guide/deposit#cat-이체", label: "🔁 자동이체 (1)" },
-      { href: "/guide/deposit#simulator", label: "🧮 이자 시뮬레이터" },
+      { href: "/guide/deposit/simulator", label: "🧮 이자 시뮬레이터" },
     ],
   },
   {
