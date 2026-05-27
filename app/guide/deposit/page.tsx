@@ -332,18 +332,35 @@ export default function DepositGuidePage() {
             <FullCompareTable products={filteredProducts} />
           </section>
 
-          {/* 카테고리별 카드 */}
-          {!activeCategory && (
-            <section className="mb-8">
-              <h2 className="text-sm font-medium text-charcoal-soft uppercase tracking-wide mb-3">
-                카테고리별 상품
-              </h2>
-              <ProductGrid products={filteredProducts} />
-            </section>
-          )}
-
-          {activeCategory && (
-            <section className="mb-8">
+          {/* 카테고리별 카드 — 사이드바 자식 메뉴와 anchor 동기화 */}
+          {!activeCategory ? (
+            <>
+              {CATEGORY_ORDER.map((c) => {
+                const items = filteredProducts.filter(
+                  (p) => p.category === c.key,
+                );
+                if (items.length === 0) return null;
+                return (
+                  <section
+                    key={c.key}
+                    id={`cat-${c.key}`}
+                    className="mb-8 scroll-mt-20"
+                  >
+                    <h2 className="text-sm font-medium text-charcoal-soft uppercase tracking-wide mb-3 flex items-center gap-1.5">
+                      <span className="text-base">{c.icon}</span>
+                      <span>{c.label}</span>
+                      <span className="text-[10px]">({items.length})</span>
+                    </h2>
+                    <ProductGrid products={items} />
+                  </section>
+                );
+              })}
+            </>
+          ) : (
+            <section
+              id={`cat-${activeCategory}`}
+              className="mb-8 scroll-mt-20"
+            >
               <h2 className="text-sm font-medium text-charcoal-soft uppercase tracking-wide mb-3">
                 {activeCategory} 상품
               </h2>

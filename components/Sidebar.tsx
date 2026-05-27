@@ -72,7 +72,15 @@ const NAV_TOP: NavItem[] = [
     label: "외화 예금·적금",
     icon: "🏦",
     href: "/guide/deposit",
-    children: [{ href: "/guide/deposit", label: "외화 예금·적금 가이드" }],
+    children: [
+      { href: "/guide/deposit", label: "전체·검색·빠른 질문" },
+      { href: "/guide/deposit#cat-통합통장", label: "🌐 통합통장 (1)" },
+      { href: "/guide/deposit#cat-수시입출", label: "💵 수시입출 (3)" },
+      { href: "/guide/deposit#cat-예치형", label: "🏛️ 예치형 (3)" },
+      { href: "/guide/deposit#cat-적금", label: "💰 적금 (4)" },
+      { href: "/guide/deposit#cat-이체", label: "🔁 자동이체 (1)" },
+      { href: "/guide/deposit#simulator", label: "🧮 이자 시뮬레이터" },
+    ],
   },
   {
     type: "group",
@@ -92,8 +100,10 @@ const NAV_BOTTOM: NavItem[] = [
 ];
 
 function isItemActive(href: string, pathname: string): boolean {
-  if (href === "/") return pathname === "/";
-  return pathname === href || pathname.startsWith(href + "/");
+  // anchor(#...) 및 query(?...) 제거 후 경로만 비교
+  const cleanHref = href.split("#")[0].split("?")[0];
+  if (cleanHref === "/") return pathname === "/";
+  return pathname === cleanHref || pathname.startsWith(cleanHref + "/");
 }
 
 function isGroupActive(group: NavGroup, pathname: string): boolean {
