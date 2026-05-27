@@ -2,12 +2,13 @@
 // 출처: 각 상품설명서·특약 + 외화예금거래기본약관 본문 정리.
 // 영업 판촉 자료가 아닌 약관/상품설명서 기준 — 영업점이 본문 근거를 확인할 수 있도록 1차 자료 출처 명시.
 
+// 카테고리는 모두 4글자 명사구로 통일.
 export type DepositCategory =
   | "통합통장"
   | "수시입출"
-  | "예치형"
-  | "적금"
-  | "이체";
+  | "기간예치"
+  | "자유적립"
+  | "자동이체";
 
 export type KeyClause = { ref: string; label: string; body: string };
 export type InterestExample = {
@@ -344,7 +345,7 @@ export const DEPOSIT_PRODUCTS: DepositProduct[] = [
     id: "fc-notice",
     title: "외화통지예금",
     shortTitle: "통지",
-    category: "예치형",
+    category: "기간예치",
     description:
       "가입일로부터 매 7일 단위로 금리가 재적용되는 단기 외화예금. 단기 자금 운용에 적합.",
     eligibility: "제한 없음 (공동명의 가입 불가)",
@@ -417,7 +418,7 @@ export const DEPOSIT_PRODUCTS: DepositProduct[] = [
     id: "fc-time-deposit",
     title: "외화정기예금",
     shortTitle: "정기",
-    category: "예치형",
+    category: "기간예치",
     description:
       "일정 기간을 정해 외화 여유자금을 예치하고 만기에 원금+이자를 받는 외화예금.",
     eligibility: "제한 없음 (공동명의 가입 불가)",
@@ -520,7 +521,7 @@ export const DEPOSIT_PRODUCTS: DepositProduct[] = [
     id: "fc-rolling-compound",
     title: "외화회전복리예금",
     shortTitle: "회전복리",
-    category: "예치형",
+    category: "기간예치",
     description:
       "회전주기(1·3·6개월)마다 금리가 복리로 계산되며, 1회전기간 경과 후 중도해지 시에도 회전기간 충족분에 대해 기본금리를 받을 수 있는 외화정기예금.",
     eligibility: "제한 없음 (공동명의 가입 불가)",
@@ -605,7 +606,7 @@ export const DEPOSIT_PRODUCTS: DepositProduct[] = [
     id: "foryou",
     title: "For You 자유적립 외화예금",
     shortTitle: "For You",
-    category: "적금",
+    category: "자유적립",
     description: "기본형 외화 자유적립 예금. 1~12개월 단기.",
     period: "1개월 이상 12개월 이내",
     initialDeposit: "USD 100 상당액 이상",
@@ -665,7 +666,7 @@ export const DEPOSIT_PRODUCTS: DepositProduct[] = [
     id: "plusyou",
     title: "Plus-You 자유적립 외화예금",
     shortTitle: "Plus-You",
-    category: "적금",
+    category: "자유적립",
     description:
       "장기·고우대 외화 적립 예금. 36개월까지 + 추가금리 + 환율우대·수수료 면제.",
     eligibility: "제한 없음",
@@ -756,7 +757,7 @@ export const DEPOSIT_PRODUCTS: DepositProduct[] = [
     id: "im-free",
     title: "iM 외화자유적금",
     shortTitle: "iM",
-    category: "적금",
+    category: "자유적립",
     description: "비대면(모바일) 전용 외화 자유 적립 적금. 12개월 고정.",
     eligibility: "실명의 개인(국민인 거주자), 1인당 최대 3개 계좌",
     period: "12개월 고정",
@@ -829,7 +830,7 @@ export const DEPOSIT_PRODUCTS: DepositProduct[] = [
     id: "idream-free",
     title: "IDREAM 외화자유적금",
     shortTitle: "IDREAM",
-    category: "적금",
+    category: "자유적립",
     description:
       "외화 자유 적립 적금. 12개월 고정 + 미성년자 우대 + 외화 첫 신규 우대.",
     eligibility: "실명의 개인(국민인 거주자), 1인당 최대 3개 계좌",
@@ -903,7 +904,7 @@ export const DEPOSIT_PRODUCTS: DepositProduct[] = [
     id: "auto-transfer",
     title: "외화 자동이체",
     shortTitle: "자동이체",
-    category: "이체",
+    category: "자동이체",
     description:
       "외화 예금·적금 적립용 자동이체. 원화→외화 또는 외화→외화 정기 이체.",
     period: "1개월 단위 자동이체 지정 (For You·Plus-You·iM·IDREAM 등 연계)",

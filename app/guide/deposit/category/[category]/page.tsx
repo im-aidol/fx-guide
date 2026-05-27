@@ -23,15 +23,15 @@ const CATEGORY_BY_SLUG: Record<
       "입출금이 자유로운 외화 통장 3종 — 보통·당좌·MMDA. 잔액 차등금리·당좌약정 여부 등으로 선택.",
   },
   term: {
-    key: "예치형",
-    label: "예치형 외화예금",
+    key: "기간예치",
+    label: "기간예치 외화예금",
     icon: "🏛️",
     description:
       "기간을 정해 예치하고 만기에 이자를 받는 외화예금 3종 — 통지·정기·회전복리.",
   },
   savings: {
-    key: "적금",
-    label: "자유적립 외화 적금",
+    key: "자유적립",
+    label: "자유적립 외화적금",
     icon: "💰",
     description:
       "매월 자유롭게 적립하는 외화 적금 4종 — For You(기본형)·Plus-You(장기·우대)·iM(비대면)·IDREAM(미성년 우대).",
@@ -356,7 +356,7 @@ function inferAdditional(p: DepositProduct): string {
 
 function inferPartial(p: DepositProduct): string {
   if (p.category === "수시입출") return "자유";
-  if (p.category === "예치형") return "불가";
+  if (p.category === "기간예치") return "불가";
   return "";
 }
 

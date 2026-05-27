@@ -120,13 +120,13 @@ const QUICK_QUESTIONS: QuickQuestion[] = [
   },
 ];
 
-// ─── 카테고리 ───
+// ─── 카테고리 (모두 4글자 명사구로 통일) ───
 const CATEGORY_ORDER: Array<{ key: string; label: string; icon: string }> = [
   { key: "통합통장", label: "통합통장", icon: "🌐" },
   { key: "수시입출", label: "수시입출", icon: "💵" },
-  { key: "예치형", label: "예치형", icon: "🏛️" },
-  { key: "적금", label: "적금", icon: "💰" },
-  { key: "이체", label: "이체", icon: "🔁" },
+  { key: "기간예치", label: "기간예치", icon: "🏛️" },
+  { key: "자유적립", label: "자유적립", icon: "💰" },
+  { key: "자동이체", label: "자동이체", icon: "🔁" },
 ];
 
 const CATEGORY_RANK: Record<string, number> = Object.fromEntries(
@@ -592,7 +592,7 @@ function inferAdditional(p: DepositProduct): string {
 
 function inferPartial(p: DepositProduct): string {
   if (p.category === "수시입출") return "자유";
-  if (p.category === "예치형") return "불가";
+  if (p.category === "기간예치") return "불가";
   return "";
 }
 

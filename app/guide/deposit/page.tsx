@@ -18,6 +18,7 @@ type HubCard = {
   highlight?: boolean;
 };
 
+// 진입 카드 6개. 카테고리 4종은 모두 4글자 명사구로 통일된 라벨.
 const CARDS: HubCard[] = [
   {
     id: "global",
@@ -33,7 +34,7 @@ const CARDS: HubCard[] = [
     id: "demand",
     href: "/guide/deposit/category/demand",
     icon: "💵",
-    title: "수시입출 외화예금",
+    title: "수시입출",
     badge: "3종",
     description: "보통·당좌·MMDA — 입출금이 자유로운 외화 통장",
   },
@@ -41,7 +42,7 @@ const CARDS: HubCard[] = [
     id: "term",
     href: "/guide/deposit/category/term",
     icon: "🏛️",
-    title: "예치형 외화예금",
+    title: "기간예치",
     badge: "3종",
     description: "통지·정기·회전복리 — 기간을 정해 예치하고 만기에 이자 수령",
   },
@@ -49,7 +50,7 @@ const CARDS: HubCard[] = [
     id: "savings",
     href: "/guide/deposit/category/savings",
     icon: "💰",
-    title: "자유적립 외화 적금",
+    title: "자유적립",
     badge: "4종",
     description:
       "For You·Plus-You·iM·IDREAM — 매월 자유 적립, 우대금리 조건 다양",
@@ -58,10 +59,10 @@ const CARDS: HubCard[] = [
     id: "transfer",
     href: "/guide/deposit/auto-transfer",
     icon: "🔁",
-    title: "외화 자동이체",
+    title: "자동이체",
     badge: "도구",
     description:
-      "적금 우대 트리거 — Plus-You 환율 50%, iM 자동 8회 +0.30%p, IDREAM 6회 우대",
+      "적립 우대 트리거 — Plus-You 환율 50%, iM 자동 8회 +0.30%p, IDREAM 6회 우대",
   },
   {
     id: "simulator",
