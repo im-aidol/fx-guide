@@ -1,9 +1,61 @@
+"use client";
+
 import Link from "next/link";
 import { AdminNote } from "@/components/admin/AdminNote";
 
-export default function ExchangeGuidePage() {
+// /guide/exchange 진입판 — /guide와 /guide/deposit과 같은 단계적 선택 패턴.
+// 외화 매매(환전) 관련 4가지 화면 + 외화 배송(비대면 외화 수령)을 환전 안에 통합.
+
+type HubCard = {
+  id: string;
+  href: string;
+  icon: string;
+  title: string;
+  badge?: string;
+  description: string;
+  highlight?: boolean;
+};
+
+const CARDS: HubCard[] = [
+  {
+    id: "calculator",
+    href: "/guide/exchange/calculator",
+    icon: "🧮",
+    title: "환전 계산기",
+    badge: "⭐ 상담 도구",
+    description:
+      "원화↔외화 환산, 환율 종류 선택(매매기준율·전신환·현찰), 환율우대 적용. 고객 상담 시 즉석 계산.",
+    highlight: true,
+  },
+  {
+    id: "info",
+    href: "/guide/exchange/info",
+    icon: "📐",
+    title: "환율 산출·BuyAndSell 안내",
+    description:
+      "매매기준율·전신환·현찰 환율 원리 + 실시간/희망환율 BuyAndSell 비교 + 영업점 환전 임계값.",
+  },
+  {
+    id: "samples",
+    href: "/samples",
+    icon: "💴",
+    title: "통화 견본",
+    description:
+      "권종별 사진·시리즈·매입/매도 가능 여부. 환전 시 매입 여부 즉시 확인.",
+  },
+  {
+    id: "delivery",
+    href: "/guide/delivery",
+    icon: "📦",
+    title: "외화 배송·기프티콘",
+    description:
+      "비대면 외화 수령 — iM외화배송 서비스 + 외화 기프티콘(외화수령증).",
+  },
+];
+
+export default function ExchangeHubPage() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
+    <div className="max-w-5xl mx-auto px-6 py-10">
       <Link
         href="/guide"
         className="text-xs text-charcoal-soft hover:text-primary inline-flex items-center gap-1 mb-3"
@@ -14,228 +66,96 @@ export default function ExchangeGuidePage() {
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
           💱 환전 (외화 매매)
         </p>
-        <h1 className="text-3xl font-bold mb-2">환전 안내</h1>
+        <h1 className="text-3xl font-bold mb-2">어떤 환전 화면을 보시겠어요?</h1>
         <p className="text-sm text-charcoal-soft">
-          외화 매수(사기) / 매도(팔기). iM뱅크 BuyAndSell 서비스 본문 기반 +
-          영업점 환전 절차.
+          외화 매수(사기) / 매도(팔기) 관련 도구·안내·자료. 외화 배송도 비대면
+          환전 수령 채널로 함께 안내합니다.
         </p>
       </header>
 
-      <AdminNote storageKey="fx-guide:note:guide-exchange" />
+      <AdminNote storageKey="fx-guide:note:guide-exchange-hub" />
 
-      {/* 환율 산출 근거 */}
-      <section className="bg-white border border-border rounded-xl p-5 mb-4">
-        <h2 className="font-bold mb-2">📐 환율 산출 (외환규정 1-2조 7호)</h2>
-        <dl className="space-y-2 text-sm">
-          <div>
-            <dt className="text-xs text-charcoal-soft uppercase tracking-wide">
-              매매기준율 (USD·CNY)
-            </dt>
-            <dd className="mt-0.5">
-              외국환중개회사를 통해 거래된 현물환매매 중 익익영업일 결제거래의
-              시장평균환율 (9:00~15:30 KST 거래량 가중평균).
-            </dd>
-          </div>
-          <div className="pt-2 border-t border-border">
-            <dt className="text-xs text-charcoal-soft uppercase tracking-wide">
-              재정된 매매기준율 (그 외 통화)
-            </dt>
-            <dd className="mt-0.5">
-              미화 외 통화와 미화의 매매중간율을 미화 매매기준율로 재정한 율.
-            </dd>
-          </div>
-          <div className="pt-2 border-t border-border">
-            <dt className="text-xs text-charcoal-soft uppercase tracking-wide">
-              (대고객) 전신환매도율 / 매입율
-            </dt>
-            <dd className="mt-0.5">
-              <strong>매도율</strong>: 현찰 외 외화 살 때 또는 외화로 송금 보낼 때 적용
-              <br />
-              <strong>매입율</strong>: 현찰 외 외화 팔 때 또는 외화로 송금 받을 때 적용
-            </dd>
-          </div>
-        </dl>
-        <p className="text-[10px] text-charcoal-soft mt-3">
-          출처: 외환규정 1-2조 7호 + 외국환거래약정서 1조 ⑪·⑫
-        </p>
+      <section className="grid md:grid-cols-2 gap-4 mb-4">
+        {CARDS.map((c) => (
+          <Link
+            key={c.id}
+            href={c.href}
+            className={[
+              "rounded-xl p-5 hover:translate-y-[-1px] transition group border",
+              c.highlight
+                ? "bg-primary/5 border-primary/30 hover:border-primary"
+                : "bg-white border-border hover:border-primary",
+            ].join(" ")}
+          >
+            <div className="flex items-start gap-3 mb-2">
+              <span className="text-3xl leading-none">{c.icon}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <h2
+                    className={[
+                      "font-bold text-lg leading-tight",
+                      c.highlight
+                        ? "text-primary"
+                        : "group-hover:text-primary transition",
+                    ].join(" ")}
+                  >
+                    {c.title}
+                  </h2>
+                  {c.badge && (
+                    <span
+                      className={[
+                        "text-[10px] px-1.5 py-0.5 rounded-full border whitespace-nowrap",
+                        c.highlight
+                          ? "text-primary border-primary/30 bg-white"
+                          : "text-charcoal-soft border-border bg-offwhite",
+                      ].join(" ")}
+                    >
+                      {c.badge}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <p className="text-sm text-charcoal-soft leading-relaxed">
+              {c.description}
+            </p>
+            <span className="text-sm text-primary font-medium mt-3 inline-block group-hover:translate-x-1 transition">
+              들어가기 →
+            </span>
+          </Link>
+        ))}
       </section>
 
-      {/* BuyAndSell — 두 방식 비교 */}
-      <section className="bg-white border border-border rounded-xl p-5 mb-4">
-        <h2 className="font-bold mb-3">🛒 외화 BuyAndSell 서비스 (비대면 전용)</h2>
-        <p className="text-sm text-charcoal-soft mb-4">
-          본인 원화 계좌와 외화 계좌 간 이체로 외화 매입/매도. 인터넷·모바일앱뱅킹.
-          가입 대상: <strong>국민인 거주자 개인</strong> (기업뱅킹 제외).
-        </p>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-offwhite">
-                <th className="text-left p-2.5 text-xs text-charcoal-soft uppercase tracking-wide w-32">
-                  항목
-                </th>
-                <th className="text-left p-2.5">실시간 Buy &amp; Sell</th>
-                <th className="text-left p-2.5">희망환율 Buy &amp; Sell</th>
-              </tr>
-            </thead>
-            <tbody>
-              <CompareRow
-                label="이용시간"
-                a="영업일 09:00 ~ 23:50"
-                b="24시간 365일 신청 (체결은 익영업일부터 영업일 09:00~17:30)"
-              />
-              <CompareRow
-                label="거래 통화"
-                a="USD / JPY / EUR / CNY ↔ KRW"
-                b="USD / JPY / EUR / CNY ↔ KRW"
-              />
-              <CompareRow
-                label="1회 금액"
-                a="USD 50 상당액 이상 ~ 전자금융 1회·1일 한도"
-                b="USD 100 ~ USD 100,000 상당액"
-              />
-              <CompareRow
-                label="1일 신청"
-                a="이체한도 내"
-                b="최대 5회"
-              />
-              <CompareRow
-                label="유효기일"
-                a="—"
-                b="익영업일 ~ 10영업일 이내 지정"
-              />
-              <CompareRow
-                label="환율우대"
-                a="전신환매매율 70% 우대"
-                b="전신환매매율 50% 우대"
-              />
-              <CompareRow
-                label="체결 방식"
-                a="즉시 거래 (환율 변동 시 처음부터 다시)"
-                b="희망환율 도달 자동 거래 (매입: ≤ 희망 / 매도: ≥ 희망)"
-              />
-              <CompareRow
-                label="결과통지"
-                a="—"
-                b="SMS (거래완료·유효기일 경과 안내)"
-              />
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-4 bg-offwhite border border-border rounded-md p-3 text-xs text-charcoal-soft">
-          <p className="font-medium text-charcoal mb-1">⚠️ 변경·취소</p>
-          <p>
-            거래 완료 후 변경·취소 불가. 단, 희망환율 신청건의 <strong>유효기일 이내 미체결</strong> 건은 인터넷·모바일뱅킹에서 취소만 가능 (변경 불가).
-          </p>
-        </div>
-
-        <p className="text-[10px] text-charcoal-soft mt-3">
-          출처: 외화 BuyAndSell 서비스 이용약관 (개정 전후 대비표 별도)
-        </p>
-      </section>
-
-      {/* 영업점 환전 임계 */}
-      <section className="bg-white border border-border rounded-xl p-5 mb-4">
-        <h2 className="font-bold mb-2">📏 영업점 환전 임계값</h2>
-        <ul className="space-y-2 text-sm">
-          <Threshold
-            value="환전 자체"
-            note="자유 (외환규정상 신고 불필요한 경우 다수)"
-            color="green"
-          />
-          <Threshold
-            value="USD 10,000 초과 휴대 출국"
-            note="세관 신고 의무 (외환거래법 위반 시 처벌)"
-            color="danger"
-          />
-          <Threshold
-            value="분할 환전 의심"
-            note="STR 검토 (특정금융정보법) — 누설 금지"
-            color="warn"
-          />
+      {/* 공통 안내 */}
+      <details className="bg-offwhite border border-border rounded-xl text-xs text-charcoal-soft">
+        <summary className="cursor-pointer p-3 font-medium text-charcoal hover:text-primary">
+          📋 환전 공통 안내 (펼치기)
+        </summary>
+        <ul className="px-3 pb-3 space-y-0.5 list-disc list-inside leading-relaxed">
+          <li>
+            <strong className="text-charcoal">매매기준율</strong>: 외환규정 1-2조
+            7호 — 외국환중개회사 시장평균환율 (USD·CNY 직접 산출, 그 외 통화는
+            재정환율).
+          </li>
+          <li>
+            <strong className="text-charcoal">환율 종류</strong>: 매매기준율 /
+            전신환매도·매입 (송금·계좌) / 현찰매도·매입 (외화 지폐) /
+            여행자수표매도 등.
+          </li>
+          <li>
+            <strong className="text-charcoal">USD 10,000 초과 휴대 출국</strong>은
+            세관 신고 의무 (외환거래법).
+          </li>
+          <li>
+            <strong className="text-charcoal">분할 환전 의심</strong> 시 STR 검토
+            대상 (특정금융정보법 — 누설 금지).
+          </li>
+          <li>
+            모든 환산·계산기 결과는 참고용 — 실제 거래는 거래 시점 영업점 게시
+            환율·당행 매매기준율 기준.
+          </li>
         </ul>
-      </section>
-
-      {/* 통화 견본 진입 */}
-      <section className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-4 flex items-center justify-between gap-3">
-        <div>
-          <p className="font-medium text-sm">💴 통화 견본 — 매입 가능 여부 확인</p>
-          <p className="text-xs text-charcoal-soft mt-0.5">
-            권종별 사진·시리즈·매입 가능 여부를 한 화면에서.
-          </p>
-        </div>
-        <Link
-          href="/samples"
-          className="text-sm text-primary hover:text-primary-dark font-medium whitespace-nowrap"
-        >
-          견양 보러가기 →
-        </Link>
-      </section>
-
-      {/* 관련 자료 */}
-      <section className="bg-offwhite border border-border rounded-xl p-5 text-sm">
-        <h3 className="font-medium mb-2">📄 관련 자료</h3>
-        <ul className="space-y-1 text-charcoal-soft list-disc list-inside">
-          <li>외환거래 기본약관</li>
-          <li>외화 BuyAndSell 서비스 이용약관 (현행)</li>
-          <li>외화 BuyAndSell 서비스 이용약관 대비표 (개정 전후)</li>
-          <li>iM외화배송서비스 이용약관 (배송 수령 시)</li>
-        </ul>
-        <p className="text-[10px] text-charcoal-soft mt-3">
-          ⚠️ 본 안내는 외환규정 + 약관 본문 기반. 영업점 환전 수수료·게시 환율은
-          영업점·홈페이지 기준 확인.
-        </p>
-      </section>
+      </details>
     </div>
-  );
-}
-
-function CompareRow({
-  label,
-  a,
-  b,
-}: {
-  label: string;
-  a: string;
-  b: string;
-}) {
-  return (
-    <tr className="border-b border-border last:border-0 align-top">
-      <td className="p-2.5 text-xs text-charcoal-soft uppercase tracking-wide whitespace-nowrap">
-        {label}
-      </td>
-      <td className="p-2.5 text-charcoal-soft leading-relaxed">{a}</td>
-      <td className="p-2.5 text-charcoal-soft leading-relaxed">{b}</td>
-    </tr>
-  );
-}
-
-function Threshold({
-  value,
-  note,
-  color,
-}: {
-  value: string;
-  note: string;
-  color: "green" | "neutral" | "warn" | "danger";
-}) {
-  const colors = {
-    green: "border-primary/30 bg-primary/5",
-    neutral: "border-border bg-offwhite",
-    warn: "border-warn/40 bg-warn/10",
-    danger: "border-danger/30 bg-danger/5",
-  };
-  return (
-    <li
-      className={[
-        "flex items-baseline justify-between gap-3 border rounded-lg px-3 py-2",
-        colors[color],
-      ].join(" ")}
-    >
-      <span className="font-bold whitespace-nowrap">{value}</span>
-      <span className="text-charcoal-soft text-right">{note}</span>
-    </li>
   );
 }

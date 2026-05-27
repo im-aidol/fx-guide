@@ -1,12 +1,13 @@
-// 6대 업무 진입판 — 영업점 직원이 창구에서 첫 분기하는 큰 업무 카테고리.
+// 6대 업무 진입판 — 영업점 직원이 창구에서 첫 분기하는 큰 카테고리.
 // "어떤 일로 오셨어요?" 의 답이 곧 이 6개 중 하나.
+// (외화 배송은 환전 안의 비대면 수령 채널로 통합되어 6대에서 제외 — 자리에 FAQ 진입.)
 
 export type BusinessArea =
   | "send"
   | "receive"
   | "exchange"
   | "deposit"
-  | "delivery"
+  | "faq"
   | "trade-finance";
 
 export type BusinessAreaInfo = {
@@ -40,9 +41,10 @@ export const BUSINESS_AREAS: BusinessAreaInfo[] = [
   {
     id: "exchange",
     title: "환전 (외화 매매)",
-    subtitle: "사기 / 팔기",
+    subtitle: "사기 / 팔기 · 통화 견본 · 외화 배송 · 환전 계산기",
     icon: "💱",
-    description: "외화 매매(BuyAndSell) 서비스 안내. 매매기준율 적용.",
+    description:
+      "환전 계산기·환율 산출 안내·통화 견본·외화 배송까지 환전 안에서 한 번에.",
     href: "/guide/exchange",
   },
   {
@@ -55,12 +57,13 @@ export const BUSINESS_AREAS: BusinessAreaInfo[] = [
     href: "/guide/deposit",
   },
   {
-    id: "delivery",
-    title: "외화 배송·기프티콘",
-    subtitle: "비대면 외화 수령",
-    icon: "📦",
-    description: "iM외화배송 서비스 + 외화 기프티콘 (외화수령증).",
-    href: "/guide/delivery",
+    id: "faq",
+    title: "FAQ · 외환 용어집",
+    subtitle: "빠른 답변 · 용어 확인",
+    icon: "❓",
+    description:
+      "자주 묻는 질문 + 외환규정 1-2조 본문 인용 용어집. 키워드 검색으로 즉답.",
+    href: "/faq",
   },
   {
     id: "trade-finance",
