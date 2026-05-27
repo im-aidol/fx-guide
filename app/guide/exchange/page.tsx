@@ -48,27 +48,27 @@ const CARDS: HubCard[] = [
     href: "/guide/exchange/e-wallet",
     icon: "💼",
     title: "외화 E-지갑",
-    badge: "비대면",
+    badge: "앱 환전 + 영업점 수령",
     description:
-      "외화 계좌 없이 환전·보관·영업점 수령·재환전. 모바일앱 전용 (USD 50%·JPY/EUR/CNY 30% 우대).",
-  },
-  {
-    id: "delivery",
-    href: "/guide/delivery",
-    icon: "📦",
-    title: "외화 배송",
-    badge: "비대면 수령",
-    description:
-      "지정 일자·장소로 배달원이 대면 수령 또는 CU편의점 수령. 10종 통화 (USD 90% 우대 최고).",
+      "외화 계좌 없이 환전·보관·영업점 대면 수령·재환전. 본인이 보관·수령 (USD 50%·JPY/EUR/CNY 30% 우대).",
   },
   {
     id: "gift",
     href: "/guide/exchange/gift",
     icon: "🎁",
     title: "외화 기프티콘",
-    badge: "대면 수령",
+    badge: "보관한도 합산",
     description:
-      "본인 또는 제3자에게 선물 발행 → 수령자가 영업점 방문해 외화수령증 작성 후 외화 현찰 수령.",
+      "외화수령증(서식 4012471)·E-지갑 상품설명서에 명시된 보관·이용한도 합산 산정 + 개인정보 수집·이용 동의 절차. 발행/수령 상세는 본부 매뉴얼.",
+  },
+  {
+    id: "delivery",
+    href: "/guide/delivery",
+    icon: "📦",
+    title: "외화 배송",
+    badge: "앱 환전 + 비대면 수령",
+    description:
+      "지정 일자·장소로 배달원 또는 CU편의점에서 비대면 수령. 10종 통화 (USD 90% 우대 — 비대면 중 최고).",
   },
 ];
 

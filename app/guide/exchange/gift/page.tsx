@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { AdminNote } from "@/components/admin/AdminNote";
 
-// 외화 기프티콘 — 외화 수령권을 제3자(또는 본인)에게 선물 형태로 전달.
-// 수령자가 영업점 방문해서 외화 현찰을 수령 (= 대면 수령).
-// 비대면 수령 채널이 아님 → 외화 배송과 구분되는 별도 서비스.
-// 출처: 외화수령증(외화기프티콘) 개인(신용)정보 수집·이용 동의서 겸용
+// 외화 기프티콘 (외화수령증).
+// PDF 자료 한계: 외화수령증 동의서(서식 4012471)와 외화 E-지갑 상품설명서에서
+// "외화기프티콘"으로 언급된 부분 외에는 상품설명서 미보유.
+// 발행 채널·환율우대·통화 종류 등 상세 절차는 본부 매뉴얼 확인 필요.
 
 export default function GiftCoinPage() {
   return (
@@ -25,177 +25,134 @@ export default function GiftCoinPage() {
 
       <header className="mb-4">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
-          🎁 환전 — 선물 전달
+          🎁 환전 — 외화 기프티콘
         </p>
         <h1 className="text-3xl font-bold mb-2">외화 기프티콘</h1>
         <p className="text-sm text-charcoal-soft leading-relaxed">
-          모바일앱에서 외화를 환전·발행해 본인 또는 제3자에게 선물 형태로 전달.
-          수령자가 영업점을 방문해 외화수령증 작성 후 외화 현찰 수령 (대면).
+          외화수령증(서식 4012471)으로 수령 시 본인 확인·개인(신용)정보 수집·이용
+          동의가 필요합니다. 보관한도·이용한도는 외화 E-지갑·환전예약과 합산
+          산정됩니다.
         </p>
       </header>
 
       <AdminNote storageKey="fx-guide:note:exchange-gift" />
 
-      {/* 외화 배송과의 차이 — 가장 헷갈리는 부분 */}
+      {/* PDF 자료 한계 — 본부 확인 필요 */}
       <section className="bg-warn/10 border border-warn/40 rounded-xl p-4 mb-4">
         <p className="text-xs font-medium text-charcoal mb-1.5">
-          ⚠️ 외화 배송과 헷갈리지 마세요
+          ⚠️ 본부 매뉴얼 확인 필요 항목
         </p>
-        <ul className="text-xs text-charcoal space-y-0.5 list-disc list-inside leading-relaxed">
-          <li>
-            <strong>외화 배송</strong>: 비대면 수령 — 지정 일자·장소로 배송원이
-            배달 또는 CU편의점 수령
-          </li>
-          <li>
-            <strong>외화 기프티콘</strong>: 대면 수령 — 수령자가{" "}
-            <strong>영업점에 직접 방문</strong>해 외화수령증 작성 후 외화 현찰
-            수령
-          </li>
-          <li>
-            두 서비스 모두 보관한도 USD 10,000은 외화 E-지갑·환전예약과{" "}
-            <strong>합산</strong> 산정
-          </li>
+        <p className="text-xs text-charcoal-soft leading-relaxed mb-1.5">
+          현재 페이지는 <strong>외화수령증 동의서(서식 4012471)</strong>와{" "}
+          <strong>외화 E-지갑 상품설명서</strong>에서 "외화기프티콘"으로 언급된
+          내용만 정리되어 있습니다. 다음은 본부 외환사업부 매뉴얼에서 확인하세요.
+        </p>
+        <ul className="text-[11px] text-charcoal-soft space-y-0.5 list-disc list-inside leading-relaxed">
+          <li>발행 채널 (모바일앱 / 영업점) 및 발행 절차</li>
+          <li>수령 방식 (수령인 영업점 방문 절차·필요 서류)</li>
+          <li>취급 통화·최소/최대 금액·환율우대 율</li>
+          <li>변경·취소·유효기간·미수령 처리</li>
+          <li>수령자 지정 범위 (본인·제3자) 및 본인 확인 방식</li>
         </ul>
       </section>
 
-      {/* 거래 흐름 */}
+      {/* PDF 명시 — 보관한도·이용한도 합산 (E-지갑 상품설명서) */}
       <section className="bg-white border border-border rounded-xl p-5 mb-4">
-        <h2 className="font-bold mb-3">🔄 거래 흐름</h2>
-        <div className="space-y-2 text-sm">
-          <FlowStep
-            n={1}
-            title="송금자(고객) — 모바일앱 발행"
-            detail="외화 기프티콘 발행 신청 + 수령인 정보(성명·휴대폰)를 본인 또는 제3자로 지정. 송금자 원화 계좌에서 외화 환전 출금."
+        <h2 className="font-bold mb-3">
+          💼 보관·이용한도 합산 (외화 E-지갑과 공통)
+        </h2>
+        <p className="text-xs text-charcoal-soft mb-3">
+          『외화 E-지갑』 서비스 상품설명서 (준법감시인 심의필 25-1407호) 본문에
+          명시된 내용입니다.
+        </p>
+        <dl className="space-y-2 text-sm">
+          <Row
+            label="외화 보관한도"
+            value="USD 10,000 상당액 이하 — 외화 E-지갑 보관 잔액 + 외화기프티콘 미수령 금액 + 환전예약 미수령 금액 합산 산정"
           />
-          <FlowStep
-            n={2}
-            title="수령인 — 모바일 알림 수신"
-            detail="지정된 수령인에게 외화 기프티콘 발행 알림(문자/앱) 전달. 보관 상태로 유지 — 별도 유효기간 없음."
+          <Row
+            label="월 이용한도"
+            value="USD 30,000 상당액 이하 — 외화 E-지갑·외화기프티콘·환전예약·전화 환전예약 합산"
           />
-          <FlowStep
-            n={3}
-            title="수령인 — 영업점 방문 (대면 수령)"
-            detail="신분증 + 모바일 수령 정보 지참하고 영업점 방문. 창구에서 외화수령증 작성·서명 + 개인(신용)정보 수집·이용 동의."
-            highlight
+          <Row
+            label="연 이용한도"
+            value="USD 100,000 상당액 이하 — 외화 E-지갑·외화기프티콘·환전예약·전화 환전예약 합산"
           />
-          <FlowStep
-            n={4}
-            title="영업점 — 외화 현찰 지급"
-            detail="외화수령증 동의 항목 ☑ 확인 후 권종별 외화 현찰 지급. 보관한도에서 차감."
-          />
-        </div>
+        </dl>
+        <p className="text-[10px] text-charcoal-soft mt-3">
+          📄 출처: 『외화 E-지갑』 서비스 상품설명서 §2 (서비스 상세내용 / 합산 산정)
+        </p>
       </section>
 
-      {/* 외화수령증 — 영업점 작성 양식 */}
+      {/* PDF 명시 — 외화수령증 양식 (서식 4012471) */}
       <section className="bg-white border border-border rounded-xl p-5 mb-4">
-        <h2 className="font-bold mb-3">📝 외화수령증 (영업점 작성 양식)</h2>
+        <h2 className="font-bold mb-3">📝 외화수령증 — 개인정보 수집·이용 동의서 (서식 4012471)</h2>
         <p className="text-xs text-charcoal-soft mb-3">
-          외화 기프티콘 수령 시 영업점에서 받는 서식. 개인(신용)정보 수집·이용
-          동의서 겸용 — 동의 거부 시 수령 불가.
+          외화수령증은 개인(신용)정보 수집·이용 동의서 겸용입니다. 신용정보의
+          이용 및 보호에 관한 법률·개인정보보호법에 따라 동의가 필요합니다.
         </p>
         <dl className="space-y-2 text-sm mb-3">
           <Row label="상품명" value="외화기프티콘" />
           <Row
             label="수집·이용 목적"
-            value="(금융)거래관계 설정·유지·이행·관리 + 금융사고 조사·분쟁해결·민원처리"
+            value="(금융)거래관계 설정·유지·이행·관리 / 금융사고 조사·분쟁해결·민원처리"
           />
           <Row
             label="수집·이용 항목"
             value="성명, 휴대폰번호, 생년월일(주민번호 앞 6자리)"
           />
           <Row
-            label="보유·이용기간"
-            value="(금융)거래 종료일로부터 5년 — 이후 법령상 의무이행 범위만 보유"
+            label="보유·이용 기간"
+            value="(금융)거래 종료일로부터 5년 — 이후 법령상 의무이행 범위에서만 보유"
           />
           <Row
-            label="동의 거부 시"
-            value="외화기프티콘 계약 체결 및 (금융)거래 설정·유지 불가"
+            label="동의 거부 권리"
+            value="거부 가능. 단 거부 시 외화기프티콘 계약 체결 및 (금융)거래 설정·유지 불가"
           />
           <Row
-            label="확인 사항"
-            value="수령인 성명·서명(또는 인) + 휴대폰번호 + 생년월일 + 수령일자"
+            label="수령 시 기재"
+            value="수령인 성명·서명(또는 인), 휴대폰번호, 생년월일, 수령일자"
+          />
+          <Row
+            label="비고"
+            value="동의 이전에 발생한 개인(신용)정보도 수집·이용 대상에 포함. 은행의 고의·과실 등 귀책사유로 인한 개인정보 유출 시 관계 법령에 따라 보상."
           />
         </dl>
         <div className="bg-offwhite border border-border rounded-md p-3 text-xs text-charcoal-soft">
           <p className="font-medium text-charcoal mb-0.5">📄 양식 식별</p>
-          <p>
-            서식 번호 4012471 · 외화수령증(외화기프티콘) 개인(신용)정보
-            수집·이용 동의서 겸용
-          </p>
+          <p>서식 번호 4012471 · 외화수령증(외화기프티콘) 개인(신용)정보 수집·이용 동의서 겸용</p>
         </div>
       </section>
 
-      {/* 영업점 응대 체크포인트 */}
+      {/* 영업점 응대 — PDF 근거만 */}
       <section className="bg-warn/5 border border-warn/40 rounded-xl p-4 mb-4">
-        <h2 className="font-bold text-sm mb-2">⚠️ 영업점 응대 체크포인트</h2>
+        <h2 className="font-bold text-sm mb-2">⚠️ 영업점 응대 — PDF 명시 사항</h2>
         <ul className="text-xs text-charcoal space-y-1 list-disc list-inside leading-relaxed">
           <li>
-            <strong>수령인 본인 확인 필수</strong> — 신분증 + 모바일 수령 정보
-            모두 확인. 제3자 대리 수령 가능 여부는 본부 매뉴얼 확인.
+            외화수령증에 수령인{" "}
+            <strong>성명·서명(또는 인)·휴대폰번호·생년월일 기재</strong> 후 동의
+            항목 ☑ 체크 확인.
           </li>
           <li>
-            외화수령증{" "}
-            <strong>“☑ 동의함” 체크 + 서명/날인 누락</strong> 시 거래 진행
-            불가.
+            동의 거부 시 외화기프티콘 계약 체결 불가 (서식 4012471 본문 명시).
           </li>
           <li>
-            수령인 본인이 송금자인 케이스 자주 발생 (
-            <strong>본인을 수령인으로 지정</strong>해서 발행) — 동일 절차 적용.
+            보관한도(USD 10,000)는{" "}
+            <strong>E-지갑·외화기프티콘·환전예약 미수령 금액 합산</strong> —
+            한도 잔여 확인 후 발행/지급.
           </li>
           <li>
-            보관 한도(USD 10,000)는{" "}
-            <strong>외화 E-지갑 보관 잔액·환전예약 미수령액과 합산</strong> 산정.
+            월/연 이용한도(USD 30,000 / USD 100,000)도{" "}
+            <strong>합산 산정</strong>되므로 다른 채널 이용 내역과 함께 확인.
           </li>
           <li>
-            영업점 통화 재고 따라 권종 수령 제한 가능 — 수령 전 확인.
-          </li>
-          <li>
-            <strong>USD 10,000 초과 환전</strong>은 국세청·관세청 자동 통보 대상
-            (외환규정, 동일자·동일인 합산).
+            상세 발행·수령 절차·환율우대는{" "}
+            <strong>본부 외환사업부 매뉴얼 확인</strong>.
           </li>
         </ul>
       </section>
 
-      {/* 고객 응대 멘트 */}
-      <section className="bg-white border border-border rounded-xl p-5 mb-4">
-        <h2 className="font-bold text-sm mb-2">💬 고객 응대 멘트</h2>
-        <ul className="space-y-3">
-          <li className="bg-white border-l-4 border-primary/40 pl-4 py-2 pr-3">
-            <p className="text-[11px] text-charcoal-soft uppercase tracking-wide mb-1">
-              기프티콘으로 선물한다고 묻는 고객
-            </p>
-            <p className="text-sm text-charcoal italic leading-relaxed">
-              &ldquo;외화 기프티콘 발행하시면 받으실 분이 우리 영업점에 직접
-              방문해서 신분증 보여주시고 외화수령증에 서명하시면 외화 현찰로
-              받아가실 수 있어요. 배송이 아니라 영업점 대면 수령이라는 점만
-              안내드릴게요.&rdquo;
-            </p>
-          </li>
-          <li className="bg-white border-l-4 border-primary/40 pl-4 py-2 pr-3">
-            <p className="text-[11px] text-charcoal-soft uppercase tracking-wide mb-1">
-              본인이 수령인으로 등록된 케이스
-            </p>
-            <p className="text-sm text-charcoal italic leading-relaxed">
-              &ldquo;본인을 수령인으로 지정해서 발행하신 거네요. 동일하게
-              외화수령증 작성하시고 개인정보 동의 ☑ 체크하시면 현찰로
-              드릴게요.&rdquo;
-            </p>
-          </li>
-          <li className="bg-white border-l-4 border-primary/40 pl-4 py-2 pr-3">
-            <p className="text-[11px] text-charcoal-soft uppercase tracking-wide mb-1">
-              외화 배송과 차이 묻는 고객
-            </p>
-            <p className="text-sm text-charcoal italic leading-relaxed">
-              &ldquo;외화 배송은 지정하신 곳으로 배달원이 가지고 가거나 편의점에서
-              받으시는 비대면 서비스이고, 외화 기프티콘은 받으실 분이 영업점에
-              직접 오셔서 받는 방식이라 차이가 있어요. 선물 보내실 분 편한 쪽으로
-              안내드릴 수 있어요.&rdquo;
-            </p>
-          </li>
-        </ul>
-      </section>
-
-      {/* 다른 환전 채널 비교 */}
+      {/* 관련 환전 채널 */}
       <section className="mt-6">
         <p className="text-[10px] text-charcoal-soft uppercase tracking-wide mb-2 px-1">
           관련 환전 채널
@@ -209,7 +166,7 @@ export default function GiftCoinPage() {
               💼 외화 E-지갑
             </p>
             <p className="text-xs text-charcoal-soft mt-0.5">
-              본인 보관·영업점 수령·재환전. 외화 계좌 불필요
+              보관한도·이용한도 합산 산정 대상
             </p>
           </Link>
           <Link
@@ -220,7 +177,7 @@ export default function GiftCoinPage() {
               📦 외화 배송
             </p>
             <p className="text-xs text-charcoal-soft mt-0.5">
-              비대면 수령 — 배달·CU편의점. USD 90% 우대 최고
+              비대면 수령 — 배달·CU편의점
             </p>
           </Link>
           <Link
@@ -239,48 +196,9 @@ export default function GiftCoinPage() {
 
       <p className="text-[10px] text-charcoal-soft mt-6 pt-4 border-t border-border">
         📄 출처: 외화수령증(외화기프티콘) 개인(신용)정보 수집·이용 동의서 겸용
-        (서식 4012471)
+        (서식 4012471) + 『외화 E-지갑』 서비스 상품설명서 (준법감시인 심의필
+        25-1407호)
       </p>
-    </div>
-  );
-}
-
-function FlowStep({
-  n,
-  title,
-  detail,
-  highlight,
-}: {
-  n: number;
-  title: string;
-  detail: string;
-  highlight?: boolean;
-}) {
-  return (
-    <div
-      className={[
-        "flex items-start gap-3 rounded-lg border p-3",
-        highlight
-          ? "bg-primary/5 border-primary/30"
-          : "bg-offwhite border-border",
-      ].join(" ")}
-    >
-      <span
-        className={[
-          "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
-          highlight
-            ? "bg-primary text-white"
-            : "bg-white text-charcoal-soft border border-border",
-        ].join(" ")}
-      >
-        {n}
-      </span>
-      <div className="min-w-0">
-        <p className="font-semibold text-charcoal text-sm">{title}</p>
-        <p className="text-xs text-charcoal-soft mt-0.5 leading-relaxed">
-          {detail}
-        </p>
-      </div>
     </div>
   );
 }

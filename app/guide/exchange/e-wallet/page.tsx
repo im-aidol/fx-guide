@@ -239,7 +239,29 @@ export default function EWalletPage() {
         <p className="text-[10px] text-charcoal-soft uppercase tracking-wide mb-2 px-1">
           비대면 환전 채널 비교
         </p>
-        <div className="grid sm:grid-cols-3 gap-2">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
+          <Link
+            href="/guide/exchange/gift"
+            className="bg-white border border-border rounded-lg p-3 hover:border-primary transition group"
+          >
+            <p className="font-medium text-sm group-hover:text-primary transition">
+              🎁 외화 기프티콘
+            </p>
+            <p className="text-xs text-charcoal-soft mt-0.5">
+              같은 패턴이지만 본인/제3자 선물 발행
+            </p>
+          </Link>
+          <Link
+            href="/guide/delivery"
+            className="bg-white border border-border rounded-lg p-3 hover:border-primary transition group"
+          >
+            <p className="font-medium text-sm group-hover:text-primary transition">
+              📦 외화 배송
+            </p>
+            <p className="text-xs text-charcoal-soft mt-0.5">
+              비대면 수령 — 배달·CU (USD 90% 우대)
+            </p>
+          </Link>
           <Link
             href="/guide/exchange/info"
             className="bg-white border border-border rounded-lg p-3 hover:border-primary transition group"
@@ -248,18 +270,7 @@ export default function EWalletPage() {
               💱 외화 Buy &amp; Sell
             </p>
             <p className="text-xs text-charcoal-soft mt-0.5">
-              원·외화 계좌 간 이체 (전신환매매율 70%/50% 우대)
-            </p>
-          </Link>
-          <Link
-            href="/guide/delivery"
-            className="bg-white border border-border rounded-lg p-3 hover:border-primary transition group"
-          >
-            <p className="font-medium text-sm group-hover:text-primary transition">
-              📦 iM 외화배송
-            </p>
-            <p className="text-xs text-charcoal-soft mt-0.5">
-              지정 일자·장소로 대면 수령 / CU편의점 (USD 90% / JPY·EUR 80% 우대)
+              원·외화 계좌 간 이체 (전신환 70%/50%)
             </p>
           </Link>
           <Link

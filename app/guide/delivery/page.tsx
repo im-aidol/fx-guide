@@ -244,19 +244,19 @@ export default function DeliveryGuidePage() {
         </p>
       </section>
 
-      {/* 외화 기프티콘 안내 — 별도 페이지 */}
+      {/* 외화 기프티콘 — 별도 페이지 안내 */}
       <section className="bg-primary/5 border border-primary/30 rounded-xl p-4 mb-4">
         <div className="flex items-start gap-3">
           <span className="text-2xl shrink-0">🎁</span>
           <div className="flex-1 min-w-0">
             <p className="font-medium text-sm text-charcoal mb-1">
-              외화 기프티콘은 별도 서비스입니다
+              외화 기프티콘은 별도 페이지입니다
             </p>
             <p className="text-xs text-charcoal-soft leading-relaxed">
-              외화 기프티콘은 본인 또는 제3자에게 선물 형태로 외화 수령권을
-              전달하는 서비스로, <strong>수령자가 영업점을 직접 방문</strong>해
-              외화수령증을 작성하고 외화 현찰을 수령하는 <strong>대면 수령</strong>{" "}
-              방식입니다. 외화 배송(비대면)과 동작이 다릅니다.
+              외화 기프티콘 보관·이용한도는 외화 E-지갑·환전예약과 합산
+              산정됩니다 (E-지갑 상품설명서 명시). 수령 시 외화수령증(서식
+              4012471) 동의 절차가 필요하며 상세 발행·수령 절차는 본부 매뉴얼
+              확인 사항입니다.
             </p>
             <Link
               href="/guide/exchange/gift"
