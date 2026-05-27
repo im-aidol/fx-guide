@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import type {
   Country,
@@ -544,7 +545,209 @@ function ResultNodeView({
           </p>
         </details>
       )}
+
+      {/* 송금 채널 선택 — 결과 후 영업점이 어떤 채널로 송금할지 결정 */}
+      <NextStepChannels />
+
+      {/* 사유별 가이드·외화송금신청서 진입 */}
+      <NextStepLinks result={result} />
+
+      {/* SWIFT 송금 시 외화송금신청서 작성 체크리스트 */}
+      <FormChecklist />
     </div>
+  );
+}
+
+// ─── 다음 단계: 송금 채널 4종 ───
+function NextStepChannels() {
+  const channels = [
+    {
+      icon: "💸",
+      title: "SWIFT 일반",
+      href: "/guide/send/channels/swift",
+      desc: "외화송금신청서로 신청 — 가장 보편적",
+    },
+    {
+      icon: "🚀",
+      title: "BARO-BARO 자동",
+      href: "/guide/send/channels/baro",
+      desc: "정기 자동 (02·08만) · 우대 30% · 수수료 면제",
+    },
+    {
+      icon: "⚡",
+      title: "WU 송금 3종",
+      href: "/guide/send/channels/wu",
+      desc: "200개국·계좌 불필요·USD 단일·7,000 이하",
+    },
+    {
+      icon: "💳",
+      title: "GLN 해외 결제",
+      href: "/guide/send/channels/gln",
+      desc: "출국 결제 (송금 아님 — 8개국)",
+    },
+  ];
+  return (
+    <section className="bg-white border border-border rounded-lg p-4">
+      <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
+        <span>📤</span>
+        <span>송금 채널 선택</span>
+        <span className="text-[10px] text-charcoal-soft font-normal">
+          위 사유로 어떤 채널로 송금할지 영업점 판단
+        </span>
+      </h3>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {channels.map((c) => (
+          <Link
+            key={c.title}
+            href={c.href}
+            className="bg-offwhite border border-border rounded-md p-2.5 hover:border-primary hover:bg-primary/5 transition group"
+          >
+            <p className="text-sm font-medium group-hover:text-primary transition flex items-center gap-1">
+              <span>{c.icon}</span>
+              <span>{c.title}</span>
+            </p>
+            <p className="text-[10px] text-charcoal-soft mt-0.5 leading-snug">
+              {c.desc}
+            </p>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─── 다음 단계: 사유별 가이드·시뮬레이터 재시작·환전 계산기 ───
+function NextStepLinks({ result }: { result: FlowResult }) {
+  // 거래코드에서 카테고리 추정 (정확하지 않으면 전체 가이드로 이동)
+  const code = result.transactionCode ?? "";
+  let categoryCue = "";
+  if (/해외체재|해외유학|해외 의료|가족 생활/.test(code)) categoryCue = "경상거래";
+  else if (/해외이주|재외동포|재산반출/.test(code)) categoryCue = "자산이전";
+  else if (/외국인|비거주자/.test(code)) categoryCue = "외국인송금";
+  else if (/해외부동산|해외직접투자|증권 취득/.test(code)) categoryCue = "자본거래";
+
+  const casesHref = categoryCue
+    ? `/guide/send/cases?cat=${encodeURIComponent(categoryCue)}`
+    : "/guide/send/cases";
+
+  return (
+    <section className="grid sm:grid-cols-3 gap-2">
+      <Link
+        href={casesHref}
+        className="bg-white border border-border rounded-lg p-3 hover:border-primary transition group"
+      >
+        <p className="text-sm font-medium group-hover:text-primary transition">
+          📋 사유별 가이드 상세
+        </p>
+        <p className="text-[10px] text-charcoal-soft mt-0.5">
+          {categoryCue
+            ? `${categoryCue} 사유 검색·정렬·표`
+            : "13개 사유 통합 검색·정렬"}
+        </p>
+      </Link>
+      <Link
+        href="/guide/exchange/calculator"
+        className="bg-white border border-border rounded-lg p-3 hover:border-primary transition group"
+      >
+        <p className="text-sm font-medium group-hover:text-primary transition">
+          🧮 환전 계산기
+        </p>
+        <p className="text-[10px] text-charcoal-soft mt-0.5">
+          원·외화 환산 + 환율우대 적용
+        </p>
+      </Link>
+      <Link
+        href="/faq?q=송금"
+        className="bg-white border border-border rounded-lg p-3 hover:border-primary transition group"
+      >
+        <p className="text-sm font-medium group-hover:text-primary transition">
+          🔍 FAQ에서 검색
+        </p>
+        <p className="text-[10px] text-charcoal-soft mt-0.5">
+          SWIFT·10만불·해외이주비 등 키워드
+        </p>
+      </Link>
+    </section>
+  );
+}
+
+// ─── SWIFT 송금 시 외화송금신청서 작성 체크리스트 ───
+function FormChecklist() {
+  const [checked, setChecked] = useState<Set<number>>(new Set());
+  const items = [
+    "송금방법 (해외/국내 · SWIFT/D-D/기타)",
+    "송금통화 + 금액",
+    "해외은행 중계수수료 부담자 (Beneficiary / Applicant)",
+    "동일내역송금 여부 (과거송금번호)",
+    "지급사유 + 지정항목 — 02 해외체재비 / 08 외국인 국내소득 / 기타",
+    "보내시는 분 — 성명(영/한)·주소·생년월일·연락처",
+    "받으실 분 — 영문 성명·국가·주소·연락처·신청인과의 관계",
+    "수취 계좌번호 (유럽·중동은 IBAN CODE 필수)",
+    "수취 은행 — 영문 은행명·주소·SWIFT/BIC·BANK CODE·중계은행",
+    "송금 목적 (송금목적 필수국 송금 시 필수 기재) · 적요",
+    "연동계좌 + 신청인 서명",
+  ];
+
+  const toggle = (i: number) =>
+    setChecked((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
+
+  const allChecked = checked.size === items.length;
+
+  return (
+    <details className="bg-white border border-border rounded-lg p-3">
+      <summary className="cursor-pointer text-sm font-medium flex items-center gap-2">
+        <span>📝</span>
+        <span>외화송금신청서 작성 체크리스트</span>
+        <span className="text-[10px] text-charcoal-soft font-normal">
+          SWIFT 송금 시 11개 필드 확인 (펼치기)
+        </span>
+      </summary>
+      <div className="mt-3 space-y-1">
+        {items.map((item, i) => {
+          const isChecked = checked.has(i);
+          return (
+            <label
+              key={i}
+              className="flex items-start gap-2 text-xs cursor-pointer hover:bg-offwhite p-1.5 rounded"
+            >
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => toggle(i)}
+                className="mt-0.5 shrink-0"
+              />
+              <span
+                className={
+                  isChecked
+                    ? "text-charcoal-soft line-through leading-relaxed"
+                    : "text-charcoal leading-relaxed"
+                }
+              >
+                {item}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+      {allChecked && (
+        <p className="mt-2 text-[11px] text-primary font-medium">
+          ✓ 모든 항목 확인 완료. 송금 처리 진행 가능.
+        </p>
+      )}
+      <p className="mt-2 text-[10px] text-charcoal-soft leading-relaxed">
+        📄 외화송금신청서(관리번호 6001) 기준. 거래외국환은행 지정은 02·08만
+        신청서에서 직접 가능 — 그 외 사유는 별도 거래외국환은행 지정 신청서
+        필요.{" "}
+        <Link href="/guide/send/channels/swift" className="text-primary hover:underline">
+          상세 →
+        </Link>
+      </p>
+    </details>
   );
 }
 
