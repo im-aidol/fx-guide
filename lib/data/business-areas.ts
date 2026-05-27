@@ -22,11 +22,11 @@ export type BusinessAreaInfo = {
 export const BUSINESS_AREAS: BusinessAreaInfo[] = [
   {
     id: "send",
-    title: "송금 보내기",
-    subtitle: "당발 송금 (한국 → 해외)",
+    title: "당발송금",
+    subtitle: "한국 → 해외",
     icon: "📤",
     description:
-      "고객 사유 따라 거래코드·서류·한도 빠른 참조. 사유 모를 땐 시뮬레이터.",
+      "당발송금 도우미(시뮬레이터)·사유별 가이드·거래코드·신청서 안내까지 한 진입판에서.",
     href: "/guide/send",
   },
   {

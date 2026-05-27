@@ -53,7 +53,7 @@ export default function HomePage() {
             href="/simulator"
             className="text-primary font-medium hover:underline"
           >
-            당발 송금 도우미 (시뮬레이터)
+            당발송금 도우미 (시뮬레이터)
           </Link>
           를 이용하세요. 입구 3개(명확/서류/모호)로 시작합니다.
         </p>

@@ -28,12 +28,29 @@ const NAV_TOP: NavItem[] = [
   {
     type: "group",
     id: "send",
-    label: "송금 (당발)",
+    label: "당발송금",
     icon: "📤",
     href: "/guide/send",
+    // 핵심 도구 + 사유별 가이드 + 사유 카테고리 빠른 진입.
     children: [
-      { href: "/guide/send", label: "송금 가이드" },
-      { href: "/simulator", label: "당발 송금 도우미" },
+      { href: "/simulator", label: "🎯 당발송금 도우미" },
+      { href: "/guide/send/cases", label: "📋 사유별 가이드 (전체)" },
+      {
+        href: "/guide/send/cases?cat=경상거래",
+        label: "└ 경상거래",
+      },
+      {
+        href: "/guide/send/cases?cat=자산이전",
+        label: "└ 자산이전",
+      },
+      {
+        href: "/guide/send/cases?cat=외국인송금",
+        label: "└ 외국인송금",
+      },
+      {
+        href: "/guide/send/cases?cat=자본거래",
+        label: "└ 자본거래",
+      },
     ],
   },
   {
