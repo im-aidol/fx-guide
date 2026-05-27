@@ -47,6 +47,42 @@ export default function SendHubPage() {
       description:
         "사유가 명확할 때 한 카드 보고 빠르게 처리. 경상거래·자산이전·외국인송금·자본거래·기타 카테고리별 검색·필터링.",
     },
+    {
+      id: "swift",
+      href: "/guide/send/channels/swift",
+      icon: "💸",
+      title: "SWIFT 일반 외화송금",
+      badge: "송금 채널",
+      description:
+        "외화송금신청서로 신청하는 가장 보편적인 해외송금. 영업점·인터넷·모바일뱅킹. 거래외국환은행 지정·신청서 작성 항목 안내.",
+    },
+    {
+      id: "baro",
+      href: "/guide/send/channels/baro",
+      icon: "🚀",
+      title: "BARO-BARO 자동송금",
+      badge: "정기 자동 · 우대 30%",
+      description:
+        "사전 지정한 송금전용계좌에서 자동 출금·해외송금. 17통화, 환율우대 30%, 송금수수료 면제. 해외체재비·외국인 국내소득 사유만.",
+    },
+    {
+      id: "wu",
+      href: "/guide/send/channels/wu",
+      icon: "⚡",
+      title: "WU 송금 3종",
+      badge: "200개국",
+      description:
+        "수취인 계좌 없이 영문이름·국가만으로 200여 개국 가맹점 수령. 특급송금(영업점)·iM더빠른송금(앱)·AUTOSEND(자동) — USD 단일·USD 7,000 이하.",
+    },
+    {
+      id: "gln",
+      href: "/guide/send/channels/gln",
+      icon: "💳",
+      title: "GLN 해외 간편 결제",
+      badge: "해외 결제 (송금 X)",
+      description:
+        "모바일앱 QR/바코드로 해외 8개국(태국·일본·대만·홍콩·싱가포르·괌·라오스·캄보디아) 가맹점 결제. 송금이 아닌 결제 서비스.",
+    },
   ];
 
   return (

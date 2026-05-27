@@ -31,26 +31,14 @@ const NAV_TOP: NavItem[] = [
     label: "당발송금",
     icon: "📤",
     href: "/guide/send",
-    // 핵심 도구 + 사유별 가이드 + 사유 카테고리 빠른 진입.
+    // 도우미 + 사유별 가이드 + 4개 송금 채널.
     children: [
       { href: "/simulator", label: "🎯 당발송금 도우미" },
-      { href: "/guide/send/cases", label: "📋 사유별 가이드 (전체)" },
-      {
-        href: "/guide/send/cases?cat=경상거래",
-        label: "└ 경상거래",
-      },
-      {
-        href: "/guide/send/cases?cat=자산이전",
-        label: "└ 자산이전",
-      },
-      {
-        href: "/guide/send/cases?cat=외국인송금",
-        label: "└ 외국인송금",
-      },
-      {
-        href: "/guide/send/cases?cat=자본거래",
-        label: "└ 자본거래",
-      },
+      { href: "/guide/send/cases", label: "📋 사유별 가이드" },
+      { href: "/guide/send/channels/swift", label: "💸 SWIFT 일반 외화송금" },
+      { href: "/guide/send/channels/baro", label: "🚀 BARO-BARO 자동송금" },
+      { href: "/guide/send/channels/wu", label: "⚡ WU 송금 3종" },
+      { href: "/guide/send/channels/gln", label: "💳 GLN 해외 결제" },
     ],
   },
   {
