@@ -92,7 +92,7 @@ export default function GlossaryPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className="max-w-[clamp(960px,92vw,1440px)] mx-auto px-6 py-12">
       <header className="mb-6">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
           외환 용어집

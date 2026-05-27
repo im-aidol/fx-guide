@@ -83,7 +83,7 @@ const CARDS: HubCard[] = [
 
 export default function ExchangeHubPage() {
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10">
+    <div className="max-w-[clamp(960px,92vw,1440px)] mx-auto px-6 py-10">
       <Link
         href="/guide"
         className="text-xs text-charcoal-soft hover:text-primary inline-flex items-center gap-1 mb-3"

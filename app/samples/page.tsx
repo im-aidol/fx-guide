@@ -28,7 +28,7 @@ export default function SamplesPage() {
     items.find((c) => c.id === selectedId) ?? primary[0] ?? items[0];
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="max-w-[clamp(1024px,94vw,1680px)] mx-auto px-6 py-12">
       <header className="mb-6">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
           통화 견본

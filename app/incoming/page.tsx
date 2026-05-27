@@ -22,7 +22,7 @@ export default function IncomingPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12 print:py-4 print:max-w-full">
+    <div className="max-w-[clamp(720px,92vw,1024px)] mx-auto px-6 py-12 print:py-4 print:max-w-full">
       <header className="mb-6 print:mb-4">
         <p className="text-xs text-primary font-medium tracking-wide mb-1 print:hidden">
           타발 송금 (해외 → 한국)
