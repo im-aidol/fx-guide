@@ -6,8 +6,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useMode, type Mode } from "@/components/Mode";
 import { useCustomMenus, slugify } from "@/lib/custom-menus";
 
-// 상단 바 네비게이션 — Sidebar의 NAV 구조 그대로 가져옴.
-// 1차 메뉴는 가로 정렬, 그룹은 hover/click drop-down. 모바일은 햄버거 + 풀스크린 메뉴.
+// 상단 바 네비게이션.
+// 1차 메뉴는 가로 정렬, 그룹은 hover/focus 시 드롭다운.
+// 모바일은 햄버거 → 풀스크린 details 메뉴.
 
 type NavGroup = {
   type: "group";
@@ -23,7 +24,9 @@ type NavItem =
   | { type: "item"; href: string; label: string; icon: string }
   | NavGroup;
 
-const NAV_TOP: NavItem[] = [
+// 1차 메뉴 통일: 홈 + 6대 업무 그룹 + 자료·공지 그룹.
+// 모두 같은 형태(아이콘 + 4글자 명사구)로 가독성·일관성.
+const NAV: NavItem[] = [
   { type: "item", href: "/", label: "홈", icon: "🏠" },
   {
     type: "group",
@@ -93,13 +96,19 @@ const NAV_TOP: NavItem[] = [
     href: "/guide/trade-finance",
     children: [{ href: "/guide/trade-finance", label: "무역금융 가이드" }],
   },
-];
-
-const NAV_BOTTOM: NavItem[] = [
-  { type: "item", href: "/notices", label: "공지사항", icon: "📣" },
-  { type: "item", href: "/qna", label: "익명 Q&A", icon: "💬" },
-  { type: "item", href: "/faq", label: "FAQ", icon: "❓" },
-  { type: "item", href: "/glossary", label: "외환 용어집", icon: "📖" },
+  {
+    type: "group",
+    id: "resources",
+    label: "자료·공지",
+    icon: "📋",
+    href: "/notices",
+    children: [
+      { href: "/notices", label: "📣 공지사항" },
+      { href: "/qna", label: "💬 익명 Q&A" },
+      { href: "/faq", label: "❓ FAQ" },
+      { href: "/glossary", label: "📖 외환 용어집" },
+    ],
+  },
 ];
 
 function isItemActive(href: string, pathname: string): boolean {
@@ -109,7 +118,8 @@ function isItemActive(href: string, pathname: string): boolean {
 }
 
 function isGroupActive(group: NavGroup, pathname: string): boolean {
-  return group.children.some((c) => isItemActive(c.href, pathname));
+  if (group.children.some((c) => isItemActive(c.href, pathname))) return true;
+  return isItemActive(group.href, pathname);
 }
 
 export function TopNav() {
@@ -118,25 +128,30 @@ export function TopNav() {
   const { mode } = useMode();
   const canEdit = mode === "hq";
 
-  const { groups: customGroups, addGroup, addItem, removeGroup, slugExists } =
+  const { groups: customGroups, addGroup, removeGroup, slugExists } =
     useCustomMenus();
 
   const [openGroupId, setOpenGroupId] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  // 외부 클릭 시 드롭다운 닫기
-  useEffect(() => {
-    function onDocClick(e: MouseEvent) {
-      if (!dropdownRef.current) return;
-      if (!dropdownRef.current.contains(e.target as Node)) {
-        setOpenGroupId(null);
-      }
+  // hover 닫힘에 살짝 딜레이 — 자식 메뉴로 이동할 때 사라지지 않도록
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openGroup = (id: string) => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
     }
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, []);
+    setOpenGroupId(id);
+  };
+
+  const scheduleClose = () => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => {
+      setOpenGroupId(null);
+    }, 120);
+  };
 
   // 페이지 이동 시 드롭다운 닫기
   useEffect(() => {
@@ -144,7 +159,16 @@ export function TopNav() {
     setMobileOpen(false);
   }, [pathname]);
 
-  // 사용자 정의 그룹
+  // Escape 키로 닫기
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpenGroupId(null);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  // 사용자 정의 그룹 → NavGroup
   const customNav: NavGroup[] = useMemo(
     () =>
       customGroups.map((g) => ({
@@ -162,10 +186,17 @@ export function TopNav() {
     [customGroups],
   );
 
-  const allNav: NavItem[] = useMemo(
-    () => [...NAV_TOP, ...customNav, ...NAV_BOTTOM],
-    [customNav],
-  );
+  // 자료·공지 그룹 앞에 사용자 정의 그룹 끼워 넣기
+  const allNav: NavItem[] = useMemo(() => {
+    const resourcesIndex = NAV.findIndex(
+      (n) => n.type === "group" && (n as NavGroup).id === "resources",
+    );
+    return [
+      ...NAV.slice(0, resourcesIndex),
+      ...customNav,
+      ...NAV.slice(resourcesIndex),
+    ];
+  }, [customNav]);
 
   const handleAddGroup = (input: {
     groupLabel: string;
@@ -195,26 +226,25 @@ export function TopNav() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-border print:hidden">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-border print:hidden">
       <div className="max-w-7xl mx-auto px-4 lg:px-6">
-        {/* 상단 줄 — 로고 + 모바일 햄버거 + 데스크톱 메뉴 + 모드 토글 */}
         <div className="flex items-center h-14 gap-3">
           {/* 로고 */}
           <Link
             href="/"
-            className="flex items-center gap-1.5 shrink-0 hover:opacity-80 transition"
+            className="flex items-center gap-2 shrink-0 hover:opacity-80 transition"
           >
             <span className="text-lg">🏦</span>
             <div className="leading-none">
               <p className="font-bold text-primary text-sm">외환 길잡이</p>
-              <p className="text-[9px] text-charcoal-soft mt-0.5">
+              <p className="text-[9px] text-charcoal-soft mt-0.5 hidden sm:block">
                 iM뱅크 외환 업무 가이드
               </p>
             </div>
           </Link>
 
           {/* 데스크톱 메뉴 */}
-          <nav className="hidden lg:flex items-center gap-0.5 flex-1 ml-2" ref={dropdownRef}>
+          <nav className="hidden lg:flex items-stretch flex-1 ml-3">
             {allNav.map((item) => {
               if (item.type === "item") {
                 const active = isItemActive(item.href, pathname);
@@ -223,14 +253,17 @@ export function TopNav() {
                     key={item.href}
                     href={item.href}
                     className={[
-                      "flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs transition whitespace-nowrap",
+                      "flex items-center gap-1.5 px-3 text-xs whitespace-nowrap transition relative",
                       active
-                        ? "bg-primary/10 text-primary font-semibold"
-                        : "text-charcoal-soft hover:bg-offwhite hover:text-charcoal",
+                        ? "text-primary font-semibold"
+                        : "text-charcoal-soft hover:text-charcoal",
                     ].join(" ")}
                   >
                     <span>{item.icon}</span>
                     <span>{item.label}</span>
+                    {active && (
+                      <span className="absolute left-2 right-2 -bottom-px h-0.5 bg-primary rounded-t" />
+                    )}
                   </Link>
                 );
               }
@@ -239,17 +272,20 @@ export function TopNav() {
               const isOpen = openGroupId === item.id;
 
               return (
-                <div key={item.id} className="relative">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenGroupId(isOpen ? null : item.id);
-                    }}
+                <div
+                  key={item.id}
+                  className="relative flex items-stretch"
+                  onMouseEnter={() => openGroup(item.id)}
+                  onMouseLeave={scheduleClose}
+                >
+                  <Link
+                    href={item.href}
+                    onFocus={() => openGroup(item.id)}
                     className={[
-                      "flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs transition whitespace-nowrap",
+                      "flex items-center gap-1.5 px-3 text-xs whitespace-nowrap transition relative",
                       groupActive || isOpen
-                        ? "bg-primary/10 text-primary font-semibold"
-                        : "text-charcoal-soft hover:bg-offwhite hover:text-charcoal",
+                        ? "text-primary font-semibold"
+                        : "text-charcoal-soft hover:text-charcoal",
                     ].join(" ")}
                   >
                     <span>{item.icon}</span>
@@ -259,41 +295,60 @@ export function TopNav() {
                         new
                       </span>
                     )}
-                    <span className="text-[9px] opacity-60">
-                      {isOpen ? "▴" : "▾"}
+                    <span
+                      className={[
+                        "text-[8px] transition-transform",
+                        isOpen ? "rotate-180" : "",
+                      ].join(" ")}
+                    >
+                      ▾
                     </span>
-                  </button>
+                    {(groupActive || isOpen) && (
+                      <span className="absolute left-2 right-2 -bottom-px h-0.5 bg-primary rounded-t" />
+                    )}
+                  </Link>
 
-                  {isOpen && (
-                    <div className="absolute left-0 top-full mt-1 min-w-56 bg-white border border-border rounded-lg shadow-lg overflow-hidden">
-                      <Link
-                        href={item.href}
-                        onClick={() => setOpenGroupId(null)}
-                        className="flex items-center gap-2 px-3 py-2 text-xs font-semibold border-b border-border bg-primary/5 hover:bg-primary/10 transition"
-                      >
-                        <span>{item.icon}</span>
-                        <span className="text-primary">
-                          {item.label} 진입판
-                        </span>
-                      </Link>
-                      {item.children.map((c) => {
+                  {/* 드롭다운 */}
+                  <div
+                    className={[
+                      "absolute left-0 top-full pt-1.5 z-50 transition-opacity duration-150",
+                      isOpen
+                        ? "opacity-100 pointer-events-auto"
+                        : "opacity-0 pointer-events-none",
+                    ].join(" ")}
+                  >
+                    <div className="min-w-60 bg-white border border-border rounded-xl shadow-xl ring-1 ring-black/5 overflow-hidden py-1.5">
+                      {item.children.map((c, idx) => {
                         const childActive = isItemActive(c.href, pathname);
                         return (
                           <Link
                             key={c.href}
                             href={c.href}
-                            onClick={() => setOpenGroupId(null)}
                             className={[
-                              "block px-3 py-2 text-xs transition",
+                              "flex items-center px-4 py-2 text-xs transition group",
                               childActive
-                                ? "bg-primary/10 text-primary font-medium"
+                                ? "bg-primary/5 text-primary font-medium"
                                 : "text-charcoal-soft hover:bg-offwhite hover:text-charcoal",
                             ].join(" ")}
                           >
-                            {c.label}
+                            <span className="flex-1">{c.label}</span>
+                            <span className="text-[10px] text-charcoal-soft opacity-0 group-hover:opacity-100 transition">
+                              →
+                            </span>
                           </Link>
                         );
                       })}
+                      <div className="border-t border-border mt-1 pt-1">
+                        <Link
+                          href={item.href}
+                          className="flex items-center px-4 py-2 text-[11px] text-primary hover:bg-primary/5 transition"
+                        >
+                          <span className="flex-1">
+                            {item.label} 진입판 전체보기
+                          </span>
+                          <span className="opacity-60">→</span>
+                        </Link>
+                      </div>
                       {canEdit && item.custom && (
                         <button
                           onClick={() => {
@@ -303,24 +358,24 @@ export function TopNav() {
                               )
                             ) {
                               removeGroup(item.id);
+                              setOpenGroupId(null);
                             }
                           }}
-                          className="w-full text-left px-3 py-2 text-[11px] text-danger hover:bg-danger/5 border-t border-border transition"
+                          className="w-full text-left px-4 py-2 text-[11px] text-danger hover:bg-danger/5 border-t border-border transition"
                         >
                           ✕ 이 그룹 삭제
                         </button>
                       )}
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}
 
-            {/* 본점 모드 — 새 업무 추가 */}
             {canEdit && (
-              <div className="relative ml-1">
+              <div className="relative flex items-center ml-1.5">
                 {showAddForm ? (
-                  <div className="absolute right-0 top-0 z-10">
+                  <div className="absolute right-0 top-12 z-50">
                     <AddGroupForm
                       onSubmit={handleAddGroup}
                       onCancel={() => setShowAddForm(false)}
@@ -329,7 +384,7 @@ export function TopNav() {
                 ) : (
                   <button
                     onClick={() => setShowAddForm(true)}
-                    className="text-[11px] text-charcoal-soft hover:text-primary border border-dashed border-border px-2 py-1.5 rounded-md transition"
+                    className="text-[11px] text-charcoal-soft hover:text-primary border border-dashed border-border px-2.5 py-1 rounded-md transition"
                   >
                     ➕ 새 업무
                   </button>
@@ -354,10 +409,10 @@ export function TopNav() {
         </div>
       </div>
 
-      {/* 모바일 메뉴 — 풀 화면 슬라이드다운 */}
+      {/* 모바일 메뉴 */}
       {mobileOpen && (
         <div className="lg:hidden bg-white border-t border-border max-h-[calc(100vh-3.5rem)] overflow-y-auto">
-          <nav className="px-4 py-3 space-y-2">
+          <nav className="px-4 py-3 space-y-1.5">
             {allNav.map((item) => {
               if (item.type === "item") {
                 const active = isItemActive(item.href, pathname);
@@ -381,11 +436,11 @@ export function TopNav() {
                 <details
                   key={item.id}
                   open={isGroupActive(item, pathname)}
-                  className="border border-border rounded-md"
+                  className="border border-border rounded-md overflow-hidden"
                 >
                   <summary className="cursor-pointer flex items-center gap-2 px-3 py-2 text-sm font-medium">
                     <span>{item.icon}</span>
-                    <span>{item.label}</span>
+                    <span className="flex-1">{item.label}</span>
                     {item.custom && (
                       <span className="text-[8px] uppercase tracking-wide bg-primary/15 text-primary px-1 rounded">
                         new
@@ -393,12 +448,6 @@ export function TopNav() {
                     )}
                   </summary>
                   <div className="border-t border-border bg-offwhite/40">
-                    <Link
-                      href={item.href}
-                      className="block px-5 py-2 text-xs text-primary hover:bg-primary/10 transition"
-                    >
-                      → 진입판
-                    </Link>
                     {item.children.map((c) => (
                       <Link
                         key={c.href}
@@ -408,6 +457,12 @@ export function TopNav() {
                         {c.label}
                       </Link>
                     ))}
+                    <Link
+                      href={item.href}
+                      className="block px-5 py-2 text-[11px] text-primary hover:bg-primary/10 border-t border-border transition"
+                    >
+                      → {item.label} 진입판 전체보기
+                    </Link>
                   </div>
                 </details>
               );
@@ -444,7 +499,7 @@ function CompactModeToggle() {
   ];
 
   return (
-    <div className="flex gap-1 bg-offwhite border border-border rounded-md p-0.5">
+    <div className="flex gap-0.5 bg-offwhite border border-border rounded-md p-0.5">
       {options.map((opt) => {
         const active = mode === opt.value;
         return (
@@ -461,7 +516,7 @@ function CompactModeToggle() {
             aria-pressed={active}
           >
             <span className="text-xs leading-none">{opt.icon}</span>
-            <span>{opt.label}</span>
+            <span className="hidden sm:inline">{opt.label}</span>
           </button>
         );
       })}
@@ -494,7 +549,7 @@ function AddGroupForm({
   };
 
   return (
-    <div className="bg-white border border-primary/40 rounded-lg p-3 space-y-2 shadow-lg w-72">
+    <div className="bg-white border border-primary/40 rounded-lg p-3 space-y-2 shadow-xl ring-1 ring-black/5 w-72">
       <p className="text-[10px] text-charcoal-soft font-medium uppercase tracking-wide">
         새 업무 그룹 추가
       </p>
