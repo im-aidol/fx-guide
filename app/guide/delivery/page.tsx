@@ -4,20 +4,26 @@ import { AdminNote } from "@/components/admin/AdminNote";
 export default function DeliveryGuidePage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
-      <Link
-        href="/guide"
-        className="text-xs text-charcoal-soft hover:text-primary inline-flex items-center gap-1 mb-3"
-      >
-        ← 가이드 홈
-      </Link>
+      <nav className="text-xs text-charcoal-soft mb-3 flex items-center gap-1">
+        <Link href="/guide" className="hover:text-primary">
+          가이드 홈
+        </Link>
+        <span>›</span>
+        <Link href="/guide/exchange" className="hover:text-primary">
+          환전
+        </Link>
+        <span>›</span>
+        <span className="text-charcoal">외화 배송·기프티콘</span>
+      </nav>
       <header className="mb-6">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
-          📦 외화 배송·기프티콘
+          📦 환전 비대면 채널 — 외화 배송·기프티콘
         </p>
         <h1 className="text-3xl font-bold mb-2">외화 수령 (비대면)</h1>
         <p className="text-sm text-charcoal-soft">
-          영업점 방문 없이 외화 수령하는 두 가지 방식. iM외화배송 약관 + 외화수령증
-          본문 기반.
+          영업점 방문 없이 외화 수령하는 두 가지 방식 — 지정 일자·장소로 받는
+          외화 배송과 제3자에게 선물 형태로 전달하는 외화 기프티콘. 상품설명서·약관
+          본문 기준.
         </p>
       </header>
 
@@ -89,18 +95,153 @@ export default function DeliveryGuidePage() {
           </table>
         </div>
 
-        <div className="mt-3 bg-offwhite border border-border rounded-md p-3 text-xs text-charcoal-soft space-y-1">
-          <p>
-            <strong>배송 취소</strong>: 모바일뱅킹에서 가능. 재환전 시{" "}
-            <strong>취소 시점 현찰매입율</strong> 적용 → 신청 시 출금계좌로 입금.
-          </p>
-          <p>
-            <strong>배송비</strong>: 수령방법별 별도. 환전금액과 함께 입출금 예금에서 인출.
+        {/* 통화 10종 + 최소금액 */}
+        <div className="mt-4">
+          <h3 className="text-xs font-medium text-charcoal-soft uppercase tracking-wide mb-2">
+            취급 통화 10종 — 건당 최소 금액
+          </h3>
+          <div className="overflow-x-auto bg-offwhite border border-border rounded-md">
+            <table className="w-full text-xs">
+              <thead className="text-charcoal-soft">
+                <tr className="border-b border-border">
+                  <th className="p-2 text-left">USD</th>
+                  <th className="p-2 text-left">JPY</th>
+                  <th className="p-2 text-left">EUR</th>
+                  <th className="p-2 text-left">CNY</th>
+                  <th className="p-2 text-left">HKD</th>
+                  <th className="p-2 text-left">SGD</th>
+                  <th className="p-2 text-left">AUD</th>
+                  <th className="p-2 text-left">CAD</th>
+                  <th className="p-2 text-left">GBP</th>
+                  <th className="p-2 text-left">THB</th>
+                </tr>
+              </thead>
+              <tbody className="text-charcoal font-medium">
+                <tr>
+                  <td className="p-2">50</td>
+                  <td className="p-2">5,000</td>
+                  <td className="p-2">50</td>
+                  <td className="p-2">300</td>
+                  <td className="p-2">300</td>
+                  <td className="p-2">50</td>
+                  <td className="p-2">50</td>
+                  <td className="p-2">50</td>
+                  <td className="p-2">50</td>
+                  <td className="p-2">1,200</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* 환율우대 */}
+        <div className="mt-4">
+          <h3 className="text-xs font-medium text-charcoal-soft uppercase tracking-wide mb-2">
+            통화별 환율우대 (현찰매도율 기준)
+          </h3>
+          <div className="overflow-x-auto bg-white border border-border rounded-md">
+            <table className="w-full text-xs">
+              <thead className="bg-offwhite text-charcoal-soft">
+                <tr className="border-b border-border">
+                  <th className="p-2 text-left">통화</th>
+                  <th className="p-2 text-left">우대율</th>
+                </tr>
+              </thead>
+              <tbody className="text-charcoal">
+                <tr className="border-b border-border">
+                  <td className="p-2 font-medium">USD</td>
+                  <td className="p-2 text-primary font-bold">90%</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="p-2 font-medium">JPY</td>
+                  <td className="p-2 text-primary font-bold">80%</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="p-2 font-medium">EUR · CNY</td>
+                  <td className="p-2 text-primary font-bold">50%</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="p-2 font-medium">AUD · CAD · GBP · THB</td>
+                  <td className="p-2 text-primary font-bold">20%</td>
+                </tr>
+                <tr>
+                  <td className="p-2 font-medium">HKD · SGD</td>
+                  <td className="p-2 text-charcoal-soft">우대 없음</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="text-[10px] text-charcoal-soft mt-1">
+            ⚠️ 재환전 시에는 환율우대 미적용.
           </p>
         </div>
 
+        {/* 배송비 + 수령 일정 */}
+        <div className="mt-4 grid sm:grid-cols-2 gap-3">
+          <div className="bg-offwhite border border-border rounded-md p-3 text-xs">
+            <p className="font-medium text-charcoal mb-1">💸 배송비</p>
+            <ul className="text-charcoal-soft space-y-0.5 list-disc list-inside leading-relaxed">
+              <li>대면 수령: 건당 <strong className="text-charcoal">5,000원</strong></li>
+              <li>CU편의점 수령: 건당 <strong className="text-charcoal">3,300원</strong></li>
+              <li>환전 신청 시 신청금액과 함께 출금</li>
+              <li>취소 시 배송비 반환 / 미수령 반송 시 미반환</li>
+            </ul>
+          </div>
+          <div className="bg-offwhite border border-border rounded-md p-3 text-xs">
+            <p className="font-medium text-charcoal mb-1">📅 수령 일자</p>
+            <ul className="text-charcoal-soft space-y-0.5 list-disc list-inside leading-relaxed">
+              <li>오전 9시 이전 신청 → +1영업일 ~ 12영업일 이내 선택</li>
+              <li>오전 9시 이후 신청 → +2영업일 ~ 11영업일 이내 선택</li>
+              <li>대면 수령: 평일 09:00~18:00</li>
+              <li>CU편의점: 24시간 (일부 점포 제외)</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* 수령 지역 + 변경·취소 */}
+        <div className="mt-3 grid sm:grid-cols-2 gap-3">
+          <div className="bg-offwhite border border-border rounded-md p-3 text-xs">
+            <p className="font-medium text-charcoal mb-1">📍 수령 지역</p>
+            <ul className="text-charcoal-soft space-y-0.5 list-disc list-inside leading-relaxed">
+              <li>대면: 전국 (군지역 이하 불가, 광역시 소재 군지역은 가능)</li>
+              <li>
+                CU편의점: 수도권 + 대구·경상북도 일부 점포
+              </li>
+            </ul>
+          </div>
+          <div className="bg-offwhite border border-border rounded-md p-3 text-xs">
+            <p className="font-medium text-charcoal mb-1">🔁 변경·취소</p>
+            <ul className="text-charcoal-soft space-y-0.5 list-disc list-inside leading-relaxed">
+              <li>수령일자 <strong className="text-charcoal">2영업일 전 24:00</strong>까지 변경·취소 가능</li>
+              <li>배송중 상태는 변경·취소 불가</li>
+              <li>취소 시 취소시점 현찰매입율로 재환전 → 출금계좌 입금</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* 영업점 체크포인트 */}
+        <div className="mt-4 bg-warn/5 border border-warn/40 rounded-md p-3 text-xs">
+          <p className="font-medium text-charcoal mb-1">
+            ⚠️ 영업점 응대 체크포인트
+          </p>
+          <ul className="text-charcoal-soft space-y-0.5 list-disc list-inside leading-relaxed">
+            <li>
+              <strong className="text-charcoal">지정된 수령인 외 대리인 수령 불가</strong>{" "}
+              — 신분증 + 모바일앱 수령 바코드 모두 필요
+            </li>
+            <li>
+              미수령 시 수령기한(+2영업일 또는 +2영업일+4일) 경과 후 반송 → 5영업일 이내 자동 재환전
+            </li>
+            <li>
+              <strong className="text-charcoal">USD 90% 우대</strong>는 비대면 환전 중 최고 수준 — Buy &amp; Sell 70% / E-지갑 50%보다 유리
+            </li>
+            <li>건당 2건 이상 동시 신청 불가 (월 3건·연 10건 한도)</li>
+          </ul>
+        </div>
+
         <p className="text-[10px] text-charcoal-soft mt-3">
-          출처: iM외화배송서비스 이용약관
+          📄 출처: iM외화배송서비스 상품설명서 (준법감시인 심의필 25-1691호,
+          2025.07.29~2027.06.30) + iM외화배송서비스 이용약관
         </p>
       </section>
 

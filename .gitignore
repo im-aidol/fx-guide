@@ -45,3 +45,4 @@ next-env.d.ts
 
 # 본부 상품설명서 PDF 추출본 (회사 내부 자료 — public repo에 commit 금지)
 docs/extracted-deposit/
+docs/extracted-exchange/

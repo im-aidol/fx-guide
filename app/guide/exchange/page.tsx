@@ -44,12 +44,22 @@ const CARDS: HubCard[] = [
       "권종별 사진·시리즈·매입/매도 가능 여부. 환전 시 매입 여부 즉시 확인.",
   },
   {
+    id: "e-wallet",
+    href: "/guide/exchange/e-wallet",
+    icon: "💼",
+    title: "외화 E-지갑",
+    badge: "비대면",
+    description:
+      "외화 계좌 없이 환전·보관·영업점 수령·재환전. 모바일앱 전용 (USD 50%·JPY/EUR/CNY 30% 우대).",
+  },
+  {
     id: "delivery",
     href: "/guide/delivery",
     icon: "📦",
     title: "외화 배송·기프티콘",
+    badge: "비대면",
     description:
-      "비대면 외화 수령 — iM외화배송 서비스 + 외화 기프티콘(외화수령증).",
+      "지정 일자·장소로 대면 수령 또는 CU편의점 수령. 10종 통화 (USD 90% 우대 최고).",
   },
 ];
 
