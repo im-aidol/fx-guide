@@ -3,6 +3,7 @@ import "./globals.css";
 import { TopNav } from "@/components/TopNav";
 import { ModeProvider } from "@/components/Mode";
 import { RouteTracker } from "@/components/RouteTracker";
+import { RecentMenuBox } from "@/components/RecentMenuBox";
 
 export const metadata: Metadata = {
   title: "외환 길잡이 | iM뱅크 영업점 가이드",
@@ -29,6 +30,16 @@ export default function RootLayout({
           <div className="min-h-screen flex flex-col">
             <TopNav />
             <main className="flex-1 min-w-0">{children}</main>
+          </div>
+          {/* 우측 상단 고정 "최근 본 메뉴" 위젯 — xl 이상 화면에서 모든 페이지에 표시.
+              뷰포트가 컨텐츠 max-w(1440px)보다 넓으면 컨텐츠 우측 가장자리에 맞춤. */}
+          <div
+            className="hidden xl:block fixed top-20 z-30 w-[280px] print:hidden"
+            style={{
+              right: "max(1rem, calc((100vw - 1440px) / 2 + 1.5rem))",
+            }}
+          >
+            <RecentMenuBox />
           </div>
         </ModeProvider>
       </body>

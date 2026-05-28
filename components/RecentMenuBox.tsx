@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { useRecentMenu } from "@/lib/hooks/useRecentMenu";
 
+/**
+ * 우측 상단 떠있는 "최근 본 메뉴" 위젯.
+ * layout.tsx에서 fixed 포지셔닝으로 모든 페이지에 노출.
+ * 좁은 화면(< xl)에서는 숨김 — 부모에서 hidden 처리.
+ */
 export function RecentMenuBox() {
   const items = useRecentMenu();
 
   return (
-    <aside className="bg-white border border-border rounded-xl p-4 lg:sticky lg:top-20 h-fit">
+    <aside className="bg-white border border-border rounded-xl p-4 shadow-sm">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-base leading-none">🕒</span>
         <h2 className="text-sm font-semibold">최근 본 메뉴</h2>
