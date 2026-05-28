@@ -21,12 +21,12 @@ export function RecentMenuBox() {
       <button
         type="button"
         onClick={() => setCollapsed((c) => !c)}
-        className="w-full flex items-center gap-1.5 px-2.5 py-1.5 hover:bg-offwhite transition"
+        className="w-full flex items-center gap-1.5 px-3 py-2 hover:bg-offwhite transition"
         aria-expanded={!collapsed}
         aria-label={collapsed ? "최근 본 메뉴 펼치기" : "최근 본 메뉴 접기"}
       >
-        <span className="text-xs leading-none">🕒</span>
-        <h2 className="text-[11px] font-semibold flex-1 text-left">
+        <span className="text-sm leading-none">🕒</span>
+        <h2 className="text-xs font-semibold flex-1 text-left">
           최근 본 메뉴
           {items.length > 0 && (
             <span className="ml-1 text-charcoal-soft font-normal">
@@ -37,7 +37,7 @@ export function RecentMenuBox() {
         <span
           aria-hidden
           className={[
-            "text-[9px] text-charcoal-soft transition-transform",
+            "text-[10px] text-charcoal-soft transition-transform",
             collapsed ? "" : "rotate-180",
           ].join(" ")}
         >
@@ -46,9 +46,9 @@ export function RecentMenuBox() {
       </button>
 
       {!collapsed && (
-        <div className="border-t border-border px-2.5 py-2">
+        <div className="border-t border-border px-3 py-2">
           {items.length === 0 ? (
-            <p className="text-[10px] text-charcoal-soft leading-relaxed">
+            <p className="text-[11px] text-charcoal-soft leading-relaxed">
               메뉴를 둘러보면 여기에 표시돼요.
             </p>
           ) : (
@@ -57,9 +57,9 @@ export function RecentMenuBox() {
                 <li key={it.path}>
                   <Link
                     href={it.path}
-                    className="flex items-center gap-1.5 px-1.5 py-1 -mx-1.5 rounded text-[11px] text-charcoal-soft hover:bg-offwhite hover:text-charcoal transition"
+                    className="flex items-center gap-1.5 px-1.5 py-1 -mx-1.5 rounded text-xs text-charcoal-soft hover:bg-offwhite hover:text-charcoal transition"
                   >
-                    <span className="text-xs leading-none shrink-0">
+                    <span className="text-sm leading-none shrink-0">
                       {it.icon}
                     </span>
                     <span className="flex-1 truncate">{it.label}</span>
