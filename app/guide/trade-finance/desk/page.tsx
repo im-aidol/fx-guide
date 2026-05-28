@@ -10,19 +10,16 @@ import {
   type TradeScenarioSubCategory,
 } from "@/lib/data/trade-scenarios";
 
-// 무역금융 영업점 응대 도우미 — 손님 와서 무엇을 가져왔는지 물으며 좁혀가는 가이드.
+// 무역금융 영업점 응대 도우미.
+// 좌측 sticky 시나리오 리스트 + 우측 상세 — 스크롤 따로, 시나리오 전환 시 우측만 바뀜.
+// 모바일: 시나리오 선택 시 상세 풀화면 모드.
 
-const CATEGORY_LABEL: Record<TradeScenarioCategory, { icon: string; title: string; desc: string }> = {
-  import: {
-    icon: "📥",
-    title: "수입 (Importer)",
-    desc: "수입상이 찾아왔어요 — 신용장 개설·서류 결제·L/G·T/T수입금융·추심 등",
-  },
-  export: {
-    icon: "📤",
-    title: "수출 (Exporter)",
-    desc: "수출상이 찾아왔어요 — 신용장 통지·매입(네고)·추심·부도처리 등",
-  },
+const CATEGORY_LABEL: Record<
+  TradeScenarioCategory,
+  { icon: string; title: string }
+> = {
+  import: { icon: "📥", title: "수입 (Importer)" },
+  export: { icon: "📤", title: "수출 (Exporter)" },
 };
 
 const SUB_LABEL: Record<TradeScenarioSubCategory, string> = {
@@ -38,13 +35,13 @@ const SUB_LABEL: Record<TradeScenarioSubCategory, string> = {
 };
 
 export default function TradeDeskPage() {
-  const [category, setCategory] = useState<TradeScenarioCategory | null>(null);
+  const [category, setCategory] = useState<TradeScenarioCategory>("import");
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const scenariosForCategory = useMemo(() => {
-    if (!category) return [];
-    return TRADE_SCENARIOS.filter((s) => s.category === category);
-  }, [category]);
+  const scenariosForCategory = useMemo(
+    () => TRADE_SCENARIOS.filter((s) => s.category === category),
+    [category],
+  );
 
   const grouped = useMemo(() => {
     const map = new Map<TradeScenarioSubCategory, TradeScenario[]>();
@@ -58,7 +55,7 @@ export default function TradeDeskPage() {
   const active = TRADE_SCENARIOS.find((s) => s.id === activeId);
 
   return (
-    <div className="max-w-[clamp(960px,92vw,1440px)] mx-auto px-6 py-8">
+    <div className="max-w-[clamp(1024px,94vw,1680px)] mx-auto px-6 py-6">
       <nav className="text-xs text-charcoal-soft mb-3 flex items-center gap-1">
         <Link href="/guide" className="hover:text-primary">
           가이드 홈
@@ -71,82 +68,73 @@ export default function TradeDeskPage() {
         <span className="text-charcoal">영업점 도우미</span>
       </nav>
 
-      <header className="mb-5">
+      <header className="mb-4">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
           🎯 무역금융 · 영업점 응대
         </p>
         <h1 className="text-2xl font-bold mb-1">무역금융 영업점 도우미</h1>
-        <p className="text-sm text-charcoal-soft leading-relaxed">
-          손님이 무엇을 들고 왔는지 클릭으로 좁혀가는 응대 가이드. 가져왔어야 할 서류·점검 항목·처리 절차·응대 멘트·관련 가이드까지 한 화면.
+        <p className="text-xs text-charcoal-soft leading-relaxed">
+          왼쪽에서 상황을 고르면 오른쪽에 응대 내용이 나타납니다. 시나리오 전환은 왼쪽 패널에서 바로
+          가능 — 스크롤 따로 동작.
         </p>
       </header>
 
       <AdminNote storageKey="fx-guide:note:guide-trade-desk" />
 
-      {/* Step 1: 수입/수출 선택 */}
-      <section className="mb-4">
-        <p className="text-[10px] font-medium text-charcoal-soft uppercase tracking-wide mb-2 px-1">
-          ① 어떤 손님이세요?
-        </p>
-        <div className="grid sm:grid-cols-2 gap-3">
-          {(Object.keys(CATEGORY_LABEL) as TradeScenarioCategory[]).map((c) => {
-            const info = CATEGORY_LABEL[c];
-            const count = TRADE_SCENARIOS.filter((s) => s.category === c).length;
-            const isActive = category === c;
-            return (
-              <button
-                key={c}
-                onClick={() => {
-                  setCategory(c);
-                  setActiveId(null);
-                }}
-                className={[
-                  "text-left border-2 rounded-xl p-4 transition",
-                  isActive
-                    ? "bg-primary text-white border-primary shadow-sm"
-                    : "bg-white border-border hover:border-primary/50",
-                ].join(" ")}
-                aria-pressed={isActive}
-              >
-                <p className="text-lg font-bold mb-0.5">
-                  {info.icon} {info.title}
-                </p>
-                <p
-                  className={[
-                    "text-xs leading-relaxed",
-                    isActive ? "text-white/85" : "text-charcoal-soft",
-                  ].join(" ")}
-                >
-                  {info.desc}
-                </p>
-                <p
-                  className={[
-                    "text-[10px] mt-2",
-                    isActive ? "text-white/70" : "text-charcoal-soft",
-                  ].join(" ")}
-                >
-                  {count}개 시나리오
-                </p>
-              </button>
-            );
-          })}
-        </div>
-      </section>
+      <div className="grid lg:grid-cols-[300px_1fr] gap-4">
+        {/* ─── 좌측: 시나리오 리스트 ─── */}
+        <aside
+          className={[
+            "lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto",
+            // 모바일: 시나리오 선택되면 숨김 (상세만 보이도록)
+            active ? "hidden lg:block" : "block",
+          ].join(" ")}
+        >
+          {/* 수입/수출 토글 */}
+          <div className="bg-white border border-border rounded-xl p-1 mb-3 flex gap-1">
+            {(Object.keys(CATEGORY_LABEL) as TradeScenarioCategory[]).map(
+              (c) => {
+                const info = CATEGORY_LABEL[c];
+                const isActive = category === c;
+                const count = TRADE_SCENARIOS.filter(
+                  (s) => s.category === c,
+                ).length;
+                return (
+                  <button
+                    key={c}
+                    onClick={() => {
+                      setCategory(c);
+                      setActiveId(null);
+                    }}
+                    className={[
+                      "flex-1 text-center text-xs px-2 py-2 rounded-lg transition",
+                      isActive
+                        ? "bg-primary text-white font-semibold"
+                        : "text-charcoal-soft hover:bg-offwhite",
+                    ].join(" ")}
+                    aria-pressed={isActive}
+                  >
+                    <span className="block text-base leading-none">
+                      {info.icon}
+                    </span>
+                    <span className="block mt-1">
+                      {info.title} ({count})
+                    </span>
+                  </button>
+                );
+              },
+            )}
+          </div>
 
-      {/* Step 2: 시나리오 선택 */}
-      {category && (
-        <section className="mb-4">
-          <p className="text-[10px] font-medium text-charcoal-soft uppercase tracking-wide mb-2 px-1">
-            ② 무슨 일로 오셨는지 골라주세요
-          </p>
-          <div className="space-y-3">
+          {/* 시나리오 리스트 */}
+          <div className="space-y-2">
             {grouped.map(([sub, items]) => (
               <div
                 key={sub}
                 className="bg-white border border-border rounded-xl overflow-hidden"
               >
-                <div className="bg-offwhite px-3 py-2 border-b border-border">
-                  <p className="text-xs font-bold text-charcoal">
+                <div className="bg-offwhite px-3 py-1.5 border-b border-border">
+                  <p className="text-[10px] font-bold text-charcoal-soft uppercase tracking-wide">
                     {SUB_LABEL[sub]}
                   </p>
                 </div>
@@ -156,37 +144,25 @@ export default function TradeDeskPage() {
                     return (
                       <button
                         key={s.id}
-                        onClick={() => setActiveId(isActive ? null : s.id)}
+                        onClick={() => setActiveId(s.id)}
                         className={[
-                          "w-full text-left px-3 py-2.5 transition",
+                          "w-full text-left px-3 py-2 transition",
                           isActive
-                            ? "bg-primary/10"
-                            : "hover:bg-offwhite/60",
+                            ? "bg-primary/10 border-l-4 border-primary"
+                            : "border-l-4 border-transparent hover:bg-offwhite/60 hover:border-primary/30",
                         ].join(" ")}
                       >
-                        <div className="flex items-start gap-2">
-                          <span
-                            className={[
-                              "text-base shrink-0",
-                              isActive ? "text-primary" : "text-charcoal-soft",
-                            ].join(" ")}
-                          >
-                            {isActive ? "▾" : "▸"}
-                          </span>
-                          <div className="flex-1">
-                            <p
-                              className={[
-                                "text-sm font-medium leading-tight",
-                                isActive ? "text-primary" : "text-charcoal",
-                              ].join(" ")}
-                            >
-                              {s.title}
-                            </p>
-                            <p className="text-[11px] text-charcoal-soft mt-0.5 leading-relaxed">
-                              💬 {s.customerSays}
-                            </p>
-                          </div>
-                        </div>
+                        <p
+                          className={[
+                            "text-xs font-medium leading-tight",
+                            isActive ? "text-primary" : "text-charcoal",
+                          ].join(" ")}
+                        >
+                          {s.title}
+                        </p>
+                        <p className="text-[10px] text-charcoal-soft mt-0.5 leading-snug italic line-clamp-1">
+                          💬 {s.customerSays}
+                        </p>
                       </button>
                     );
                   })}
@@ -194,52 +170,79 @@ export default function TradeDeskPage() {
               </div>
             ))}
           </div>
-        </section>
-      )}
 
-      {/* Step 3: 시나리오 상세 */}
-      {active && <ScenarioDetail scenario={active} />}
+          <Link
+            href="/guide/trade-finance/cases"
+            className="block mt-3 text-center text-[11px] text-charcoal-soft hover:text-primary border border-dashed border-border rounded-lg py-2"
+          >
+            📋 표·검색으로 보기 →
+          </Link>
+        </aside>
 
-      {/* 빠른 링크 */}
-      <section className="grid sm:grid-cols-2 gap-3 mt-5">
-        <Link
-          href="/guide/trade-finance/cases"
-          className="bg-white border border-border rounded-xl p-3 hover:border-primary transition group"
+        {/* ─── 우측: 상세 ─── */}
+        <main
+          className={[
+            "min-w-0",
+            // 모바일: 시나리오 선택 안 했으면 숨김
+            !active ? "hidden lg:block" : "block",
+          ].join(" ")}
         >
-          <p className="font-bold text-sm group-hover:text-primary transition">
-            📋 상황별 가이드 (표) →
-          </p>
-          <p className="text-xs text-charcoal-soft mt-0.5">
-            전체 시나리오 검색·필터·정렬
-          </p>
-        </Link>
-        <Link
-          href="/guide/trade-finance"
-          className="bg-white border border-border rounded-xl p-3 hover:border-primary transition group"
-        >
-          <p className="font-bold text-sm group-hover:text-primary transition">
-            ← 무역금융 진입판
-          </p>
-          <p className="text-xs text-charcoal-soft mt-0.5">
-            학습용 상세 가이드·도구 전체
-          </p>
-        </Link>
-      </section>
+          {active ? (
+            <ScenarioDetail
+              scenario={active}
+              onClose={() => setActiveId(null)}
+            />
+          ) : (
+            <EmptyState />
+          )}
+        </main>
+      </div>
     </div>
   );
 }
 
-function ScenarioDetail({ scenario: s }: { scenario: TradeScenario }) {
+function EmptyState() {
   return (
-    <section className="bg-white border-2 border-primary rounded-xl overflow-hidden mb-4 shadow-sm">
-      <div className="bg-primary text-white px-4 py-3">
-        <p className="text-[10px] uppercase tracking-wide opacity-80">
-          {SUB_LABEL[s.subCategory]}
-        </p>
-        <h2 className="font-bold text-lg">{s.title}</h2>
-        <p className="text-xs mt-1 opacity-90 leading-relaxed">
-          💬 &ldquo;{s.customerSays}&rdquo;
-        </p>
+    <div className="bg-white border-2 border-dashed border-border rounded-xl p-10 text-center">
+      <p className="text-4xl mb-3">👈</p>
+      <p className="font-medium text-charcoal mb-1">
+        왼쪽에서 상황을 골라주세요
+      </p>
+      <p className="text-xs text-charcoal-soft leading-relaxed">
+        손님이 어떤 일로 오셨는지 클릭하면<br />
+        가져왔어야 할 서류·점검 항목·처리 절차·응대 멘트가 나타납니다.
+      </p>
+    </div>
+  );
+}
+
+function ScenarioDetail({
+  scenario: s,
+  onClose,
+}: {
+  scenario: TradeScenario;
+  onClose: () => void;
+}) {
+  return (
+    <article className="bg-white border-2 border-primary rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-primary text-white px-4 py-3 flex items-start gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] uppercase tracking-wide opacity-80">
+            {SUB_LABEL[s.subCategory]}
+          </p>
+          <h2 className="font-bold text-lg leading-tight">{s.title}</h2>
+          <p className="text-xs mt-1 opacity-90 leading-relaxed italic">
+            💬 &ldquo;{s.customerSays}&rdquo;
+          </p>
+        </div>
+        {/* 모바일에서 닫기 */}
+        <button
+          onClick={onClose}
+          className="lg:hidden text-white/80 hover:text-white text-xl leading-none shrink-0 -mt-1"
+          aria-label="닫고 시나리오 목록으로"
+        >
+          ✕
+        </button>
       </div>
 
       <div className="p-4 space-y-4">
@@ -247,11 +250,7 @@ function ScenarioDetail({ scenario: s }: { scenario: TradeScenario }) {
           📌 <strong>요약:</strong> {s.summary}
         </p>
 
-        {/* 가져왔어야 할 것 */}
-        <DetailBlock
-          title="🎒 손님이 가져왔어야 할 것"
-          color="primary"
-        >
+        <DetailBlock title="🎒 손님이 가져왔어야 할 것" color="primary">
           <ul className="text-xs text-charcoal-soft list-disc list-inside space-y-1 leading-relaxed">
             {s.whatToBring.map((w, i) => (
               <li key={i}>{w}</li>
@@ -259,7 +258,6 @@ function ScenarioDetail({ scenario: s }: { scenario: TradeScenario }) {
           </ul>
         </DetailBlock>
 
-        {/* 점검 항목 */}
         <DetailBlock title="✅ 영업점 점검 항목" color="primary">
           <ul className="text-xs text-charcoal-soft space-y-2">
             {s.checklist.map((c, i) => (
@@ -278,7 +276,6 @@ function ScenarioDetail({ scenario: s }: { scenario: TradeScenario }) {
           </ul>
         </DetailBlock>
 
-        {/* 처리 절차 */}
         <DetailBlock title="🔧 처리 절차" color="warn">
           <ol className="text-xs text-charcoal-soft list-decimal list-inside space-y-1 leading-relaxed">
             {s.procedure.map((p, i) => (
@@ -287,7 +284,6 @@ function ScenarioDetail({ scenario: s }: { scenario: TradeScenario }) {
           </ol>
         </DetailBlock>
 
-        {/* 기한·수수료 */}
         {(s.timing || s.fees) && (
           <div className="grid sm:grid-cols-2 gap-3">
             {s.timing && (
@@ -309,7 +305,6 @@ function ScenarioDetail({ scenario: s }: { scenario: TradeScenario }) {
           </div>
         )}
 
-        {/* 주의사항 */}
         {s.cautions && s.cautions.length > 0 && (
           <DetailBlock title="⚠️ 주의사항·하자 가능성" color="danger">
             <ul className="text-xs text-charcoal-soft list-disc list-inside space-y-1 leading-relaxed">
@@ -320,7 +315,6 @@ function ScenarioDetail({ scenario: s }: { scenario: TradeScenario }) {
           </DetailBlock>
         )}
 
-        {/* 응대 멘트 */}
         <DetailBlock title="💬 영업점 응대 멘트" color="primary">
           <ul className="text-xs text-charcoal space-y-1.5 leading-relaxed">
             {s.scripts.map((line, i) => (
@@ -331,7 +325,6 @@ function ScenarioDetail({ scenario: s }: { scenario: TradeScenario }) {
           </ul>
         </DetailBlock>
 
-        {/* 관련 가이드 */}
         {s.relatedGuides && s.relatedGuides.length > 0 && (
           <DetailBlock title="📚 관련 상세 가이드" color="info" compact>
             <div className="flex flex-wrap gap-2">
@@ -351,8 +344,16 @@ function ScenarioDetail({ scenario: s }: { scenario: TradeScenario }) {
         <p className="text-[10px] text-charcoal-soft text-right">
           출처: {s.source}
         </p>
+
+        {/* 모바일 — 닫고 다른 상황 보기 */}
+        <button
+          onClick={onClose}
+          className="lg:hidden w-full text-center text-xs text-charcoal-soft hover:text-primary border border-border rounded-lg py-2"
+        >
+          ← 다른 상황 보기
+        </button>
       </div>
-    </section>
+    </article>
   );
 }
 
