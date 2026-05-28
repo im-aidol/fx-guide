@@ -45,6 +45,22 @@ const MAIN_GUIDES: GuideCard[] = [
       "무신용장 추심 — 지급인도조건(D/P) vs 인수인도조건(D/A). 은행은 중개인 역할만, 지급보증 없음.",
     ruleRef: "URC 522",
   },
+  {
+    href: "/guide/trade-finance/tt-import",
+    icon: "💰",
+    title: "T/T수입금융",
+    description:
+      "송금방식(T/T) 수입거래에 대한 은행 신용공여 상품. 사전·사후송금 모두 가능, USD·JPY·EUR.",
+    ruleRef: "외국환거래 추가약정서[T/T수입금융]",
+  },
+  {
+    href: "/guide/trade-finance/lc-amendment",
+    icon: "📝",
+    title: "신용장 조건변경",
+    description:
+      "MT707 전문 기반 조건변경. 당사자 전원 합의, 효력 발생 시기, 증액·감액·가격조건·필드별 ADD/DELETE/REPLACE ALL.",
+    ruleRef: "UCP 600 제10조",
+  },
 ];
 
 const TOOLS: GuideCard[] = [
@@ -75,6 +91,13 @@ const TOOLS: GuideCard[] = [
     title: "신용장 하자 점검 도구",
     description:
       "신용장 문구 붙여넣기 → 독소조항·불명확 용어·서류 요건 자동 점검 (UCP 600·ISBP 745 룰셋).",
+  },
+  {
+    href: "/guide/trade-finance/document-guide",
+    icon: "📑",
+    title: "서류별 ISBP 작성 가이드",
+    description:
+      "환어음·상업송장·B/L·AWB·보험증권·원산지증명서 6종 서류별 필드 가이드. 매입 시 점검 포인트.",
   },
 ];
 

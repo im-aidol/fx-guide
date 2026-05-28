@@ -1233,3 +1233,487 @@ export const EXPORT_DEFAULT_HANDLING = {
     "수출신용보증 또는 단기수출보험 부보된 경우: 보험대금 수령일까지",
   ],
 };
+
+// ─── T/T 수입금융 (송금방식 수입거래 신용공여 상품) ───
+// 출처: 「T/T수입금융」 상품설명서 (준법감시인 심의필 제 25-1587호, 2025.07.01~2027.06.30)
+export const TT_IMPORT_FINANCE = {
+  productName: "T/T수입금융",
+  description:
+    "수입기업이 수출기업과 송금방식(T/T) 수입계약을 체결하고, 해당 계약에 기반하여 은행에 신용공여를 신청. 수입기업은 약정만기일에 원금 및 이자 등을 상환하는 방식.",
+  contractRef:
+    "외국환거래 추가약정서[T/T수입금융 거래용] 적용. 외환규정·전자금융거래법·금융실명법·외환거래기본약관·은행여신거래기본약관(기업용)·외국환 거래약정서 및 여신거래약정서(기업용) 등.",
+  eligibility: {
+    customers: "법인 및 개인사업자",
+    currencies: ["USD", "JPY", "EUR"],
+    targets: [
+      "사전송금방식: 신청일로부터 2개월 이내 선적이 예정된 수입거래",
+      "사후송금방식: 선적일로부터 3개월 이내 물품대금 지급예정인 수입거래",
+    ],
+  },
+  schedule: {
+    sendDate: "신청일 다음 영업일로부터 3~7영업일 이내 (송금희망일 최소 3영업일 전 신청)",
+    creditPeriod: "송금희망일로부터 1년 범위 내 신청 가능",
+    extension: "원칙적으로 신청일 이후 연장은 불가. 조기상환은 1회에 한하여 가능.",
+  },
+  fees: [
+    { name: "신청수수료", amount: "20,000원", when: "신청 시" },
+    {
+      name: "인수수수료",
+      amount: "최저 20,000원",
+      when: "인수 시",
+      formula:
+        "인수금액 × 인수수수료율(연) × 인수기간 / 360 × 매매기준율 (USD·EUR) / 365 (JPY). 인수수수료율: 최저 1.5% ~ 최고 2.3% (신용등급별 상이)",
+    },
+    { name: "조건변경수수료", amount: "30,000원", when: "조건변경 시" },
+    { name: "전신료", amount: "발신 1건당 8,000원", when: "신청·조건변경 등" },
+    {
+      name: "A/D Charge (인수이자)",
+      amount: "해외인수은행의 정책에 따름",
+      when: "인수 시",
+    },
+    {
+      name: "송금수수료",
+      amount: "해외인수은행별 상이",
+      when: "송금 시",
+      formula:
+        "송금인 USD 30 내외 / 수취인 USD 20 내외 (수취인 부담 수수료는 송금액에서 차감). OUR 선택 시 만기일에 송금인이 수취인 부담 수수료 포함하여 결제.",
+    },
+  ],
+  default: {
+    title: "대지급 및 대지급금 이자",
+    rules: [
+      "만기상환액을 만기일까지 상환하지 않은 경우, 은행이 만기일 다음 영업일에 대지급 실행 (대지급금 = 만기상환액 × 대지급 실행 당시 전신환매도율)",
+      "대지급금 이자 = 대지급금 × 외화연체금리 × 대지급 기간 / 365",
+      "외화연체금리(연) = 인수수수료율 + 3%p와 15% 중 낮은 금리 적용",
+      "대지급 기간 = 대지급금 발생일로부터 상환일 전일까지의 일수",
+      "대지급 당일 상환하는 경우, 1일치에 대한 대지급금 이자 납부",
+    ],
+  },
+  cautions: [
+    "인수하는 해외인수은행에 따라 이용가능기간·인수이자·송금수수료가 달리 적용",
+    "해외인수은행 소재 국가의 영업일 규정에 따라 송금일·만기일이 다음 영업일 또는 이전 영업일로 조정될 수 있음",
+    "만기일에 해외인수은행이 청구한 A/D Charge 및 송금수수료 등과 함께 원금(만기상환액) 상환",
+    "거래 신청 취소는 해외은행 앞 인수 신청 전문의 발송 이전까지만 가능. 해외은행 심사 과정에서 인수거절될 수 있음",
+    "개별 신청건의 증빙서류와 관련된 송금지급이 이미 지급된 건의 중복지급인 경우 이용 불가",
+    "운송서류상 선적항·선적일자·선박 정박기록 등과 상이한 정보가 존재할 경우 이용 불가",
+    "사전송금방식의 경우, 송금 후 2개월 이내 선적 사실 확인이 가능한 운송서류를 은행에 제출해야 함",
+    "거래상대방·수취은행·수취국가 등 관련인이 국제 제재(UN·미국·EU·영국 등) 대상에 해당하는 경우 이용 불가",
+    "은행은 만기상환액에 대한 지급보증 책임만 부담. 수출기업의 신용상태·무역거래 자체 등에 대한 책임 없음",
+    "본 거래에서 인정되는 운송서류: 해상운송서류(선하증권, 해상운송장) / 항공운송서류(항공운송장) / 복합운송서류 / 특송배달영수증",
+  ],
+  source:
+    "「T/T수입금융」 상품설명서 (준법감시인 심의필 제 25-1587호, 2025.07.01~2027.06.30)",
+};
+
+// ─── 신용장 조건변경 (Amendment, MT707) ───
+export const LC_AMENDMENT = {
+  definition:
+    "이미 개설된 신용장의 조건 중 일부를 관계 당사자간의 합의에 따라 수정하는 것.",
+  swiftMessage: "MT707 (Amendment of Documentary Credit) — MT747은 상환수권 관련 (상환은행으로 발송)",
+  parties: {
+    required: [
+      "개설은행 (Issuing Bank)",
+      "확인은행 (Confirming Bank) — 확인은행이 있는 경우",
+      "수익자 (Beneficiary)",
+    ],
+    notParty: [
+      "개설의뢰인(Applicant) = 수입상은 신용장 거래의 당사자 아님",
+      "통지은행과 BENEFICIARY는 조건변경을 통해 수정 불가",
+    ],
+  },
+  effectiveTiming: [
+    {
+      situation: "개설은행이 조건변경 통지 시",
+      effective: false,
+      note: "통지만으로는 효력 없음",
+    },
+    {
+      situation: "수익자의 조건변경 수락 통지가 도착한 경우",
+      effective: true,
+      note: "정상 수락 → 효력 발생",
+    },
+    {
+      situation:
+        "수락의 통지 없이 신용장의 변경된 조건에 일치하는 서류를 제시한 경우",
+      effective: true,
+      note: "묵시적 수락으로 간주 (UCP 600)",
+    },
+  ],
+  partialAcceptance:
+    "조건변경 통지에 대한 부분적인 수락은 허용되지 않으며 어떠한 효력도 가지지 못함 (UCP 600 제10조 f항).",
+  fields: [
+    {
+      group: "원 신용장 정보",
+      items: [
+        { name: "CREDIT NUMBER", desc: "신용장번호" },
+        { name: "DATE OF ISSUE", desc: "발행일" },
+        {
+          name: "ADVISING BANK / SWIFT CODE",
+          desc: "원신용장 통지은행 정보",
+        },
+      ],
+    },
+    {
+      group: "신용장 취소 요청",
+      items: [
+        {
+          name: "취소",
+          desc: "수출상의 동의여부 전문 수신 후 전체 취소 가능. 기교부한 신용장 원본 회수 + 개설은행에 동사실 통보.",
+        },
+      ],
+    },
+    {
+      group: "INCREASE / DECREASE OF L/C AMOUNT (증액·감액)",
+      items: [
+        {
+          name: "감액",
+          desc:
+            "수출상의 동의 여부 필요. ALIOS-대외전문송신의뢰서(수입) 작성하여 통지은행으로 전문발신 → 거래 당사자의 동의전문 수신 후 조건변경(감액) 거래 가능.",
+        },
+        {
+          name: "증액",
+          desc:
+            "① 한도잔액 확인 후 부족 시 보증금 추가 적립. ② 수입상 부보조건인 경우: 증액부분에 대한 추가 보험가입, 보험증권 원본 징구 (스텝 스캔 및 물류배송).",
+        },
+      ],
+    },
+    {
+      group: "기일·장소·기타 변경",
+      items: [
+        { name: "NEW DATE OF EXPIRY", desc: "변경 후 신용장 유효기일" },
+        { name: "NEW LATEST DATE OF SHIPMENT", desc: "변경 후 선적기일" },
+        {
+          name: "CHANGED APPLICANT / BENEFICIARY DETAILS",
+          desc:
+            "수입·수출상 정보. ⚠️ 수출상 정보 변경 시 외환사업부 사후관리 담당자 통화 요망.",
+        },
+        { name: "TRANSFER", desc: "양도 허용 여부" },
+        { name: "MORE / LESS", desc: "과부족 조건" },
+        {
+          name: "가격조건",
+          desc:
+            "운임·보험서류·가격조건 장소 변경 확인. 예: FOB → CIF 변경 시 FREIGHT: COLLECT → PREPAID, 보험서류: 불요 → 요구, FOB+출발지 → CIF+도착지.",
+        },
+        { name: "PARTIAL SHIPMENT", desc: "분할선적" },
+        { name: "TRANSHIPMENT", desc: "환적" },
+        {
+          name: "NEW PLACE ~ OF DELIVERY",
+          desc: "가격조건 출발/도착지 변경 확인 요망",
+        },
+        { name: "PERIOD FOR PRESENTATION", desc: "서류제시기간" },
+        {
+          name: "국외 수수료 부담자",
+          desc: "수출상(BENEFICIARY) / 수입상(APPLICANT)",
+        },
+        { name: "CONFIRMATION", desc: "신용장 확인" },
+      ],
+    },
+    {
+      group: "DESCRIPTION OF GOODS · DOCUMENT REQUIRED · ADDITIONAL CONDITIONS",
+      items: [
+        { name: "ADD", desc: "원신용장에 추가할 내용 기재" },
+        { name: "DELETE", desc: "원신용장에 삭제할 내용 기재" },
+        {
+          name: "REPLACE ALL",
+          desc: "원신용장 해당 필드 전체를 입력 내용으로 대체",
+        },
+      ],
+    },
+  ],
+};
+
+// ─── 서류별 ISBP 작성 가이드 ───
+// 출처: 수출입 업무의 이해 연수교재 (HR부, 2025.06) Section 3 + ISBP 745 본문 인용.
+export type DocumentPrepGuide = {
+  korName: string;
+  engName: string;
+  ucpRef?: string;
+  isbpRef?: string;
+  fields: {
+    no: number;
+    name: string;
+    description: string;
+    caution?: string;
+  }[];
+};
+
+export const DOCUMENT_PREP_GUIDES: DocumentPrepGuide[] = [
+  {
+    korName: "환어음",
+    engName: "Draft / Bill of Exchange",
+    ucpRef: "UCP 600 제6조 b항",
+    isbpRef: "ISBP 745 B (Drafts and Calculation of Maturity Date)",
+    fields: [
+      {
+        no: 1,
+        name: "통화 및 숫자 금액",
+        description: "예: USD 100,000",
+        caution: "신용장 통화·금액과 일치",
+      },
+      {
+        no: 2,
+        name: "어음 발행지",
+        description: "예: DAEGU",
+      },
+      {
+        no: 3,
+        name: "어음 발행일",
+        description: "예: 19. Dec-2023",
+      },
+      {
+        no: 4,
+        name: "TENOR (만기)",
+        description:
+          "AT SIGHT (일람불) / XX DAYS AFTER SIGHT (일람 후 기한부) / XX DAYS AFTER B/L DATE (선적일자 후)",
+        caution: "신용장 42C 필드와 정확히 일치",
+      },
+      {
+        no: 5,
+        name: "수취인 (Payee)",
+        description: "매입은행 명칭",
+      },
+      {
+        no: 6,
+        name: "통화 및 문자 금액",
+        description: "예: US DOLLARS ONE HUNDRED THOUSAND ONLY",
+        caution: "숫자 금액과 일치 — 차이 시 문자 금액 우선",
+      },
+      {
+        no: 7,
+        name: "개설의뢰인의 명칭 및 주소",
+        description: "신용장 50 필드와 일치",
+      },
+      {
+        no: 8,
+        name: "개설은행의 명칭 및 주소",
+        description: "신용장 헤더와 일치",
+      },
+      {
+        no: 9,
+        name: "신용장 번호 / 신용장 개설일",
+        description: "신용장 20·31C 필드 인용",
+      },
+      {
+        no: 10,
+        name: "지급인 (Drawee)",
+        description:
+          "신용장상 'drawee' 또는 'drawn on' 다음에 기재된 은행의 명칭과 주소. D/P·D/A 방식의 경우에는 수입상의 명칭과 주소.",
+        caution: "신용장 42a 필드와 일치",
+      },
+      {
+        no: 11,
+        name: "발행인 서명",
+        description: "수익자 서명 (수기 또는 회사 명판)",
+      },
+    ],
+  },
+  {
+    korName: "상업송장",
+    engName: "Commercial Invoice",
+    ucpRef: "UCP 600 제18조",
+    isbpRef: "ISBP 745 C (Invoices)",
+    fields: [
+      {
+        no: 1,
+        name: "송장의 종류",
+        description:
+          "추가설명 없이 송장 제시 요구 시 — 상업(Commercial) / 세관(Customs) / 세금(Tax) / 최종(Final) 송장 등의 제시로 충족.",
+        caution:
+          "임시(PROVISIONAL) · 견적서(PROFORMA) 송장 또는 유사한 것은 불가",
+      },
+      {
+        no: 2,
+        name: "발행인 → 수신인",
+        description:
+          "수익자가 개설의뢰인(APPLICANT) 앞으로 발행. 양도신용장인 경우 제2수익자가 제1수익자 앞으로 발행해도 허용.",
+        caution: "ISBP 745 C2 — 수익자명·APPLICANT명 정확히 일치",
+      },
+      {
+        no: 3,
+        name: "물품명세 (엄격일치 원칙)",
+        description:
+          "실제 선적된 대로, 신용장 물품명세 정보를 정확하게 기재. 물품명 + 신용장통화·금액 + 단가·할인·공제 + 가격조건(INCOTERMS).",
+        caution:
+          "엄격일치 원칙 적용 — 단순 오타·재배열도 하자 가능 (UCP 600 제18조 c항, ISBP 745 C3)",
+      },
+      {
+        no: 4,
+        name: "SIGNED vs MANUALLY SIGNED",
+        description:
+          "SIGNED 요구 시: 수기 서명 또는 업체의 영문명판 날인으로 충족. MANUALLY SIGNED 요구 시: 수기 서명만 허용.",
+      },
+    ],
+  },
+  {
+    korName: "선하증권",
+    engName: "Bill of Lading (B/L)",
+    ucpRef: "UCP 600 제20조",
+    isbpRef: "ISBP 745 E (Bill of Lading)",
+    fields: [
+      {
+        no: 1,
+        name: "수하인 (CONSIGNEE)",
+        description:
+          "신용장조건과 반드시 일치. 단순 지시식 'TO ORDER (SHIPPER)' = 배서 필요. 기명식 'TO ABC COMPANY' = 배서 불요.",
+        caution: "iM뱅크 지시식 'TO THE ORDER OF iM BANK' = 당행 배서/양도 필요",
+      },
+      {
+        no: 2,
+        name: "통지처 (NOTIFY PARTY)",
+        description:
+          "신용장 명시 통지처와 반드시 일치. 주소·연락처 기재요건 없는 경우 명칭만 기재 가능. 주소·연락처 표시되었다면 신용장과 저촉되지 않아야 함.",
+      },
+      {
+        no: 3,
+        name: "운송 구간",
+        description:
+          "PRE-CARRIAGE: 사전운송수단 / PORT OF RECEIPT: 물품수령지 / PORT OF LOADING: 선적항 / PORT OF DISCHARGE: 하역항 / PORT OF DELIVERY: 물품인도장소 / FINAL DESTINATION: 최종목적지.",
+        caution:
+          "사전운송수단·물품수령지·최종목적지 등이 함께 기재되어 서로 다른 운송수단으로 운송될 경우 → 복합운송서류 제시 필요",
+      },
+      {
+        no: 4,
+        name: "본선적재부기 (ON BOARD NOTATION)",
+        description:
+          "실제선적일자를 기재 (= LADEN ON BOARD). Received B/L의 경우 필수.",
+        caution: "선적일자 = 신용장 선적기일 충족 근거",
+      },
+      {
+        no: 5,
+        name: "원본 발행 부수",
+        description:
+          "원본 발행 부수가 반드시 기재. 신용장상 FULL SET 요구 시 기재된 원본 전통이 제시되어야 함.",
+      },
+      {
+        no: 6,
+        name: "운송인명 표시 및 서명권자",
+        description:
+          "○ 운송인 명칭 표시: (1) 운송인 또는 기명대리인 'CARRIER // AS AGENT FOR THE CARRIER' / (2) 선장 또는 기명대리인 'MASTER OR CAPTAIN // AS AGENT FOR THE MASTER OR CAPTAIN'. ○ 서명권자: 운송인·선장·대리인의 서명으로 특정. 대리인 서명은 운송인을 위하여 또는 대리하여 또는 선장을 위하여 또는 대리하여 서명한 것인지 표시해야 함.",
+      },
+    ],
+  },
+  {
+    korName: "항공운송장",
+    engName: "Air Waybill (AWB)",
+    ucpRef: "UCP 600 제23조",
+    isbpRef: "ISBP 745 H (Air Transport Document)",
+    fields: [
+      {
+        no: 1,
+        name: "AIR WAY BILL NO.",
+        description: "예: KOREA-12345 — 운송장 고유번호",
+      },
+      {
+        no: 2,
+        name: "CONSIGNEE",
+        description: "항공운송서류의 수하인은 기명식으로 발행.",
+        caution: "iM뱅크 'CONSIGNED TO iM BANK' 등 명시 권장",
+      },
+      {
+        no: 3,
+        name: "NOTIFY",
+        description:
+          "통상 NOTIFY PARTY란이 없으므로 NOTIFY(통지처)를 기재 후 신용장상 명시된 통지업체 기재.",
+      },
+      {
+        no: 4,
+        name: "출발/도착 공항",
+        description:
+          "신용장 기재된 출발공항·도착공항 기재. 공항코드 IATA 사용 가능 (예: INCHEON // ICN).",
+      },
+      {
+        no: 5,
+        name: "발행일 (선적일)",
+        description:
+          "발행일이 원칙적으로 선적일로 간주. 단, 실제선적일을 나타내는 명확한 부기가 있다면 그 부기의 일자를 선적일로 봄.",
+        caution: "신용장 선적기일과 비교 시 부기일자 우선 확인",
+      },
+      {
+        no: 6,
+        name: "운송인 명칭·서명권자",
+        description: "선하증권과 동일 — 운송인 또는 기명대리인.",
+      },
+    ],
+  },
+  {
+    korName: "보험증권",
+    engName: "Insurance Policy",
+    ucpRef: "UCP 600 제28조",
+    isbpRef: "ISBP 745 K (Insurance Document)",
+    fields: [
+      {
+        no: 1,
+        name: "ASSURED (피보험자)",
+        description:
+          "신용장에 명시된 대로 기재 + 피보험자에 의해 배서. (1) 특정인 지시식 'TO ORDER OF ABC COMPANY' 로 발행 요구 시 — 특정인을 피보험자로 지정한 보험서류 'ASSURED: ABC COMPANY' 도 허용. (2) 피보험자 미지정 'TO ORDER, IN FAVOUR OF' 경우 — 당사자 백지배서(수출상 배서), 개설은행 또는 개설의뢰인이 보험금을 지급 받을 수 있도록 배서된 서류 허용.",
+      },
+      {
+        no: 2,
+        name: "보험 금액",
+        description:
+          "상업송장 금액의 최저 110% 이상으로 신용장과 동일한 통화로 발행.",
+        caution: "ISBP 745 K10 — 110% 미달 시 하자",
+      },
+      {
+        no: 3,
+        name: "보험 조건",
+        description:
+          "신용장에서 요구하는 조건대로 보험가입. 신용장 조건을 그대로 명시하여도 허용. 예: ICC(A) / ICC(B) / ICC(C).",
+      },
+      {
+        no: 4,
+        name: "AGENT 정보",
+        description: "보험금 청구 가능한 AGENT명 및 상세주소",
+      },
+      {
+        no: 5,
+        name: "보험가입일 / 보험증권발행일",
+        description:
+          "선적일과 같거나 그 이전. 선적일 이후 가입된 경우, 선적일부터의 보험소급적용이 가능하다는 문구 기재 시 신용장 조건 충족 가능.",
+        caution: "ISBP 745 K11 — 소급 문구 없으면 하자",
+      },
+      {
+        no: 6,
+        name: "원본 부수",
+        description:
+          "원본 부수는 기재되지 않아도 되나, 기재되어 있는 경우에는 전통이 제시되어야 함.",
+      },
+    ],
+  },
+  {
+    korName: "원산지증명서",
+    engName: "Certificate of Origin (C/O)",
+    ucpRef: "UCP 600 제3조",
+    isbpRef: "ISBP 745 L (Certificate of Origin)",
+    fields: [
+      {
+        no: 1,
+        name: "발행인",
+        description:
+          "① 신용장 명시 자. 명시하지 않은 경우 수익자를 포함하여 누구든지 발행 가능. ② 수익자·수출자·제조업자 발행 요구 시 — 본인 또는 상업회의소 등 유사한 성격을 가진 단체. ③ 상업회의소의 발행 요구 시 — 상업회의소 또는 유사한 성격을 가진 단체.",
+      },
+      {
+        no: 2,
+        name: "형식",
+        description:
+          "신용장상 특정 형식의 원산지증명서를 요구하는 경우 오직 그 형식의 증명서만 수리 가능.",
+        caution: "예: GSP Form A, FTA 협정별 양식 등",
+      },
+      {
+        no: 3,
+        name: "원산지 표시",
+        description: "원산지가 확인되어야 함.",
+      },
+      {
+        no: 4,
+        name: "물품 일치",
+        description: "송장에 기재된 물품과 관련된 물품이 나타나야 함.",
+      },
+      {
+        no: 5,
+        name: "서명",
+        description: "서명되어야 함.",
+      },
+    ],
+  },
+];
