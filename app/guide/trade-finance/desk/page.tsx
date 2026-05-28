@@ -3,16 +3,18 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { AdminNote } from "@/components/admin/AdminNote";
-import {
-  TRADE_SCENARIOS,
-  type TradeScenario,
-  type TradeScenarioCategory,
-  type TradeScenarioSubCategory,
+import { useMode } from "@/components/Mode";
+import { useEditableScenarios } from "@/lib/hooks/useEditableScenarios";
+import { ScenarioEditor } from "@/components/trade/ScenarioEditor";
+import type {
+  TradeScenario,
+  TradeScenarioCategory,
+  TradeScenarioSubCategory,
 } from "@/lib/data/trade-scenarios";
 
 // 무역금융 영업점 응대 도우미.
-// 좌측 sticky 시나리오 리스트 + 우측 상세 — 스크롤 따로, 시나리오 전환 시 우측만 바뀜.
-// 모바일: 시나리오 선택 시 상세 풀화면 모드.
+// 좌측 sticky 시나리오 리스트 + 우측 상세 — 스크롤 따로.
+// 본점 모드: 시나리오 추가·수정·삭제·초기화 가능.
 
 const CATEGORY_LABEL: Record<
   TradeScenarioCategory,
@@ -35,12 +37,21 @@ const SUB_LABEL: Record<TradeScenarioSubCategory, string> = {
 };
 
 export default function TradeDeskPage() {
+  const { mode } = useMode();
+  const canEdit = mode === "hq";
+
+  const { items: scenarios, add, update, remove, reset } =
+    useEditableScenarios();
+
   const [category, setCategory] = useState<TradeScenarioCategory>("import");
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null); // null = 새로 추가
+
   const scenariosForCategory = useMemo(
-    () => TRADE_SCENARIOS.filter((s) => s.category === category),
-    [category],
+    () => scenarios.filter((s) => s.category === category),
+    [scenarios, category],
   );
 
   const grouped = useMemo(() => {
@@ -52,7 +63,52 @@ export default function TradeDeskPage() {
     return Array.from(map.entries());
   }, [scenariosForCategory]);
 
-  const active = TRADE_SCENARIOS.find((s) => s.id === activeId);
+  const active = scenarios.find((s) => s.id === activeId);
+  const editing = editingId ? scenarios.find((s) => s.id === editingId) : null;
+
+  const openAddEditor = () => {
+    setEditingId(null);
+    setEditorOpen(true);
+  };
+
+  const openEditEditor = (id: string) => {
+    setEditingId(id);
+    setEditorOpen(true);
+  };
+
+  const handleSave = (s: TradeScenario) => {
+    if (editingId) {
+      update(editingId, s);
+    } else {
+      // 중복 ID 방지
+      const exists = scenarios.some((it) => it.id === s.id);
+      const finalId = exists ? `${s.id}-${Date.now()}` : s.id;
+      add({ ...s, id: finalId });
+      setActiveId(finalId);
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    if (
+      !confirm(
+        "이 시나리오를 삭제할까요? 영업점에는 즉시 안 보이게 됩니다. (브라우저 단위 — 초기화 시 복구)",
+      )
+    )
+      return;
+    remove(id);
+    if (activeId === id) setActiveId(null);
+  };
+
+  const handleReset = () => {
+    if (
+      !confirm(
+        "모든 시나리오를 기본값(코드 상수)으로 되돌릴까요? 본점 편집 내용 전체 삭제됩니다.",
+      )
+    )
+      return;
+    reset();
+    setActiveId(null);
+  };
 
   return (
     <div className="max-w-[clamp(1024px,94vw,1680px)] mx-auto px-6 py-6">
@@ -68,15 +124,38 @@ export default function TradeDeskPage() {
         <span className="text-charcoal">영업점 도우미</span>
       </nav>
 
-      <header className="mb-4">
-        <p className="text-xs text-primary font-medium tracking-wide mb-1">
-          🎯 무역금융 · 영업점 응대
-        </p>
-        <h1 className="text-2xl font-bold mb-1">무역금융 영업점 도우미</h1>
-        <p className="text-xs text-charcoal-soft leading-relaxed">
-          왼쪽에서 상황을 고르면 오른쪽에 응대 내용이 나타납니다. 시나리오 전환은 왼쪽 패널에서 바로
-          가능 — 스크롤 따로 동작.
-        </p>
+      <header className="mb-4 flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <p className="text-xs text-primary font-medium tracking-wide mb-1">
+            🎯 무역금융 · 영업점 응대
+          </p>
+          <h1 className="text-2xl font-bold mb-1">무역금융 영업점 도우미</h1>
+          <p className="text-xs text-charcoal-soft leading-relaxed">
+            왼쪽에서 상황을 고르면 오른쪽에 응대 내용이 나타납니다. 시나리오 전환은 왼쪽 패널에서 바로
+            가능 — 스크롤 따로 동작.
+          </p>
+        </div>
+
+        {/* 본점: 추가·초기화 */}
+        {canEdit && (
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] uppercase tracking-wide bg-primary/15 text-primary px-1.5 py-0.5 rounded font-medium">
+              본점 편집
+            </span>
+            <button
+              onClick={openAddEditor}
+              className="bg-primary hover:bg-primary-dark text-white text-xs font-medium px-3 py-1.5 rounded transition"
+            >
+              ➕ 새 시나리오
+            </button>
+            <button
+              onClick={handleReset}
+              className="text-xs text-charcoal-soft hover:text-danger border border-border rounded px-2 py-1.5"
+            >
+              ↺ 기본값 복원
+            </button>
+          </div>
+        )}
       </header>
 
       <AdminNote storageKey="fx-guide:note:guide-trade-desk" />
@@ -86,7 +165,6 @@ export default function TradeDeskPage() {
         <aside
           className={[
             "lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto",
-            // 모바일: 시나리오 선택되면 숨김 (상세만 보이도록)
             active ? "hidden lg:block" : "block",
           ].join(" ")}
         >
@@ -96,9 +174,7 @@ export default function TradeDeskPage() {
               (c) => {
                 const info = CATEGORY_LABEL[c];
                 const isActive = category === c;
-                const count = TRADE_SCENARIOS.filter(
-                  (s) => s.category === c,
-                ).length;
+                const count = scenarios.filter((s) => s.category === c).length;
                 return (
                   <button
                     key={c}
@@ -126,7 +202,6 @@ export default function TradeDeskPage() {
             )}
           </div>
 
-          {/* 시나리오 리스트 */}
           <div className="space-y-2">
             {grouped.map(([sub, items]) => (
               <div
@@ -183,20 +258,32 @@ export default function TradeDeskPage() {
         <main
           className={[
             "min-w-0",
-            // 모바일: 시나리오 선택 안 했으면 숨김
             !active ? "hidden lg:block" : "block",
           ].join(" ")}
         >
           {active ? (
             <ScenarioDetail
               scenario={active}
+              canEdit={canEdit}
               onClose={() => setActiveId(null)}
+              onEdit={() => openEditEditor(active.id)}
+              onDelete={() => handleDelete(active.id)}
             />
           ) : (
             <EmptyState />
           )}
         </main>
       </div>
+
+      {/* 본점 에디터 */}
+      {canEdit && (
+        <ScenarioEditor
+          scenario={editing ?? null}
+          isOpen={editorOpen}
+          onClose={() => setEditorOpen(false)}
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 }
@@ -218,10 +305,16 @@ function EmptyState() {
 
 function ScenarioDetail({
   scenario: s,
+  canEdit,
   onClose,
+  onEdit,
+  onDelete,
 }: {
   scenario: TradeScenario;
+  canEdit: boolean;
   onClose: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }) {
   return (
     <article className="bg-white border-2 border-primary rounded-xl overflow-hidden shadow-sm">
@@ -235,14 +328,33 @@ function ScenarioDetail({
             💬 &ldquo;{s.customerSays}&rdquo;
           </p>
         </div>
-        {/* 모바일에서 닫기 */}
-        <button
-          onClick={onClose}
-          className="lg:hidden text-white/80 hover:text-white text-xl leading-none shrink-0 -mt-1"
-          aria-label="닫고 시나리오 목록으로"
-        >
-          ✕
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          {canEdit && (
+            <>
+              <button
+                onClick={onEdit}
+                className="bg-white/15 hover:bg-white/25 text-white text-[11px] font-medium px-2 py-1 rounded transition whitespace-nowrap"
+                title="이 시나리오 수정 (본점)"
+              >
+                ✏️ 수정
+              </button>
+              <button
+                onClick={onDelete}
+                className="bg-white/15 hover:bg-danger text-white text-[11px] font-medium px-2 py-1 rounded transition whitespace-nowrap"
+                title="이 시나리오 삭제 (본점)"
+              >
+                🗑️
+              </button>
+            </>
+          )}
+          <button
+            onClick={onClose}
+            className="lg:hidden text-white/80 hover:text-white text-xl leading-none ml-1"
+            aria-label="닫고 시나리오 목록으로"
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       <div className="p-4 space-y-4">
@@ -345,7 +457,6 @@ function ScenarioDetail({
           출처: {s.source}
         </p>
 
-        {/* 모바일 — 닫고 다른 상황 보기 */}
         <button
           onClick={onClose}
           className="lg:hidden w-full text-center text-xs text-charcoal-soft hover:text-primary border border-border rounded-lg py-2"

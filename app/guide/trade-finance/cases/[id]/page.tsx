@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { use } from "react";
-import { notFound } from "next/navigation";
+import { use, useState } from "react";
+import { notFound, useRouter } from "next/navigation";
 import { AdminNote } from "@/components/admin/AdminNote";
-import {
-  TRADE_SCENARIOS,
-  type TradeScenarioSubCategory,
+import { useMode } from "@/components/Mode";
+import { useEditableScenarios } from "@/lib/hooks/useEditableScenarios";
+import { ScenarioEditor } from "@/components/trade/ScenarioEditor";
+import type {
+  TradeScenario,
+  TradeScenarioSubCategory,
 } from "@/lib/data/trade-scenarios";
 
 const SUB_LABEL: Record<TradeScenarioSubCategory, string> = {
@@ -27,11 +30,44 @@ export default function TradeCaseDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const s = TRADE_SCENARIOS.find((it) => it.id === id);
+  const router = useRouter();
+  const { mode } = useMode();
+  const canEdit = mode === "hq";
+
+  const { items: scenarios, update, remove, hydrated } =
+    useEditableScenarios();
+
+  const [editorOpen, setEditorOpen] = useState(false);
+
+  const s = scenarios.find((it) => it.id === id);
+
+  // hydration 전에는 코드 상수 fallback 사용 — 못 찾으면 잠시 대기.
+  if (!hydrated && !s) {
+    return (
+      <div className="max-w-[clamp(840px,92vw,1280px)] mx-auto px-6 py-12 text-center text-sm text-charcoal-soft">
+        로딩 중...
+      </div>
+    );
+  }
 
   if (!s) {
     notFound();
   }
+
+  const handleSave = (next: TradeScenario) => {
+    update(id, next);
+  };
+
+  const handleDelete = () => {
+    if (
+      !confirm(
+        "이 시나리오를 삭제할까요? 영업점에서 즉시 안 보이게 됩니다. (브라우저 단위 — 도우미 페이지에서 ↺ 기본값 복원으로 복구 가능)",
+      )
+    )
+      return;
+    remove(id);
+    router.push("/guide/trade-finance/cases");
+  };
 
   return (
     <div className="max-w-[clamp(840px,92vw,1280px)] mx-auto px-6 py-8">
@@ -52,27 +88,58 @@ export default function TradeCaseDetailPage({
       </nav>
 
       {/* 헤더 */}
-      <header className="mb-5">
-        <div className="flex items-center gap-2 mb-1">
-          <span
-            className={[
-              "text-[10px] px-1.5 py-0.5 rounded-full border whitespace-nowrap font-medium",
-              s.category === "import"
-                ? "bg-primary/10 text-primary border-primary/30"
-                : "bg-warn/10 text-warn border-warn/30",
-            ].join(" ")}
-          >
-            {s.category === "import" ? "📥 수입" : "📤 수출"}
-          </span>
-          <span className="text-[10px] text-charcoal-soft">
-            {SUB_LABEL[s.subCategory]}
-          </span>
+      <header className="mb-5 flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span
+              className={[
+                "text-[10px] px-1.5 py-0.5 rounded-full border whitespace-nowrap font-medium",
+                s.category === "import"
+                  ? "bg-primary/10 text-primary border-primary/30"
+                  : "bg-warn/10 text-warn border-warn/30",
+              ].join(" ")}
+            >
+              {s.category === "import" ? "📥 수입" : "📤 수출"}
+            </span>
+            <span className="text-[10px] text-charcoal-soft">
+              {SUB_LABEL[s.subCategory]}
+            </span>
+          </div>
+          <h1 className="text-2xl font-bold mb-2">{s.title}</h1>
+          <p className="text-sm text-charcoal-soft leading-relaxed italic">
+            💬 &ldquo;{s.customerSays}&rdquo;
+          </p>
         </div>
-        <h1 className="text-2xl font-bold mb-2">{s.title}</h1>
-        <p className="text-sm text-charcoal-soft leading-relaxed italic">
-          💬 &ldquo;{s.customerSays}&rdquo;
-        </p>
+
+        {canEdit && (
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] uppercase tracking-wide bg-primary/15 text-primary px-1.5 py-0.5 rounded font-medium">
+              본점 편집
+            </span>
+            <button
+              onClick={() => setEditorOpen(true)}
+              className="bg-primary hover:bg-primary-dark text-white text-xs font-medium px-3 py-1.5 rounded transition"
+            >
+              ✏️ 수정
+            </button>
+            <button
+              onClick={handleDelete}
+              className="text-xs text-danger hover:bg-danger hover:text-white border border-danger/40 rounded px-2 py-1.5 transition"
+            >
+              🗑️ 삭제
+            </button>
+          </div>
+        )}
       </header>
+
+      {canEdit && (
+        <ScenarioEditor
+          scenario={s}
+          isOpen={editorOpen}
+          onClose={() => setEditorOpen(false)}
+          onSave={handleSave}
+        />
+      )}
 
       <AdminNote storageKey={`fx-guide:note:guide-trade-case-${s.id}`} />
 
