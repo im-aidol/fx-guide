@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { TopNav } from "@/components/TopNav";
 import { ModeProvider } from "@/components/Mode";
+import { RouteTracker } from "@/components/RouteTracker";
 
 export const metadata: Metadata = {
   title: "외환 길잡이 | iM뱅크 영업점 가이드",
@@ -24,6 +25,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full bg-offwhite text-charcoal">
         <ModeProvider>
+          <RouteTracker />
           <div className="min-h-screen flex flex-col">
             <TopNav />
             <main className="flex-1 min-w-0">{children}</main>
