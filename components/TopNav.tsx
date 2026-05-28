@@ -95,6 +95,8 @@ const NAV: NavItem[] = [
     icon: "🏭",
     href: "/guide/trade-finance",
     children: [
+      { href: "/guide/trade-finance/desk", label: "🎯 영업점 도우미" },
+      { href: "/guide/trade-finance/cases", label: "📋 상황별 가이드" },
       { href: "/guide/trade-finance/overview", label: "🌐 수출입 업무 개요" },
       { href: "/guide/trade-finance/import-lc", label: "📥 수입 신용장" },
       { href: "/guide/trade-finance/export-lc", label: "📤 수출 신용장" },

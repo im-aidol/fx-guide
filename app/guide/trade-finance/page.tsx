@@ -145,6 +145,37 @@ export default function TradeFinanceGuidePage() {
 
       <AdminNote storageKey="fx-guide:note:guide-trade-finance" />
 
+      {/* 영업점 응대용 — 가장 위에 배치 */}
+      <section className="mb-5">
+        <h2 className="text-[10px] font-medium text-charcoal-soft uppercase tracking-wide mb-2 px-1">
+          🎯 손님이 왔어요 — 바로 응대
+        </h2>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <Link
+            href="/guide/trade-finance/desk"
+            className="bg-primary text-white rounded-xl p-4 hover:bg-primary-dark transition group shadow-sm"
+          >
+            <p className="font-bold text-base group-hover:underline mb-1">
+              🎯 무역금융 영업점 도우미
+            </p>
+            <p className="text-xs text-white/90 leading-relaxed">
+              수입·수출 → 시나리오 → 가져왔어야 할 서류·점검 항목·처리 절차·응대 멘트까지 클릭으로 좁혀가는 응대 가이드. <strong>창구 첫 진입 추천.</strong>
+            </p>
+          </Link>
+          <Link
+            href="/guide/trade-finance/cases"
+            className="bg-white border-2 border-primary rounded-xl p-4 hover:bg-primary/5 transition group"
+          >
+            <p className="font-bold text-base text-primary group-hover:underline mb-1">
+              📋 상황별 가이드 (표)
+            </p>
+            <p className="text-xs text-charcoal-soft leading-relaxed">
+              17개 시나리오 표·검색·필터. 상황을 알고 계시면 빠르게 찾으세요 — 개설·조건변경·서류 도착·L/G·매입·추심·부도 등.
+            </p>
+          </Link>
+        </div>
+      </section>
+
       {/* 시작 — 외국환거래약정서 */}
       <section className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-4">
         <h2 className="font-bold mb-2 text-sm">
