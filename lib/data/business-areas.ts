@@ -26,7 +26,7 @@ export const BUSINESS_AREAS: BusinessAreaInfo[] = [
     subtitle: "한국 → 해외",
     icon: "📤",
     description:
-      "당발송금 도우미(시뮬레이터)·사유별 가이드·거래코드·신청서 안내까지 한 진입판에서.",
+      "당발송금 도우미(시뮬레이터)·사유별 가이드·거래코드·신청서 안내까지 한 곳에서.",
     href: "/guide/send",
   },
   {

@@ -91,7 +91,7 @@ export default function QnaPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="max-w-[clamp(840px,92vw,1280px)] mx-auto px-6 py-12">
       <header className="mb-6">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
           익명 Q&amp;A

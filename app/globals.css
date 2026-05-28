@@ -14,9 +14,18 @@
     system-ui, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
 
+/*
+ * 기본 폰트 크기를 화면 너비에 비례해 자동 스케일.
+ * 사용자 피드백: "기본 배율로 봤을 때 화면이 작음, 150% 줌 정도가 적당".
+ * → 한 번에 모든 모니터에서 자연스러운 크기로 보이도록 clamp() 적용.
+ *
+ * 1rem 기준값: 1024px 화면에서 16px, 1920px에서 ~19px, 2560px에서 ~21px.
+ * (모든 rem·em 단위 텍스트·패딩·갭이 동일 비율로 커짐 — 한 번 설정으로 전역 반영)
+ */
 html {
   background: var(--color-offwhite);
   color: var(--color-charcoal);
+  font-size: clamp(15px, 0.85vw + 8px, 21px);
 }
 
 body {

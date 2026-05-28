@@ -9,7 +9,7 @@ import { AdminNote } from "@/components/admin/AdminNote";
 
 export default function GlnPage() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-8">
+    <div className="max-w-[clamp(960px,92vw,1440px)] mx-auto px-6 py-8">
       <nav className="text-xs text-charcoal-soft mb-3 flex items-center gap-1">
         <Link href="/guide" className="hover:text-primary">
           가이드 홈

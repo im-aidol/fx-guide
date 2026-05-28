@@ -114,7 +114,7 @@ export default function SendCasesPage() {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="max-w-[clamp(1024px,94vw,1680px)] mx-auto px-6 py-8">
       <nav className="text-xs text-charcoal-soft mb-3 flex items-center gap-1">
         <Link href="/guide" className="hover:text-primary">
           가이드 홈
@@ -231,10 +231,10 @@ export default function SendCasesPage() {
           className="bg-white border border-border rounded-xl p-4 hover:border-primary transition group"
         >
           <p className="font-bold text-sm group-hover:text-primary transition mb-0.5">
-            📤 당발송금 진입판
+            📤 당발송금 전체보기
           </p>
           <p className="text-xs text-charcoal-soft leading-relaxed">
-            한도·필수 기재국·송금 채널(SWIFT·BARO·WU·GLN) 등 다른 화면 둘러보기
+            한도·필수 기재국·송금 채널(SWIFT·BARO·WU) 등 다른 화면 둘러보기
           </p>
         </Link>
       </div>

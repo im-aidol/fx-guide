@@ -6,7 +6,7 @@ import { AdminNote } from "@/components/admin/AdminNote";
 
 export default function ExchangeCalculatorPage() {
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="max-w-[clamp(840px,92vw,1280px)] mx-auto px-6 py-8">
       <nav className="text-xs text-charcoal-soft mb-3 flex items-center gap-1">
         <Link href="/guide" className="hover:text-primary">
           가이드 홈

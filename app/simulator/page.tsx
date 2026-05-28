@@ -4,7 +4,7 @@ import { AdminNote } from "@/components/admin/AdminNote";
 
 export default function SimulatorPage() {
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className="max-w-[clamp(1024px,94vw,1680px)] mx-auto px-6 py-12">
       <div className="mb-8">
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
           당발송금 (한국 → 해외) · 시나리오 트리 v0.1

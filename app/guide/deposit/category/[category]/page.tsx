@@ -105,7 +105,7 @@ export default function DepositCategoryPage({
   }, [products, search, searchIndex]);
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-8">
+    <div className="max-w-[clamp(960px,92vw,1440px)] mx-auto px-6 py-8">
       {/* Breadcrumb */}
       <nav className="text-xs text-charcoal-soft mb-3 flex items-center gap-1">
         <Link href="/guide" className="hover:text-primary">
@@ -213,10 +213,10 @@ export default function DepositCategoryPage({
             className="bg-white border border-border rounded-lg p-2.5 hover:border-primary transition group"
           >
             <p className="text-sm font-medium group-hover:text-primary transition">
-              ← 진입판
+              ← 외화 예금·적금
             </p>
             <p className="text-[10px] text-charcoal-soft mt-0.5">
-              외화 예금·적금 홈
+              전체 선택 화면
             </p>
           </Link>
         </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Sidebar } from "@/components/Sidebar";
+import { TopNav } from "@/components/TopNav";
 import { ModeProvider } from "@/components/Mode";
 
 export const metadata: Metadata = {
@@ -24,8 +24,8 @@ export default function RootLayout({
       </head>
       <body className="min-h-full bg-offwhite text-charcoal">
         <ModeProvider>
-          <div className="md:flex md:min-h-screen">
-            <Sidebar />
+          <div className="min-h-screen flex flex-col">
+            <TopNav />
             <main className="flex-1 min-w-0">{children}</main>
           </div>
         </ModeProvider>
