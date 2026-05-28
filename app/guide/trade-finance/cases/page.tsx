@@ -3,10 +3,13 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { AdminNote } from "@/components/admin/AdminNote";
-import {
-  TRADE_SCENARIOS,
-  type TradeScenarioCategory,
-  type TradeScenarioSubCategory,
+import { useMode } from "@/components/Mode";
+import { useEditableScenarios } from "@/lib/hooks/useEditableScenarios";
+import { ScenarioEditor } from "@/components/trade/ScenarioEditor";
+import type {
+  TradeScenario,
+  TradeScenarioCategory,
+  TradeScenarioSubCategory,
 } from "@/lib/data/trade-scenarios";
 
 // 무역금융 상황별 가이드 — 표 중심 (영업점 빠른 참조용).
@@ -31,14 +34,37 @@ const SUB_LABEL: Record<TradeScenarioSubCategory, string> = {
 type SortKey = "default" | "title" | "category";
 
 export default function TradeCasesPage() {
+  const { mode } = useMode();
+  const canEdit = mode === "hq";
+
+  const { items: scenarios, add, reset } = useEditableScenarios();
+
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] =
     useState<TradeScenarioCategory | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("default");
 
+  const [editorOpen, setEditorOpen] = useState(false);
+
+  const handleSave = (s: TradeScenario) => {
+    const exists = scenarios.some((it) => it.id === s.id);
+    const finalId = exists ? `${s.id}-${Date.now()}` : s.id;
+    add({ ...s, id: finalId });
+  };
+
+  const handleReset = () => {
+    if (
+      !confirm(
+        "모든 시나리오를 기본값(코드 상수)으로 되돌릴까요? 본점 편집 내용 전체 삭제됩니다.",
+      )
+    )
+      return;
+    reset();
+  };
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return TRADE_SCENARIOS.filter((s) => {
+    return scenarios.filter((s) => {
       if (activeCategory && s.category !== activeCategory) return false;
       if (!q) return true;
       const blob = [
@@ -57,7 +83,7 @@ export default function TradeCasesPage() {
         .toLowerCase();
       return blob.includes(q);
     });
-  }, [search, activeCategory]);
+  }, [scenarios, search, activeCategory]);
 
   const sorted = useMemo(() => {
     if (sortKey === "default") {
@@ -82,11 +108,11 @@ export default function TradeCasesPage() {
 
   const counts = useMemo(() => {
     const map: Record<string, number> = {};
-    TRADE_SCENARIOS.forEach((s) => {
+    scenarios.forEach((s) => {
       map[s.category] = (map[s.category] ?? 0) + 1;
     });
     return map;
-  }, []);
+  }, [scenarios]);
 
   return (
     <div className="max-w-[clamp(1024px,94vw,1680px)] mx-auto px-6 py-8">
@@ -102,19 +128,50 @@ export default function TradeCasesPage() {
         <span className="text-charcoal">상황별 가이드</span>
       </nav>
 
-      <header className="mb-4">
-        <p className="text-xs text-primary font-medium tracking-wide mb-1">
-          📋 무역금융 · 상황별 가이드
-        </p>
-        <h1 className="text-2xl font-bold mb-1">
-          상황별 가이드 ({TRADE_SCENARIOS.length}개)
-        </h1>
-        <p className="text-xs text-charcoal-soft">
-          영업점 빠른 참조 — 검색·카테고리 필터·정렬 가능. 행 클릭 시 가져왔어야 할 서류·점검·절차·응대 멘트 상세 페이지.
-        </p>
+      <header className="mb-4 flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <p className="text-xs text-primary font-medium tracking-wide mb-1">
+            📋 무역금융 · 상황별 가이드
+          </p>
+          <h1 className="text-2xl font-bold mb-1">
+            상황별 가이드 ({scenarios.length}개)
+          </h1>
+          <p className="text-xs text-charcoal-soft">
+            영업점 빠른 참조 — 검색·카테고리 필터·정렬 가능. 행 클릭 시 가져왔어야 할 서류·점검·절차·응대 멘트 상세 페이지.
+          </p>
+        </div>
+
+        {canEdit && (
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] uppercase tracking-wide bg-primary/15 text-primary px-1.5 py-0.5 rounded font-medium">
+              본점 편집
+            </span>
+            <button
+              onClick={() => setEditorOpen(true)}
+              className="bg-primary hover:bg-primary-dark text-white text-xs font-medium px-3 py-1.5 rounded transition"
+            >
+              ➕ 새 시나리오
+            </button>
+            <button
+              onClick={handleReset}
+              className="text-xs text-charcoal-soft hover:text-danger border border-border rounded px-2 py-1.5"
+            >
+              ↺ 기본값 복원
+            </button>
+          </div>
+        )}
       </header>
 
       <AdminNote storageKey="fx-guide:note:guide-trade-cases" />
+
+      {canEdit && (
+        <ScenarioEditor
+          scenario={null}
+          isOpen={editorOpen}
+          onClose={() => setEditorOpen(false)}
+          onSave={handleSave}
+        />
+      )}
 
       {/* 검색·필터 */}
       <div className="bg-white border border-border rounded-xl p-3 mb-4">
@@ -142,7 +199,7 @@ export default function TradeCasesPage() {
         </div>
         <div className="flex flex-wrap gap-1 mt-2">
           <Chip
-            label={`전체 ${TRADE_SCENARIOS.length}`}
+            label={`전체 ${scenarios.length}`}
             active={activeCategory === null}
             onClick={() => setActiveCategory(null)}
           />
@@ -260,7 +317,7 @@ export default function TradeCasesPage() {
             🎯 상황을 모르시면 → 무역금융 영업점 도우미
           </p>
           <p className="text-xs text-charcoal-soft leading-relaxed">
-            손님 답변 따라 클릭으로 좁혀가는 트리식 가이드. 수입/수출 → 시나리오 → 가져온 서류·점검·응대 멘트.
+            손님 답변 따라 클릭으로 좁혀가는 사이드바식 가이드. 수입/수출 → 시나리오 → 가져온 서류·점검·응대 멘트.
           </p>
         </Link>
         <Link
