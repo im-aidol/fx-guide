@@ -34,7 +34,7 @@ export default function RootLayout({
           {/* 우측 상단 고정 "최근 본 메뉴" 위젯 — xl 이상 화면에서 모든 페이지에 표시.
               뷰포트가 컨텐츠 max-w(1440px)보다 넓으면 컨텐츠 우측 가장자리에 맞춤. */}
           <div
-            className="hidden xl:block fixed top-20 z-30 w-[280px] print:hidden"
+            className="hidden xl:block fixed top-20 z-30 w-[220px] print:hidden"
             style={{
               right: "max(1rem, calc((100vw - 1440px) / 2 + 1.5rem))",
             }}
