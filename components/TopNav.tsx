@@ -94,7 +94,30 @@ const NAV: NavItem[] = [
     label: "무역금융",
     icon: "🏭",
     href: "/guide/trade-finance",
-    children: [{ href: "/guide/trade-finance", label: "무역금융 가이드" }],
+    children: [
+      { href: "/guide/trade-finance/desk", label: "🎯 영업점 도우미" },
+      { href: "/guide/trade-finance/cases", label: "📋 상황별 가이드" },
+      { href: "/guide/trade-finance/overview", label: "🌐 수출입 업무 개요" },
+      { href: "/guide/trade-finance/import-lc", label: "📥 수입 신용장" },
+      { href: "/guide/trade-finance/export-lc", label: "📤 수출 신용장" },
+      { href: "/guide/trade-finance/collection", label: "🔄 추심 (D/P·D/A)" },
+      { href: "/guide/trade-finance/tt-import", label: "💰 T/T수입금융" },
+      {
+        href: "/guide/trade-finance/lc-amendment",
+        label: "📝 신용장 조건변경",
+      },
+      { href: "/guide/trade-finance/flow-lc", label: "🗺️ 신용장 거래 흐름도" },
+      {
+        href: "/guide/trade-finance/flow-collection",
+        label: "🔁 추심 거래 흐름도",
+      },
+      { href: "/guide/trade-finance/lc-fields", label: "📑 신용장 19개 필드" },
+      {
+        href: "/guide/trade-finance/document-guide",
+        label: "📑 서류별 ISBP 가이드",
+      },
+      { href: "/guide/trade-finance/lc-checker", label: "🔍 신용장 하자 점검" },
+    ],
   },
   {
     type: "group",
