@@ -29,7 +29,7 @@ export function HomeRatePanel() {
   return (
     <section className="bg-white border border-border rounded-xl p-5 mt-8">
       <div className="flex items-baseline justify-between mb-3 gap-2">
-        <h2 className="font-semibold">참고 환율 (주요 통화)</h2>
+        <h2 className="font-semibold">💱 참고 환율 (주요 통화)</h2>
         <button
           type="button"
           onClick={load}
@@ -55,7 +55,7 @@ export function HomeRatePanel() {
           />
           <RateCard
             flag="🇯🇵"
-            label="JPY (100엔)"
+            label="JPY"
             unit="100 JPY"
             krw={(rates.rates.krw / rates.rates.jpy) * 100}
           />
@@ -76,7 +76,7 @@ export function HomeRatePanel() {
 
       <p className="text-[10px] text-charcoal-soft mt-3">
         {rates ? `${rates.date} 기준 · fawazahmed0/exchange-api` : "출처: fawazahmed0/exchange-api"}
-        {" · "}⚠️ 참고용, 실제 거래는 iM뱅크 매매기준율 적용
+        {" · "}⚠️ 해당 환율은 참고용으로, 실제 환율과 차이가 있을 수 있어요
       </p>
     </section>
   );
