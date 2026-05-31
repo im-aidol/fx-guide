@@ -19,7 +19,6 @@ export type RecentItem = {
 const PATH_LABELS: Record<string, { label: string; icon: string }> = {
   // 도구
   "/simulator": { label: "당발송금 도우미", icon: "🎯" },
-  "/incoming": { label: "타발 송금 안내서", icon: "📥" },
   "/samples": { label: "통화 견본", icon: "💴" },
 
   // 당발송금
@@ -30,7 +29,11 @@ const PATH_LABELS: Record<string, { label: string; icon: string }> = {
   "/guide/send/channels/wu": { label: "WU 송금 3종", icon: "⚡" },
 
   // 타발
-  "/guide/receive": { label: "타발 가이드", icon: "📥" },
+  "/guide/receive": { label: "타발 송금 진입판", icon: "📥" },
+  "/guide/receive/swift": { label: "iM뱅크 수취 정보 (SWIFT)", icon: "🏦" },
+  "/guide/receive/thresholds": { label: "수취 임계값", icon: "📏" },
+  "/guide/receive/wu": { label: "WU 수령", icon: "⚡" },
+  "/guide/receive/print-card": { label: "인쇄용 고객 안내서", icon: "🖨️" },
 
   // 환전
   "/guide/exchange": { label: "환전 가이드", icon: "💱" },
