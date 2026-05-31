@@ -120,7 +120,49 @@ const QUICK_QUESTIONS: QuickQuestion[] = [
   },
 ];
 
-// ─── 카테고리 (모두 4글자 명사구로 통일) ───
+// ─── 필터 그룹 (메인 카드 4개에 맞춤) ───
+const FILTER_GROUPS: Array<{
+  key: string;
+  label: string;
+  icon: string;
+  match: (product: DepositProduct) => boolean;
+}> = [
+  {
+    key: "입출금",
+    label: "입출금",
+    icon: "🌐",
+    match: (product) => product.id === "global-comprehensive",
+  },
+  {
+    key: "외화예금",
+    label: "외화예금",
+    icon: "🏛️",
+    match: (product) =>
+      ["fc-time-deposit", "fc-rolling-compound", "fc-notice", "foryou", "plusyou"].includes(product.id),
+  },
+  {
+    key: "외화적금",
+    label: "외화적금",
+    icon: "💰",
+    match: (product) => ["im-free", "idream-free"].includes(product.id),
+  },
+];
+
+const DISPLAYABLE_PRODUCT_IDS = new Set([
+  "global-comprehensive",
+  "fc-time-deposit",
+  "fc-rolling-compound",
+  "fc-notice",
+  "foryou",
+  "plusyou",
+  "im-free",
+  "idream-free",
+]);
+
+const DISPLAYABLE_PRODUCTS = DEPOSIT_PRODUCTS.filter((product) =>
+  DISPLAYABLE_PRODUCT_IDS.has(product.id),
+);
+
 const CATEGORY_ORDER: Array<{ key: string; label: string; icon: string }> = [
   { key: "통합통장", label: "통합통장", icon: "🌐" },
   { key: "수시입출", label: "수시입출", icon: "💵" },
@@ -132,6 +174,17 @@ const CATEGORY_ORDER: Array<{ key: string; label: string; icon: string }> = [
 const CATEGORY_RANK: Record<string, number> = Object.fromEntries(
   CATEGORY_ORDER.map((c, i) => [c.key, i]),
 );
+
+const DISPLAY_ORDER = [
+  "global-comprehensive",
+  "foryou",
+  "plusyou",
+  "fc-time-deposit",
+  "fc-rolling-compound",
+  "fc-notice",
+  "im-free",
+  "idream-free",
+];
 
 // ─── 정렬 키 ───
 type SortKey =
@@ -149,7 +202,7 @@ export default function DepositGuidePage() {
 
   // 검색 인덱스
   const searchIndex = useMemo(() => {
-    return DEPOSIT_PRODUCTS.map((p) => ({
+    return DISPLAYABLE_PRODUCTS.map((p) => ({
       id: p.id,
       blob: [
         p.title,
@@ -193,9 +246,12 @@ export default function DepositGuidePage() {
 
   const filteredProducts = useMemo(() => {
     const q = search.trim().toLowerCase();
-    let result = DEPOSIT_PRODUCTS;
+    let result = DISPLAYABLE_PRODUCTS;
     if (activeCategory) {
-      result = result.filter((p) => p.category === activeCategory);
+      const activeGroup = FILTER_GROUPS.find((group) => group.key === activeCategory);
+      if (activeGroup) {
+        result = result.filter((p) => activeGroup.match(p));
+      }
     }
     if (q) {
       const matchIds = new Set(
@@ -208,10 +264,15 @@ export default function DepositGuidePage() {
 
   const sortedProducts = useMemo(() => {
     if (sortKey === "default") {
-      // 기본: 카테고리 순 → 글로벌통장 우선
+      // 기본: 지정 순서 → 카테고리 순 폴백
       return [...filteredProducts].sort((a, b) => {
-        if (a.id === "global-comprehensive") return -1;
-        if (b.id === "global-comprehensive") return 1;
+        const aOrder = DISPLAY_ORDER.indexOf(a.id);
+        const bOrder = DISPLAY_ORDER.indexOf(b.id);
+        if (aOrder !== -1 || bOrder !== -1) {
+          if (aOrder === -1) return 1;
+          if (bOrder === -1) return -1;
+          return aOrder - bOrder;
+        }
         const ca = CATEGORY_RANK[a.category] ?? 99;
         const cb = CATEGORY_RANK[b.category] ?? 99;
         if (ca !== cb) return ca - cb;
@@ -262,9 +323,6 @@ export default function DepositGuidePage() {
           🔍 외화 예금·적금 / 전체 검색
         </p>
         <h1 className="text-2xl font-bold mb-1">전체 상품 비교·검색</h1>
-        <p className="text-xs text-charcoal-soft">
-          {DEPOSIT_PRODUCTS.length}개 상품 통합 검색·자주 묻는 질문·정렬 가능한 표
-        </p>
       </header>
 
       <AdminNote storageKey="fx-guide:note:guide-deposit-all" />
@@ -276,7 +334,7 @@ export default function DepositGuidePage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="검색 — 중도해지 / 9통화 / 비대면 / 법인 / 미성년 / 복리 / 36개월 / 자동이체 ..."
+            placeholder="통화, 금액..."
             className="w-full pl-9 pr-9 py-2.5 border border-border rounded-lg focus:outline-none focus:border-primary text-sm"
             autoFocus
           />
@@ -295,21 +353,19 @@ export default function DepositGuidePage() {
         </div>
         <div className="flex flex-wrap gap-1 mt-2">
           <Chip
-            label={`전체 ${DEPOSIT_PRODUCTS.length}`}
+            label={`전체 ${DISPLAYABLE_PRODUCTS.length}`}
             active={activeCategory === null}
             onClick={() => setActiveCategory(null)}
           />
-          {CATEGORY_ORDER.map((c) => {
-            const count = DEPOSIT_PRODUCTS.filter(
-              (p) => p.category === c.key,
-            ).length;
+          {FILTER_GROUPS.map((group) => {
+            const count = DISPLAYABLE_PRODUCTS.filter((p) => group.match(p)).length;
             return (
               <Chip
-                key={c.key}
-                label={`${c.icon} ${c.label} ${count}`}
-                active={activeCategory === c.key}
+                key={group.key}
+                label={`${group.icon} ${group.label} ${count}`}
+                active={activeCategory === group.key}
                 onClick={() =>
-                  setActiveCategory(activeCategory === c.key ? null : c.key)
+                  setActiveCategory(activeCategory === group.key ? null : group.key)
                 }
               />
             );
@@ -446,96 +502,85 @@ function DepositTable({ products }: { products: DepositProduct[] }) {
   return (
     <div className="overflow-x-auto bg-white border border-border rounded-xl">
       <table className="w-full text-xs">
-        <thead className="bg-offwhite text-charcoal-soft">
+        <thead className="bg-primary text-white">
           <tr className="border-b border-border">
-            <Th className="sticky left-0 bg-offwhite z-10 min-w-44">상품</Th>
-            <Th className="w-20">구분</Th>
+            <Th className="sticky left-0 bg-primary z-10 min-w-44">상품</Th>
+            <Th className="w-16">구분</Th>
             <Th>기간</Th>
             <Th>통화</Th>
-            <Th>최소가입</Th>
+            <Th className="w-24 whitespace-nowrap">최소가입</Th>
             <Th>추가입금</Th>
             <Th>일부해지</Th>
-            <Th className="w-16">비대면</Th>
-            <Th>핵심</Th>
-            <Th className="sticky right-0 bg-offwhite z-10 w-20 text-right">
-              상세
-            </Th>
+            <Th className="w-24 whitespace-nowrap">자동재예치</Th>
+            <Th className="w-20 whitespace-nowrap">비대면</Th>
+            <Th className="sticky right-0 bg-primary z-10 w-14"></Th>
           </tr>
         </thead>
         <tbody className="text-charcoal">
           {products.map((p, i) => {
             const isGlobal = p.id === "global-comprehensive";
-            const rowBg = isGlobal
-              ? "bg-primary/5"
-              : i % 2 === 1
-                ? "bg-offwhite/50"
-                : "bg-white";
+            const rowBg = i % 2 === 1 ? "bg-offwhite/50" : "bg-white";
             return (
               <tr
                 key={p.id}
                 className={[
-                  "border-b border-border last:border-0 align-top hover:bg-primary/5 transition",
+                  "border-b border-border last:border-0 align-middle hover:bg-primary/5 transition",
                   rowBg,
                 ].join(" ")}
               >
-                <td
-                  className={[
-                    "py-2 px-3 sticky left-0 z-10",
-                    isGlobal ? "bg-primary/5" : i % 2 === 1 ? "bg-offwhite/50" : "bg-white",
-                  ].join(" ")}
-                >
+                <td className="py-2 px-3 sticky left-0 z-10 bg-primary/5">
                   <Link
                     href={`/guide/deposit/${p.id}`}
                     className="block leading-tight hover:text-primary group"
                   >
                     <span className="font-semibold text-sm">
-                      {isGlobal && <span className="text-primary">⭐ </span>}
-                      {p.shortTitle}
+                      {productMainLabel(p)}
                     </span>
-                    <span className="block text-[10px] text-charcoal-soft mt-0.5">
-                      {p.title}
-                    </span>
+                    {productSubLabel(p) && (
+                      <span className="block text-[10px] text-charcoal-soft mt-0.5">
+                        {productSubLabel(p)}
+                      </span>
+                    )}
                   </Link>
                 </td>
-                <td className="py-2 px-3 text-charcoal-soft whitespace-nowrap">
-                  {p.category}
+                <td className="py-2 px-3 text-center whitespace-nowrap">
+                  <span className="inline-block px-2 py-0.5 rounded-full bg-charcoal/10 text-charcoal-soft text-[10px] font-medium">
+                    {categoryDisplay(p)}
+                  </span>
                 </td>
-                <td className="py-2 px-3 leading-tight">{p.period ?? "—"}</td>
-                <td className="py-2 px-3 leading-tight">
-                  {summarizeCurrencies(p.currencies)}
+                <td className="py-2 px-3 text-center leading-tight">
+                  {periodDisplay(p)}
                 </td>
-                <td className="py-2 px-3 leading-tight">
-                  {summarize(p.initialDeposit) || "—"}
+                <td className="py-2 px-3 text-center leading-tight">
+                  {renderCurrencies(p)}
                 </td>
-                <td className="py-2 px-3 leading-tight">
-                  {summarize(p.additionalDeposit) ||
-                    inferAdditional(p) ||
-                    "—"}
+                <td className="py-2 px-3 text-center leading-tight whitespace-nowrap">
+                  {minDepositDisplay(p)}
                 </td>
-                <td className="py-2 px-3 leading-tight">
-                  {summarize(p.partialWithdraw) || inferPartial(p) || "—"}
+                <td className="py-2 px-3 text-center leading-tight">
+                  {simplifyDeposit(p.additionalDeposit, inferAdditional(p))}
                 </td>
-                <td className="py-2 px-3">
-                  {channelOnline(p.channels) ? (
-                    <span className="text-primary text-base">✓</span>
-                  ) : (
-                    <span className="text-charcoal-soft">—</span>
-                  )}
+                <td className="py-2 px-3 text-center leading-tight">
+                  {simplifyDeposit(p.partialWithdraw, inferPartial(p))}
                 </td>
-                <td className="py-2 px-3 leading-tight font-medium text-charcoal">
-                  {coreHighlight(p)}
+                <td className="py-2 px-3 text-center leading-tight">
+                  {autoRenewMark(p)}
+                </td>
+                <td className="py-2 px-3 text-center leading-tight">
+                  {channelOnline(p.channels) ? "O" : "X"}
                 </td>
                 <td
                   className={[
-                    "py-2 px-3 sticky right-0 z-10 text-right",
-                    isGlobal ? "bg-primary/5" : i % 2 === 1 ? "bg-offwhite/50" : "bg-white",
+                    "py-2 px-3 sticky right-0 z-10 text-center",
+                    i % 2 === 1 ? "bg-offwhite/50" : "bg-white",
                   ].join(" ")}
                 >
                   <Link
                     href={`/guide/deposit/${p.id}`}
-                    className="text-primary hover:text-primary-dark font-medium whitespace-nowrap"
+                    className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-lg leading-none font-bold hover:bg-primary hover:text-white hover:scale-110 active:scale-95 transition shadow-sm"
+                    aria-label={`${p.title} 상세보기`}
                   >
-                    보기 →
+                    ›
                   </Link>
                 </td>
               </tr>
@@ -551,13 +596,13 @@ function Th({
   children,
   className,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
 }) {
   return (
     <th
       className={[
-        "text-left py-2 px-3 uppercase tracking-wide text-[10px] font-medium",
+        "text-center py-2 px-3 uppercase tracking-wide text-xs font-semibold",
         className ?? "",
       ].join(" ")}
     >
@@ -580,6 +625,32 @@ function summarizeCurrencies(s?: string): string {
   return summarize(s);
 }
 
+const CURRENCY_LIST_9 = "(USD, JPY, EUR, GBP, CAD, AUD, CHF, NZD, CNY)";
+const CURRENCY_LIST_8 = "(USD, JPY, EUR, GBP, CAD, AUD, CHF, NZD)";
+const CURRENCY_LIST_3 = "(USD, JPY, EUR)";
+
+function renderCurrencies(p: DepositProduct): React.ReactNode {
+  const detail: { count: string; list: string } | null =
+    p.id === "global-comprehensive"
+      ? { count: "9종", list: CURRENCY_LIST_9 }
+      : p.id === "foryou" || p.id === "plusyou"
+        ? { count: "8종", list: CURRENCY_LIST_8 }
+        : p.id === "im-free" || p.id === "idream-free"
+          ? { count: "3종", list: CURRENCY_LIST_3 }
+          : null;
+  if (detail) {
+    return (
+      <>
+        {detail.count}
+        <span className="block text-[10px] text-charcoal-soft mt-0.5">
+          {detail.list}
+        </span>
+      </>
+    );
+  }
+  return summarizeCurrencies(p.currencies);
+}
+
 function channelOnline(channels?: string): boolean {
   if (!channels) return false;
   return /인터넷|모바일|비대면|앱뱅킹/.test(channels);
@@ -592,38 +663,92 @@ function inferAdditional(p: DepositProduct): string {
 
 function inferPartial(p: DepositProduct): string {
   if (p.category === "수시입출") return "자유";
-  if (p.category === "기간예치") return "불가";
+  if (p.category === "기간예치") return "X";
   return "";
 }
 
-function coreHighlight(p: DepositProduct): string {
+function simplifyDeposit(value: string | undefined, fallback: string): string {
+  if (value) {
+    if (/불가/.test(value)) return "X";
+    return summarize(value);
+  }
+  return fallback || "—";
+}
+
+function productMainLabel(p: DepositProduct): string {
+  if (p.id === "global-comprehensive") return p.title;
+  if (p.id === "foryou") return "For-You";
+  if (p.id === "fc-time-deposit") return "외화정기예금";
+  if (p.id === "fc-rolling-compound") return "외화회전복리예금";
+  if (p.id === "fc-notice") return "외화통지예금";
+  if (p.id === "im-free") return "iM 외화자유적금";
+  if (p.id === "idream-free") return "IDREAM 외화자유적금";
+  return p.shortTitle;
+}
+
+function productSubLabel(p: DepositProduct): string {
+  if (p.id === "global-comprehensive") return "외화보통예금";
+  if (p.id === "foryou") return "자유적립 외화예금";
+  if (p.id === "fc-time-deposit") return "";
+  if (p.id === "fc-rolling-compound") return "";
+  if (p.id === "fc-notice") return "";
+  if (p.id === "im-free") return "";
+  if (p.id === "idream-free") return "";
+  return p.title;
+}
+
+function minDepositDisplay(p: DepositProduct): string {
+  if (p.id === "global-comprehensive") return "없음";
+  if (!p.initialDeposit) return "—";
+  const match = p.initialDeposit.match(/USD\s+[\d,]+(?:만)?/);
+  return match ? `${match[0]}~` : summarize(p.initialDeposit);
+}
+
+function periodDisplay(p: DepositProduct): React.ReactNode {
+  const withUnit = (main: string, unit: string) => (
+    <>
+      <span className="whitespace-nowrap">{main}</span>
+      <span className="block text-[10px] text-charcoal-soft mt-0.5 whitespace-nowrap">
+        {unit}
+      </span>
+    </>
+  );
+  if (p.id === "global-comprehensive") return "제한 없음";
+  if (p.id === "foryou") return withUnit("1~12개월", "(월/일단위)");
+  if (p.id === "plusyou") return withUnit("1~36개월", "(월/일단위)");
+  if (p.id === "fc-time-deposit") return <span className="whitespace-nowrap">7일~12개월</span>;
+  if (p.id === "fc-rolling-compound") return withUnit("1년~3년", "(연단위)");
+  if (p.id === "fc-notice") return <span className="whitespace-nowrap">7일이상</span>;
+  if (p.id === "im-free" || p.id === "idream-free") return withUnit("12개월", "(고정)");
+  return <span className="whitespace-nowrap">{p.period ?? "—"}</span>;
+}
+
+function categoryDisplay(p: DepositProduct): string {
+  if (p.id === "global-comprehensive") return "보통";
+  if (p.id === "im-free" || p.id === "idream-free") return "적금";
+  return "예금";
+}
+
+function autoRenewMark(p: DepositProduct): string {
   switch (p.id) {
-    case "global-comprehensive":
-      return "수수료 우대";
-    case "fc-ordinary":
-      return "기본 외화통장";
-    case "fc-checking":
-      return "무이자·당좌약정";
-    case "fc-mmda":
-      return "잔액 차등금리";
-    case "fc-notice":
-      return "7일 갱신";
-    case "fc-time-deposit":
-      return "표준 정기예금";
-    case "fc-rolling-compound":
-      return "복리";
     case "foryou":
-      return "기본 자유적립";
+      return "X";
     case "plusyou":
-      return "장기 우대+수수료";
+      return "O";
+    case "fc-time-deposit":
+      return "O";
+    case "fc-rolling-compound":
+      return "X";
+    case "fc-notice":
+      return "X";
     case "im-free":
-      return "비대면·최대 +0.50%";
+      return "O";
     case "idream-free":
-      return "미성년·외화 첫 +0.30%";
-    case "auto-transfer":
-      return "적립 우대 트리거";
+      return "O";
+    case "global-comprehensive":
+      return "—";
     default:
-      return "";
+      return "—";
   }
 }
 
