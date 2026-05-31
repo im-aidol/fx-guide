@@ -3,7 +3,7 @@ import Link from "next/link";
 const ITEMS = [
   { href: "/", label: "홈" },
   { href: "/simulator", label: "송금 흐름 도우미" },
-  { href: "/incoming", label: "타발 송금 안내" },
+  { href: "/guide/receive", label: "타발 송금" },
   { href: "/guide", label: "업무별 가이드" },
   { href: "/faq", label: "FAQ" },
   { href: "/glossary", label: "용어사전" },

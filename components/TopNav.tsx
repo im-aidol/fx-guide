@@ -49,8 +49,10 @@ const NAV: NavItem[] = [
     icon: "📥",
     href: "/guide/receive",
     children: [
-      { href: "/guide/receive", label: "타발 가이드" },
-      { href: "/incoming", label: "타발 송금 안내서" },
+      { href: "/guide/receive/swift", label: "🏦 iM뱅크 수취 정보 (SWIFT)" },
+      { href: "/guide/receive/thresholds", label: "📏 수취 임계값" },
+      { href: "/guide/receive/wu", label: "⚡ WU 수령" },
+      { href: "/guide/receive/print-card", label: "🖨️ 인쇄용 고객 안내서" },
     ],
   },
   {

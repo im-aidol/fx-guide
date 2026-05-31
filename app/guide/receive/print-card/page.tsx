@@ -1,16 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { AdminNote } from "@/components/admin/AdminNote";
 
-// iM뱅크 타발 송금 수취 정보 (출처: imbank.co.kr 공식 안내)
+// 인쇄용 고객 안내서 — 해외 송금자에게 전달.
+// 기존 /incoming 페이지 이전 (구조 일관성 회복).
+
 const BANK_INFO = {
   name: "iM Bank (FORMERLY DAEGU BANK)",
   swift: "DAEBKR22",
   address: "2310, DALGUBEOL-DAERO, SUSEONG-GU, DAEGU, SOUTH KOREA",
 };
 
-export default function IncomingPage() {
+export default function ReceivePrintCardPage() {
   const [name, setName] = useState("");
   const [account, setAccount] = useState("");
   const [address, setAddress] = useState("");
@@ -22,12 +25,24 @@ export default function IncomingPage() {
   };
 
   return (
-    <div className="max-w-[clamp(720px,92vw,1024px)] mx-auto px-6 py-12 print:py-4 print:max-w-full">
+    <div className="max-w-[clamp(720px,92vw,1024px)] mx-auto px-6 py-8 print:py-4 print:max-w-full">
+      <nav className="text-xs text-charcoal-soft mb-3 flex items-center gap-1 print:hidden">
+        <Link href="/guide" className="hover:text-primary">
+          가이드 홈
+        </Link>
+        <span>›</span>
+        <Link href="/guide/receive" className="hover:text-primary">
+          타발 송금
+        </Link>
+        <span>›</span>
+        <span className="text-charcoal">인쇄용 고객 안내서</span>
+      </nav>
+
       <header className="mb-6 print:mb-4">
         <p className="text-xs text-primary font-medium tracking-wide mb-1 print:hidden">
-          타발 송금 (해외 → 한국)
+          🖨️ 타발 송금 · 인쇄용
         </p>
-        <h1 className="text-3xl font-bold mb-2 print:text-2xl">
+        <h1 className="text-2xl font-bold mb-1 print:text-2xl">
           타발 송금 안내서
         </h1>
         <p className="text-sm text-charcoal-soft print:hidden">
@@ -36,7 +51,7 @@ export default function IncomingPage() {
       </header>
 
       <div className="print:hidden">
-        <AdminNote storageKey="fx-guide:note:incoming" />
+        <AdminNote storageKey="fx-guide:note:guide-receive-print-card" />
       </div>
 
       <section className="bg-white border border-border rounded-xl p-6 mb-4 print:rounded-md print:border-charcoal print:p-4 print:mb-3">
@@ -107,6 +122,12 @@ export default function IncomingPage() {
         >
           입력 비우기
         </button>
+        <Link
+          href="/guide/receive"
+          className="ml-auto border border-border px-3 py-2.5 rounded-lg text-charcoal-soft hover:text-primary transition text-sm"
+        >
+          ← 타발 송금 진입판
+        </Link>
       </div>
     </div>
   );

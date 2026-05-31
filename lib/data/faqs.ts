@@ -11,7 +11,7 @@ export const FAQS: Faq[] = [
     category: "타발 송금",
     question: "iM뱅크 SWIFT/BIC 코드와 영문 은행명·주소가 뭔가요?",
     answer:
-      "**SWIFT/BIC**: DAEBKR22\n**Bank Name**: iM Bank (FORMERLY DAEGU BANK)\n**Bank Address**: 2310, DALGUBEOL-DAERO, SUSEONG-GU, DAEGU, SOUTH KOREA\n\n해외에서 한국으로 송금받을 때 송금자에게 알려주는 정보입니다. /incoming 페이지에서 수취인 정보 입력 후 인쇄해 드릴 수 있습니다.",
+      "**SWIFT/BIC**: DAEBKR22\n**Bank Name**: iM Bank (FORMERLY DAEGU BANK)\n**Bank Address**: 2310, DALGUBEOL-DAERO, SUSEONG-GU, DAEGU, SOUTH KOREA\n\n해외에서 한국으로 송금받을 때 송금자에게 알려주는 정보입니다. /guide/receive/print-card 페이지에서 수취인 정보 입력 후 인쇄해 드릴 수 있습니다.",
     source: "iM뱅크 공식 안내 (imbank.co.kr)",
     keywords: ["SWIFT", "BIC", "DAEBKR22", "타발", "수취", "받기"],
   },
