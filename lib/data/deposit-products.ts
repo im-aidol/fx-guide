@@ -608,7 +608,8 @@ export const DEPOSIT_PRODUCTS: DepositProduct[] = [
     shortTitle: "For You",
     category: "자유적립",
     description: "기본형 외화 자유적립 예금. 1~12개월 단기.",
-    period: "1개월 이상 12개월 이내",
+    period: "1개월~12개월 (일단위 또는 월단위)",
+    currencies: "8종 (USD/JPY/EUR/CAD/GBP/AUD/CHF/NZD)",
     initialDeposit: "USD 100 상당액 이상",
     additionalDeposit:
       "건당 USD 100 상당액 또는 원화 100,000원 이상 / 건당 최고 USD 100만 이하 / 만기일 전날까지 자유 입금",

@@ -45,7 +45,7 @@ export function HomeRatePanel() {
   return (
     <section className="bg-white border border-border rounded-xl p-5 mt-8">
       <div className="flex items-baseline justify-between mb-3 gap-2">
-        <h2 className="font-semibold">참고 환율 (주요 통화)</h2>
+        <h2 className="font-semibold">💱 참고 환율 (주요 통화)</h2>
         <button
           type="button"
           onClick={load}
@@ -79,7 +79,7 @@ export function HomeRatePanel() {
           />
           <RateCard
             flag="🇯🇵"
-            label="JPY (100엔)"
+            label="JPY"
             unit="100 JPY"
             krw={rates.jpy * 100}
             onClick={() =>
@@ -126,6 +126,7 @@ export function HomeRatePanel() {
       <p className="text-[10px] text-charcoal-soft mt-3">
         {rates ? `${rates.date} 기준 · ECB (Frankfurter API)` : "출처: ECB (Frankfurter API)"}
         {" · "}카드 클릭 → 30일 추세 보기
+        {" · "}⚠️ 해당 환율은 참고용으로, 실제 환율과 차이가 있을 수 있어요
       </p>
       <p className="text-[10px] text-charcoal-soft mt-1">
         ⚠️ ECB가 한국 시각 23시경에 환율을 고시해 영업시간에는 전 영업일 환율이 최신으로 표시돼요. 참고용이라 실제 거래는 iM뱅크 매매기준율을 적용해요.

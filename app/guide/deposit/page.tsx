@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { DEPOSIT_PRODUCTS } from "@/lib/data/deposit-products";
 import { AdminNote } from "@/components/admin/AdminNote";
 
 // /guide/deposit 진입판 — /guide의 6개 업무 선택과 동일한 패턴.
@@ -15,62 +14,60 @@ type HubCard = {
   title: string;
   badge?: string;
   description: string;
-  highlight?: boolean;
+  variant?: "product" | "tool";
 };
 
-// 진입 카드 6개. 카테고리 4종은 모두 4글자 명사구로 통일된 라벨.
+const CARD_LINK_CLASS =
+  "h-full flex flex-col rounded-xl p-5 hover:translate-y-[-1px] transition group border";
+const CARD_BADGE_CLASS =
+  "text-[10px] px-1.5 py-0.5 rounded-full border whitespace-nowrap";
+const CARD_TITLE_CLASS = "font-bold text-lg leading-tight transition";
+
+const CARD_VARIANTS = {
+  product: {
+    link: "bg-white border-border hover:border-primary",
+    title: "text-charcoal",
+    badge: "text-charcoal-soft border-border bg-offwhite",
+  },
+  tool: {
+    link: "bg-primary/5 border-primary/30 hover:border-primary shadow-[0_0_0_1px_rgba(62,178,134,0.12)]",
+    title: "text-primary",
+    badge: "text-primary border-primary/30 bg-white",
+  },
+} as const;
+
+// 진입 카드 4개. 원하는 순서대로 정렬.
 const CARDS: HubCard[] = [
   {
     id: "global",
     href: "/guide/deposit/global-comprehensive",
     icon: "🌐",
     title: "글로벌외화종합통장",
-    badge: "⭐ 첫 가입 추천",
-    description:
-      "보통+정기+통지+회전복리 한 통장. 정기·통지 5만불 이상 신규 시 송금·현찰 50%·TC 30% 우대.",
-    highlight: true,
-  },
-  {
-    id: "demand",
-    href: "/guide/deposit/category/demand",
-    icon: "💵",
-    title: "수시입출",
-    badge: "3종",
-    description: "보통·당좌·MMDA — 입출금이 자유로운 외화 통장",
+    description: "다양한 통화를 한 통장으로 이용 가능한 외화 입출금통장",
   },
   {
     id: "term",
     href: "/guide/deposit/category/term",
     icon: "🏛️",
-    title: "기간예치",
-    badge: "3종",
-    description: "통지·정기·회전복리 — 기간을 정해 예치하고 만기에 이자 수령",
+    title: "외화예금",
+    badge: "5종",
+    description: "For-You 자유적립, Plus-You 자유적립, 정기예금, 회전복리, 통지예금",
   },
   {
     id: "savings",
     href: "/guide/deposit/category/savings",
     icon: "💰",
-    title: "자유적립",
-    badge: "4종",
-    description:
-      "For You·Plus-You·iM·IDREAM — 매월 자유 적립, 우대금리 조건 다양",
-  },
-  {
-    id: "transfer",
-    href: "/guide/deposit/auto-transfer",
-    icon: "🔁",
-    title: "자동이체",
-    badge: "도구",
-    description:
-      "적립 우대 트리거 — Plus-You 환율 50%, iM 자동 8회 +0.30%p, IDREAM 6회 우대",
+    title: "외화적금",
+    badge: "2종",
+    description: "IDREAM외화자유적금, iM외화자유적금",
   },
   {
     id: "simulator",
     href: "/guide/deposit/simulator",
     icon: "🧮",
-    title: "이자 시뮬레이터",
-    badge: "도구",
-    description: "통화·기간·금액·금리 입력 → 만기 이자·원리금 미리 계산",
+    title: "이자 계산기",
+    description: "만기 이자·원리금 미리 계산",
+    variant: "tool",
   },
 ];
 
@@ -90,72 +87,46 @@ export default function DepositHubPage() {
         <h1 className="text-3xl font-bold mb-2">
           어떤 상품을 보시겠어요?
         </h1>
-        <p className="text-sm text-charcoal-soft">
-          {DEPOSIT_PRODUCTS.length}개 상품 — 카테고리·단일 상품·도구 중 선택해
-          들어갑니다.
-        </p>
       </header>
 
       <AdminNote storageKey="fx-guide:note:guide-deposit-hub" />
 
       {/* 진입 카드 그리드 */}
-      <section className="grid md:grid-cols-2 gap-4 mb-6">
-        {CARDS.map((c) => (
-          <Link
-            key={c.id}
-            href={c.href}
-            className={[
-              "rounded-xl p-5 hover:translate-y-[-1px] transition group border",
-              c.highlight
-                ? "bg-primary/5 border-primary/30 hover:border-primary"
-                : "bg-white border-border hover:border-primary",
-            ].join(" ")}
-          >
-            <div className="flex items-start gap-3 mb-2">
-              <span className="text-3xl leading-none">{c.icon}</span>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <h2
-                    className={[
-                      "font-bold text-lg leading-tight",
-                      c.highlight
-                        ? "text-primary"
-                        : "group-hover:text-primary transition",
-                    ].join(" ")}
-                  >
-                    {c.title}
-                  </h2>
-                  {c.badge && (
-                    <span
-                      className={[
-                        "text-[10px] px-1.5 py-0.5 rounded-full border whitespace-nowrap",
-                        c.highlight
-                          ? "text-primary border-primary/30 bg-white"
-                          : "text-charcoal-soft border-border bg-offwhite",
-                      ].join(" ")}
-                    >
-                      {c.badge}
-                    </span>
-                  )}
+      <section className="grid md:grid-cols-2 md:auto-rows-fr gap-4 mb-6">
+        {CARDS.map((c) => {
+          const variant = CARD_VARIANTS[c.variant ?? "product"];
+
+          return (
+            <Link
+              key={c.id}
+              href={c.href}
+              className={`${CARD_LINK_CLASS} ${variant.link}`}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl leading-none">{c.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h2 className={`${CARD_TITLE_CLASS} ${variant.title}`}>{c.title}</h2>
+                    {c.badge && (
+                      <span className={`${CARD_BADGE_CLASS} ${variant.badge}`}>
+                        {c.badge}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-            <p className="text-sm text-charcoal-soft leading-relaxed">
-              {c.description}
-            </p>
-            <span
-              className={[
-                "text-sm font-medium mt-3 inline-block group-hover:translate-x-1 transition",
-                c.highlight ? "text-primary" : "text-primary",
-              ].join(" ")}
-            >
-              들어가기 →
-            </span>
-          </Link>
-        ))}
+              <p className="text-sm text-charcoal-soft leading-relaxed flex-1">
+                {c.description}
+              </p>
+              <span className="text-sm font-medium mt-3 inline-block text-primary group-hover:translate-x-1 transition">
+                들어가기 →
+              </span>
+            </Link>
+          );
+        })}
       </section>
 
-      {/* 보조 — 전체 검색·표 */}
+      {/* 보조 — 전체 상품 비교 */}
       <Link
         href="/guide/deposit/all"
         className="block bg-white border border-border rounded-xl p-4 hover:border-primary transition group"
@@ -165,11 +136,10 @@ export default function DepositHubPage() {
             <span className="text-2xl">🔍</span>
             <div>
               <h3 className="font-bold text-sm group-hover:text-primary transition">
-                전체 상품 한 화면 비교·검색
+                전체 상품 비교·검색
               </h3>
               <p className="text-xs text-charcoal-soft mt-0.5">
-                {DEPOSIT_PRODUCTS.length}개 상품 통합 검색 · 자주 묻는 질문 12개 ·
-                정렬 가능한 표
+                외화예금·적금 상품을 한 화면에서 비교하고 찾아보세요.
               </p>
             </div>
           </div>

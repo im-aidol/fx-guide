@@ -10,9 +10,9 @@ export default function HomePage() {
         <p className="text-xs text-primary font-medium tracking-wide mb-1">
           영업점 외환 가이드
         </p>
-        <h1 className="text-3xl font-bold mb-2">어떤 일로 오셨어요?</h1>
+        <h1 className="text-3xl font-bold mb-2">어떤 업무를 도와드릴까요?</h1>
         <p className="text-sm text-charcoal-soft">
-          창구에서 가장 먼저 분기되는 6개 업무. 클릭해서 해당 영역의 사유·상품·절차를 확인하세요.
+          가장 많이 일어나는 업무를 정리했어요! 클릭하면 상세 페이지로 들어가요.
         </p>
       </header>
 
@@ -45,20 +45,6 @@ export default function HomePage() {
           </Link>
         ))}
       </section>
-
-      <aside className="mt-8 bg-offwhite border border-border rounded-xl p-5 text-sm">
-        <p className="font-medium mb-1">💡 사유를 모르시면</p>
-        <p className="text-charcoal-soft">
-          고객 답변 들으면서 클릭해 좁혀가는{" "}
-          <Link
-            href="/simulator"
-            className="text-primary font-medium hover:underline"
-          >
-            당발송금 도우미 (시뮬레이터)
-          </Link>
-          를 이용하세요. 입구 3개(명확/서류/모호)로 시작합니다.
-        </p>
-      </aside>
 
       <HomeRatePanel />
     </div>
